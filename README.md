@@ -2,8 +2,6 @@
 
 I’m a full-stack engineer with a strong academic background in software, data, and AI engineering. I build scalable systems end-to-end, from distributed backends and infrastructure to data pipelines.
 
----
-
 ## 🛠️ Tech Stack
 
 ### 💻 **Languages**
