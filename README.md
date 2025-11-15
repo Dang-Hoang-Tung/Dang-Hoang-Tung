@@ -1,14 +1,34 @@
-# Hi 👋 I'm Tony.
+# 💫 Hi, I’m Tony — Software Engineer  
 
-I like to build a lot of different things. Here are some of my past projects:
+I’m a full-stack engineer with a strong academic background in software, data, and AI engineering. I build scalable systems end-to-end, from distributed backends and infrastructure to data pipelines.
 
-### Product Engineering
+---
 
-### Data Engineering
+## 🛠️ Tech Stack
 
-### Platform Engineering
+### **Languages**
+- **Advanced:** TypeScript, Python  
+- **Proficient:** C, Java  
 
-### AI Engineering
+### **Full-Stack Engineering**
+- **Advanced:** React, Node.js, GraphQL  
+- **Proficient:** Next.js, PostgreSQL, DynamoDB  
+
+### **Platform & DevOps**
+- **Advanced:** Terraform, YAML, AWS, Ansible  
+- **Proficient:** Docker, Prometheus, Grafana  
+
+### **AI & Data Engineering**
+- **Advanced:** PyTorch, Transformers  
+- **Proficient:** Spark, Hadoop, Slurm, RabbitMQ  
+
+---
+
+## 📫 Contact
+
+- 📍 London, UK  
+- 🔗 **LinkedIn:** https://www.linkedin.com/in/hoang-tung-dang/  
+
 
 
 
