@@ -1,4 +1,17 @@
-## Hi there 👋
+# Hi 👋 I'm Tony.
+
+I like to build a lot of different things. Here are some of my past projects:
+
+### Product Engineering
+
+### Data Engineering
+
+### Platform Engineering
+
+### AI Engineering
+
+
+
 
 <!--
 **Dang-Hoang-Tung/Dang-Hoang-Tung** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
