@@ -22,13 +22,6 @@ I’m a full-stack engineer with a strong academic background in software, data,
 - **Advanced:** PyTorch, Transformers  
 - **Proficient:** Spark, Hadoop, Slurm, RabbitMQ  
 
----
-
-## 📫 Contact
-
-- 📍 London, UK  
-- 🔗 **LinkedIn:** https://www.linkedin.com/in/hoang-tung-dang/  
-
 
 
 
