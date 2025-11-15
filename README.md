@@ -6,22 +6,21 @@ I’m a full-stack engineer with a strong academic background in software, data,
 
 ## 🛠️ Tech Stack
 
-### **Languages**
+### 💻 **Languages**
 - **Advanced:** TypeScript, Python  
 - **Proficient:** C, Java  
 
-### **Full-Stack Engineering**
+### 🌐 **Full-Stack Engineering**
 - **Advanced:** React, Node.js, GraphQL  
 - **Proficient:** Next.js, PostgreSQL, DynamoDB  
 
-### **Platform & DevOps**
+### 🧰 **Platform & DevOps**
 - **Advanced:** Terraform, YAML, AWS, Ansible  
 - **Proficient:** Docker, Prometheus, Grafana  
 
-### **AI & Data Engineering**
+### 🤖 **AI & Data Engineering**
 - **Advanced:** PyTorch, Transformers  
 - **Proficient:** Spark, Hadoop, Slurm, RabbitMQ  
-
 
 
 
