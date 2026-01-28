@@ -13,7 +13,15 @@ Regardless, I feel like I don't have a lot of cool things to show off, so I'm tr
 I have some ongoing projects, and to keep myself accountable, I'm putting them here.
 
 - [Learning LangChain](https://github.com/Dang-Hoang-Tung/langchain)
-- ...
+- Puncto frontend, backend
+
+<!--
+## TODO Projects
+- [ ] 🚀 A LangChain project + example apps (FastAPI)
+- [ ] 🚀 A full-stack app (React + Django + PostgreSQL)
+- [ ] A Kubernetes backend project
+- [ ] A portfolio frontend project (with interactive AI)
+-->
 
 
 ## 🛠️ Tech Stack
@@ -26,11 +34,11 @@ I have some ongoing projects, and to keep myself accountable, I'm putting them h
 - **Advanced:** React, Node.js, GraphQL  
 - **Proficient:** Next.js, PostgreSQL, DynamoDB  
 
-### 🧰 **Platform & DevOps**
+### ⚙️ **Platform & DevOps**
 - **Advanced:** Terraform, YAML, AWS, Ansible  
 - **Proficient:** Docker, Prometheus, Grafana  
 
-### 🤖 **Data Engineering**
+### 🏭 **Data Engineering**
 - **Proficient:** PyTorch, Spark, Hadoop, Slurm  
 
 ### 🤖 **AI Engineering**
