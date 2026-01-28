@@ -1,6 +1,20 @@
 # 👋 Hi, I’m Tony
 
-I’m a full-stack engineer with a strong academic background in software, data, and AI engineering. I build scalable systems end-to-end, from distributed backends and infrastructure to data pipelines.
+I'm a full-stack engineer, more backend-leaning but I do enjoy working on everything.
+
+## Projects
+
+I've done some major projects in my previous work experiences, which I can only talk about. 
+At the same time I've done some really cool personal/academic projects - some of which I've 
+pinned on my profile.
+
+Regardless, I feel like I don't have a lot of cool things to show off, so I'm trying to change that...
+
+I have some ongoing projects, and to keep myself accountable, I'm putting them here.
+
+- [Learning LangChain](https://github.com/Dang-Hoang-Tung/langchain)
+- ...
+
 
 ## 🛠️ Tech Stack
 
@@ -8,7 +22,7 @@ I’m a full-stack engineer with a strong academic background in software, data,
 - **Advanced:** TypeScript, Python  
 - **Proficient:** C, Java  
 
-### 🌐 **Full-Stack Engineering**
+### 🌐 **Software Engineering**
 - **Advanced:** React, Node.js, GraphQL  
 - **Proficient:** Next.js, PostgreSQL, DynamoDB  
 
@@ -16,24 +30,8 @@ I’m a full-stack engineer with a strong academic background in software, data,
 - **Advanced:** Terraform, YAML, AWS, Ansible  
 - **Proficient:** Docker, Prometheus, Grafana  
 
-### 🤖 **AI & Data Engineering**
-- **Advanced:** PyTorch, Transformers  
-- **Proficient:** Spark, Hadoop, Slurm, RabbitMQ  
+### 🤖 **Data Engineering**
+- **Proficient:** PyTorch, Spark, Hadoop, Slurm  
 
-
-
-
-<!--
-**Dang-Hoang-Tung/Dang-Hoang-Tung** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
-
-Here are some ideas to get you started:
-
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+### 🤖 **AI Engineering**
+- **Proficient:** LiveKit  
