@@ -2,8 +2,8 @@
 
 I'm a full-stack engineer, more backend-leaning but I enjoy working on everything. I don't have a portfolio
 website yet, that's TBD. I've worked on frontend, backend, APIs, databases, integrations, platform, CICD,
-etc. Honestly there's not much to brag about, I'm still learning, but I like to think I'm a solid engineer
-who's able to understand problems
+etc. Honestly there's not much to brag about, I'm still learning, but I think I'm a solid engineer who's able
+to understand problems fundamentally well and create quality solutions.
 
 ## Projects
 
