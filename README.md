@@ -16,14 +16,16 @@ Regardless, I feel like I don't have a lot of cool things to show off, so I'm tr
 I have some ongoing projects, and to keep myself accountable, I'm putting them here.
 
 - [Learning LangChain](https://github.com/Dang-Hoang-Tung/langchain)
-- Puncto frontend, backend
+- Puncto [frontend](https://github.com/Dang-Hoang-Tung/puncto-frontend), [backend](https://github.com/Dang-Hoang-Tung/puncto-backend)
 
 <!--
 ## TODO Projects
-- [ ] 🚀 A LangChain project + example apps (FastAPI)
-- [ ] 🚀 A full-stack app (React + Django + PostgreSQL)
+- [ ] 🚀 LangChain: A learning project + example apps (FastAPI)
+- [ ] 🚀 Puncto: A full-stack app (React + Django + PostgreSQL)
 - [ ] A portfolio frontend project (with interactive AI)
 - [ ] A Kubernetes backend project
+- [ ] A MicroGrad project
+- [ ] An ML fine-tuning project (TTS model or LLM)
 -->
 
 
