@@ -1,6 +1,9 @@
 # 👋 Hi, I’m Tony
 
-I'm a full-stack engineer, more backend-leaning but I do enjoy working on everything.
+I'm a full-stack engineer, more backend-leaning but I enjoy working on everything. I don't have a portfolio
+website yet, that's TBD. I've worked on frontend, backend, APIs, databases, integrations, platform, CICD,
+etc. Honestly there's not much to brag about, I'm still learning, but I like to think I'm a solid engineer
+who's able to understand problems
 
 ## Projects
 
@@ -19,8 +22,8 @@ I have some ongoing projects, and to keep myself accountable, I'm putting them h
 ## TODO Projects
 - [ ] 🚀 A LangChain project + example apps (FastAPI)
 - [ ] 🚀 A full-stack app (React + Django + PostgreSQL)
-- [ ] A Kubernetes backend project
 - [ ] A portfolio frontend project (with interactive AI)
+- [ ] A Kubernetes backend project
 -->
 
 
