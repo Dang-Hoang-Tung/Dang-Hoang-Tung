@@ -8,10 +8,10 @@ to understand problems fundamentally well and create quality solutions.
 ## Projects
 
 I've done some major projects in my previous work experiences, which I can only talk about. 
-At the same time I've done some really cool personal/academic projects - some of which I've 
+At the same time I've done some really interesting personal/academic projects - some of which I've 
 pinned on my profile.
 
-Regardless, I feel like I don't have a lot of cool things to show off, so I'm trying to change that...
+Regardless, I feel like I don't have a lot of "cool" things to show off, so I'm trying to change that...
 
 I have some ongoing projects, and to keep myself accountable, I'm putting them here.
 
