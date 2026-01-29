@@ -17,6 +17,7 @@ I have some ongoing projects, and to keep myself accountable, I'm putting them h
 
 - [Learning LangChain](https://github.com/Dang-Hoang-Tung/langchain)
 - Puncto [frontend](https://github.com/Dang-Hoang-Tung/puncto-frontend), [backend](https://github.com/Dang-Hoang-Tung/puncto-backend)
+- [Algorithms](https://github.com/Dang-Hoang-Tung/Algos)
 
 <!--
 ## TODO Projects
