@@ -15,6 +15,7 @@ Regardless, I feel like I don't have a lot of "cool" things to show off, so I'm 
 
 I have some ongoing projects, and to keep myself accountable, I'm putting them here.
 
+- [LangChain Medical Incident Analysis](https://github.com/Dang-Hoang-Tung/LangChain.Incident-Analysis)
 - [LangChain Multi-Agent Document Processor](https://github.com/Dang-Hoang-Tung/LangChain.MultiAgent-Document-Processor)
 - [Learning LangChain](https://github.com/Dang-Hoang-Tung/langchain)
 - [Algorithms](https://github.com/Dang-Hoang-Tung/Algos)
@@ -22,7 +23,7 @@ I have some ongoing projects, and to keep myself accountable, I'm putting them h
 
 <!--
 ## TODO Projects
-- [ ] 🚀 LangChain: A learning project + example apps (FastAPI)
+- [x] 🚀 LangChain: A learning project + example apps (FastAPI)
 - [ ] 🚀 Puncto: A full-stack app (React + Django + PostgreSQL)
 - [ ] A portfolio frontend project (with interactive AI)
 - [ ] A Kubernetes backend project
