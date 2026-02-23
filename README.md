@@ -15,9 +15,10 @@ Regardless, I feel like I don't have a lot of "cool" things to show off, so I'm 
 
 I have some ongoing projects, and to keep myself accountable, I'm putting them here.
 
+- [LangChain Multi-Agent Document Processor](https://github.com/Dang-Hoang-Tung/LangChain.MultiAgent-Document-Processor)
 - [Learning LangChain](https://github.com/Dang-Hoang-Tung/langchain)
-- Puncto [frontend](https://github.com/Dang-Hoang-Tung/puncto-frontend), [backend](https://github.com/Dang-Hoang-Tung/puncto-backend)
 - [Algorithms](https://github.com/Dang-Hoang-Tung/Algos)
+- Puncto [frontend](https://github.com/Dang-Hoang-Tung/puncto-frontend), [backend](https://github.com/Dang-Hoang-Tung/puncto-backend)
 
 <!--
 ## TODO Projects
