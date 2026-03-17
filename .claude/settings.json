@@ -6,6 +6,7 @@
       "Bash(grep:*)",
       "Bash(ls:*)",
       "Bash(cat:*)",
+      "Bash(xargs ls:*)",
       "Bash(git log:*)",
       "Bash(git status:*)",
       "Bash(git diff:*)",
