@@ -48,5 +48,6 @@
       "Bash(kill:*)",
       "Bash(pkill:*)"
     ]
-  }
+  },
+  "effortLevel": "high"
 }
