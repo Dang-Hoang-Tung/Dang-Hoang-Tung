@@ -3,10 +3,15 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
-# --- Zshrc ---
-echo "\n# --- BEGIN user settings ---" >> ~/.zshrc
-cat .zshrc >> ~/.zshrc
-echo "# --- END user settings ---" >> ~/.zshrc
+# --- Shell rc files ---
+for rc in ~/.zshrc ~/.bashrc; do
+  echo "\n# --- BEGIN user settings ---" >> "$rc"
+  cat .zshrc >> "$rc"
+  echo "# --- END user settings ---" >> "$rc"
+done
+
+# --- Gitconfig ---
+cp .gitconfig ~/.gitconfig
 
 # --- Claude ---
 curl -fsSL https://claude.ai/install.sh | bash

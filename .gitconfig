@@ -1,0 +1,16 @@
+[alias]
+    s     = status
+    a     = add
+    aa    = add --all
+    c     = commit -m
+    ca    = commit -am
+    ps    = push
+    pl    = pull
+    l     = log --oneline --graph --decorate
+    d     = diff
+    co    = checkout
+    cob   = checkout -b
+    b     = branch
+    st    = stash
+    stp   = stash pop
+    c-noci = "!f() { git commit -m \"$* [skip ci]\"; }; f"
