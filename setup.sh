@@ -5,9 +5,9 @@ cd "$(dirname "$0")"
 
 # --- Shell rc files ---
 for rc in ~/.zshrc ~/.bashrc; do
-  echo "\n# --- BEGIN user settings ---" >> "$rc"
+  printf "\n# --- BEGIN user settings ---\n" >> "$rc"
   cat .zshrc >> "$rc"
-  echo "# --- END user settings ---" >> "$rc"
+  printf "# --- END user settings ---\n" >> "$rc"
 done
 
 # --- Gitconfig ---

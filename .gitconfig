@@ -18,3 +18,7 @@
     wtr   = worktree remove
     wtp   = worktree prune
     c-noci = "!f() { git commit -m \"$* [skip ci]\"; }; f"
+
+[user]
+    name = Tony Dang
+    email = tonydang.main@gmail.com
