@@ -14,3 +14,10 @@ alias gb="git branch"
 alias gst="git stash"
 alias gstp="git stash pop"
 gcnoci() { git commit -m "$* [skip ci]"; }
+alias gwtl="git worktree list"
+alias gwta="git worktree add"
+alias gwtr="git worktree remove"
+alias gwtp="git worktree prune"
+
+# Add ~/.local/bin to PATH
+export PATH="$HOME/.local/bin:$PATH"

@@ -13,4 +13,8 @@
     b     = branch
     st    = stash
     stp   = stash pop
+    wtl   = worktree list
+    wta   = worktree add
+    wtr   = worktree remove
+    wtp   = worktree prune
     c-noci = "!f() { git commit -m \"$* [skip ci]\"; }; f"
