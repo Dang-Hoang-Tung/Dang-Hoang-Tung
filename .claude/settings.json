@@ -1,16 +1,52 @@
 {
   "permissions": {
-    "allow": [
-      "Read",
-      "Bash(find:*)",
-      "Bash(grep:*)",
-      "Bash(ls:*)",
-      "Bash(cat:*)",
-      "Bash(xargs ls:*)",
-      "Bash(git log:*)",
-      "Bash(git status:*)",
-      "Bash(git diff:*)",
-      "WebFetch"
+    "allow": ["Bash(*)", "Read", "WebFetch"],
+    "ask": [
+      "Bash(rm:*)",
+      "Bash(rmdir:*)",
+
+      "Bash(mv:*)",
+      "Bash(cp:*)",
+
+      "Bash(mkdir:*)",
+      "Bash(touch:*)",
+
+      "Bash(tee:*)",
+      "Bash(printf:*)",
+
+      "Bash(sed:*)",
+      "Bash(awk:*)",
+      "Bash(perl:*)",
+      "Bash(python:*)",
+      "Bash(python3:*)",
+      "Bash(node:*)",
+
+      "Bash(chmod:*)",
+      "Bash(chown:*)",
+      "Bash(chgrp:*)",
+
+      "Bash(sudo:*)",
+      "Bash(su:*)",
+
+      "Bash(curl:*)",
+      "Bash(wget:*)",
+
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git reset:*)",
+      "Bash(git checkout:*)",
+      "Bash(git merge:*)",
+      "Bash(git rebase:*)",
+      "Bash(git branch -d:*)",
+      "Bash(git stash:*)",
+
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(yarn:*)",
+      "Bash(pnpm:*)",
+
+      "Bash(kill:*)",
+      "Bash(pkill:*)"
     ]
   }
 }
