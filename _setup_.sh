@@ -14,5 +14,5 @@ done
 cp .gitconfig ~/.gitconfig
 
 # --- Claude ---
-curl -fsSL https://claude.ai/install.sh | bash
 cp .claude/settings.json ~/.claude/settings.json
+rm -rf ~/.claude/skills/ && cp -r .claude/skills/ ~/.claude/skills/
