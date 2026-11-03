@@ -1,18 +1,8 @@
 # 👋 Hi, I’m Tony
 
-I'm a full-stack engineer (backend-leaning). I don't have a portfolio website yet, that's TBD. 
-I've worked on frontend, backend, APIs, databases, integrations, platform, etc. I'm a solid engineer
-who's able to understand problems fundamentally well and create quality solutions.
+I'm a product engineer.
 
 ## Projects
-
-I've done some major projects in my previous work experiences, which I can only talk about. 
-At the same time I've done some really interesting personal/academic projects - some of which I've 
-pinned on my profile.
-
-Regardless, I feel like I don't have a lot of "cool" things to show off, so I'm changing that...
-
-I have some ongoing projects, and to keep myself accountable, I'm putting them here.
 
 - [LangChain Medical Incident Analysis](https://github.com/Dang-Hoang-Tung/LangChain.Incident-Analysis)
 - [LangChain Multi-Agent Document Processor](https://github.com/Dang-Hoang-Tung/LangChain.MultiAgent-Document-Processor)
