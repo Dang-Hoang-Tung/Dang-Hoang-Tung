@@ -37,7 +37,7 @@ Needs `gh` (signed in) and Python 3.9+. Every command takes `--config PATH` firs
 
 ## How saving works
 
-`review.py` starts the helper (`app/server/http.py`) if it isn't running and opens the queue through it. The helper listens on 127.0.0.1 only, needs the token from the link it opens, saves each PR's state (comments, viewed files, ticks) to `<data_dir>/state/`, and posts `post:` comments with `gh`. It stops after `idle_hours` without use (never, with `0`); run `review.py` again to restart it. The session token is saved in `<data_dir>/token`, so links survive restarts. State files are pruned `keep_days` after their last change. Pages opened straight from disk still display but don't save.
+`review.py` starts the helper (`app/server/http.py`) if it isn't running and opens the queue through it. The helper listens on 127.0.0.1 only, needs the token from the link it opens, saves each PR's state (comments, viewed files, ticks) to `<data_dir>/state/`, and posts `post:` comments with `gh`. It stops after `idle_hours` without use (never, with `0`); run `review.py` again to restart it. The session token is saved in `<data_dir>/token`, so links survive restarts. State files are pruned `keep_days` after their last change. The queue page's **Refresh** button rebuilds everything through the helper and logs what changed to `<data_dir>/events.jsonl` (see CONTRACT.md). Pages opened straight from disk still display but don't save.
 
 ## Files
 

@@ -8,6 +8,7 @@ Find every path with `python3 review.py paths`, or read `<data_dir>/manifest.jso
 
 | File | Who writes it | What it's for |
 |---|---|---|
+| `events.jsonl` | the tool, on every build or Refresh | One line per rebuild: which PRs to re-check (`check`), new, moved (new commits) and gone PRs, and PRs whose insights are missing or stale |
 | `manifest.json` | the tool, on every build | Every PR in the queue with its page, state, insights and diff paths |
 | `diffs/<slug>.diff` | the tool | The PR's unified diff, for reading |
 | `insights/<slug>.json` | an AI, optional | Summary and recommendations shown on the page and in the queue |
@@ -113,11 +114,25 @@ The page writes this; an AI may add replies. Use `review.py ai reply`, or write 
 
 A reviewer message that starts with `post:` is posted to the PR as written (without the prefix) when the reviewer sends it: a line comment for a thread on lines, otherwise a conversation comment. An AI can post a thread's latest `post:` message with `review.py ai post <slug> <thread>`. Posting is recorded per message in `posted_messages` (and in `posted`) and is never repeated for the same message.
 
+## After a refresh
+
+Clicking **Refresh** on the queue page (or running `review.py build`) rebuilds every page and appends an event to `events.jsonl`. `review.py ai changes` prints the latest one:
+
+```json
+{"type": "rebuild", "source": "refresh", "at": "…", "partial": false,
+ "check": [29627, 29682],
+ "new": [{"slug", "pr", "title", "head_sha"}], "moved": [{"slug", "pr", "title", "from", "to"}], "gone": ["<slug>"],
+ "needs_insights": [{"slug", "pr", "title", "status": "missing|stale|invalid: …"}]}
+```
+
+`check` lists exactly the PRs that are new or have new commits since the previous build. Re-check your read on those (and rewrite their insights); the rest are unchanged.
+
 ## Commands for an AI
 
 ```
 python3 review.py paths                      # where everything lives
 python3 review.py ai list                    # threads waiting for a reply
+python3 review.py ai changes                 # what changed in the latest rebuild or Refresh
 python3 review.py ai reply <slug> <thread> "text"
 python3 review.py ai post <slug> <thread>    # only when the reviewer asked for it
 python3 review.py build --no-open [PR …]     # rebuild pages after writing insights

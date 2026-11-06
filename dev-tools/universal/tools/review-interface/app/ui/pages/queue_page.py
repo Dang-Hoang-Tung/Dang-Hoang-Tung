@@ -3,7 +3,8 @@ from app.ui.html import esc
 from app.ui.pages import document
 
 CSS = ["tokens.css", "base.css", "appbar.css", "cards.css", "dropdown.css", "queue.css"]
-JS = ["shared/dom.js", "shared/time.js", "shared/dropdown.js", "queue/filters.js", "queue/main.js"]
+JS = ["shared/dom.js", "shared/time.js", "shared/dropdown.js", "queue/filters.js", "queue/refresh.js", "queue/main.js"]
+REFRESH_ICON = '<svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg>'
 
 
 def _count(model):
@@ -13,7 +14,8 @@ def _count(model):
 def _heading(model):
     return (
         f'<div class="qhead"><h1>Hello {esc(model["user"])}. Let\'s review!</h1>'
-        f'<span class="sub" id="qsum">{_count(model)} PRs · ~{model["total_minutes"]} min</span></div>'
+        f'<div class="qhead-side"><span class="sub" id="qsum">{_count(model)} PRs · ~{model["total_minutes"]} min</span>'
+        f'<button type="button" class="qrefresh" id="qrefresh" hidden title="Fetch the latest PRs, diffs and briefs">{REFRESH_ICON}<span>Refresh</span></button></div></div>'
     )
 
 
@@ -26,4 +28,4 @@ def _content(model):
 
 def render(model):
     body = f'<div class="queue">{_heading(model)}\n{_content(model)}</div>'
-    return document.render("Review queue", CSS, body, JS if model["buckets"] else None)
+    return document.render("Review queue", CSS, body, JS)

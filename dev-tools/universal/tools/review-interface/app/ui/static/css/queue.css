@@ -57,3 +57,11 @@
 .fopt:hover{background:var(--surface-2);color:var(--text)}
 .fopt input{margin:0;accent-color:var(--accent);width:15px;height:15px}
 .frow{display:flex;justify-content:flex-end;border-top:1px solid var(--line);margin-top:4px;padding-top:4px}
+
+.qhead-side{display:flex;align-items:center;gap:12px}
+.qrefresh{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;padding:5px 12px;border-radius:999px}
+.qrefresh svg{width:14px;height:14px}
+.qrefresh.busy svg{animation:qspin 1s linear infinite}
+@keyframes qspin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.qrefresh.busy svg{animation:none}}
+.qrefreshed{font-size:12px;color:var(--add)}

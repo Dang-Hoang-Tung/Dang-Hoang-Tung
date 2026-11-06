@@ -20,7 +20,7 @@ import urllib.request
 
 from app.config import ROOT, dirs, load_config, now
 from app.services import build as builder
-from app.services import manifest, posting, state
+from app.services import events, manifest, posting, state
 
 COMMANDS = ("build", "serve", "paths", "ai")
 
@@ -108,6 +108,7 @@ def build_parser():
     ai = sub.add_parser("ai")
     ai_sub = ai.add_subparsers(dest="ai_cmd", required=True)
     ai_sub.add_parser("list")
+    ai_sub.add_parser("changes", help="what changed in the latest rebuild or refresh")
     r = ai_sub.add_parser("reply")
     r.add_argument("slug")
     r.add_argument("thread")
@@ -155,6 +156,8 @@ def main(argv=None):
     elif a.cmd == "ai":
         if a.ai_cmd == "list":
             ai_list(cfg)
+        elif a.ai_cmd == "changes":
+            print(json.dumps(events.latest(cfg) or {"type": "none", "note": "no rebuild recorded yet"}, indent=2))
         elif a.ai_cmd == "reply":
             ai_reply(cfg, a.slug, a.thread, a.text)
         elif a.ai_cmd == "post":

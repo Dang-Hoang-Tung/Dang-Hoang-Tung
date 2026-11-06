@@ -25,6 +25,7 @@ python3 ~/.claude/skills/universal/tools/review-interface/review.py
 - It finds the PRs waiting on me, builds a page for each, starts a small local helper and opens the queue in my browser.
 - The helper stops by itself when idle. Run the command again to bring it back.
 - After you write or update briefs, rebuild so they show: `review.py build --no-open` (add a PR number for just one).
+- When I hit **Refresh** on the queue, run `review.py ai changes`. Re-check only the PRs in `check` (new, or new commits) and update their briefs.
 - My comments are saved in the app. When I ask, read them with `review.py ai list` and answer with `review.py ai reply <slug> <thread> "<text>"`. How the files work: `CONTRACT.md` in the app folder.
 
 ## 1. Queue

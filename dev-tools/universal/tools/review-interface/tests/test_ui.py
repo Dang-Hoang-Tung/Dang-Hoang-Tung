@@ -295,7 +295,7 @@ class QueuePageTests(unittest.TestCase):
     def test_empty_queue(self):
         page = queue_page.render({"user": "Tony", "total_minutes": 0, "authors": [], "buckets": []})
         self.assertIn("Nothing waiting for your review.", page)
-        self.assertEqual(len(inline_scripts(page)), 1)
+        self.assertEqual(len(inline_scripts(page)), 2)
 
     def test_inline_scripts_parse(self):
         check_scripts(self, self.page, 2)

@@ -16,7 +16,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
 from app.config import dirs, load_config
-from app.services import manifest, posting, state
+from app.services import build as builder
+from app.services import events, manifest, posting, state
 
 MAX_BODY = 2 * 1024 * 1024
 LOCAL_HOSTS = ("127.0.0.1", "localhost")
@@ -36,7 +37,29 @@ def same(a, b):
         return False
 
 
+REFRESH_LOCK = threading.Lock()
+
+
+def start_refresh(cfg, status):
+    """Rebuild every page in the background; one refresh at a time."""
+    with REFRESH_LOCK:
+        if status["running"]:
+            return
+        status.update(running=True, error=None, started=time.time())
+
+    def work():
+        try:
+            builder.build(cfg, source="refresh")
+            status["changes"] = events.latest(cfg)
+        except Exception as e:  # report any build failure to the page
+            status["error"] = str(e)[:300]
+        finally:
+            status.update(running=False, finished=time.time())
+    threading.Thread(target=work, daemon=True).start()
+
+
 def make_handler(cfg, token, touch):
+    refresh = {"running": False, "error": None, "started": None, "finished": None}
     pages = dirs(cfg)["pages"].resolve()
 
     class Handler(BaseHTTPRequestHandler):
@@ -141,6 +164,8 @@ def make_handler(cfg, token, touch):
                 return
             if url.path.startswith("/api/state/"):
                 return self._get_state(url.path)
+            if url.path == "/api/refresh":
+                return self._json(200, refresh)
             return self._get_page(url.path)
 
         def do_PUT(self):
@@ -169,6 +194,9 @@ def make_handler(cfg, token, touch):
             if not self._ok_request(write=True):
                 return
             url = urlparse(self.path)
+            if url.path == "/api/refresh":
+                start_refresh(cfg, refresh)
+                return self._json(202, refresh)
             if not url.path.startswith("/api/post/"):
                 return self._send(404, "not found")
             s = url.path.rsplit("/", 1)[1]

@@ -18,7 +18,10 @@ function initAvatars() {
   $$('.qbhead').forEach(h => withAvatarFallback($('img', h), $('span', h).textContent));
 }
 
-initAvatars();
-renderRequestedTimes();
-initBriefButtons();
-initFilters();
+if ($('.qitem')) {
+  initAvatars();
+  renderRequestedTimes();
+  initBriefButtons();
+  initFilters();
+}
+initRefresh();

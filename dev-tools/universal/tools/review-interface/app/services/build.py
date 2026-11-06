@@ -3,6 +3,7 @@ import subprocess
 import sys
 
 from app.config import dirs, slug
+from app.services import events
 from app.services import git, github, manifest, models
 from app.services.adapters import team_reviewer
 from app.services.insights import load as load_insights
@@ -65,7 +66,7 @@ def queue_items(cfg, entries):
     return items
 
 
-def build(cfg, only=None):
+def build(cfg, only=None, source="cli"):
     d = dirs(cfg)
     prs = github.list_pending(cfg, only)
     name = user_name(cfg)
@@ -90,4 +91,6 @@ def build(cfg, only=None):
         print(f"  {pr['repo']}#{pr['number']}: {summary['files']} files, insights {summary['insights_status']}")
     entries = list(merged.values())
     (d["pages"] / "index.html").write_text(queue_page.render(models.queue_model(queue_items(cfg, entries), name)))
-    return manifest.write_manifest(cfg, entries)
+    written = manifest.write_manifest(cfg, entries)
+    events.append(cfg, events.rebuild_event(previous, entries, source, partial=bool(only)))
+    return written
