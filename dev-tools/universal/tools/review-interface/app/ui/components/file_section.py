@@ -1,7 +1,15 @@
+import os
+
 from app.ui.html import esc
 from app.domain import SEVERITY_LABELS, worst
 
 SIGNS = {"add": "+", "del": "−"}
+LANGS = {
+    ".ts": "typescript", ".mts": "typescript", ".cts": "typescript", ".tsx": "tsx",
+    ".js": "javascript", ".mjs": "javascript", ".cjs": "javascript", ".jsx": "jsx",
+    ".json": "json", ".css": "css", ".py": "python", ".sql": "sql", ".yml": "yaml", ".yaml": "yaml",
+    ".md": "markdown", ".sh": "shellscript", ".bash": "shellscript", ".zsh": "shellscript",
+}
 
 
 def _num(value):
@@ -16,6 +24,10 @@ def _index_notes(notes):
         for row_id in note["rows"]:
             hot.setdefault(row_id, []).append(note)
     return ends, hot
+
+
+def _lang(path):
+    return LANGS.get(os.path.splitext(path)[1].lower())
 
 
 def _path_parts(path):
@@ -62,7 +74,7 @@ def _row(f, index, row, ends, hot):
     return (
         f'<tr id="{row_id}" data-f="{f["idx"]}" data-o="{_num(old)}" data-n="{_num(new)}" class="{kind}{hot_class}">'
         f'<td class="num">{_num(old)}</td><td class="num">{_num(new)}</td>'
-        f'<td class="code"><span class="sign">{SIGNS.get(kind, " ")}</span>{_code(text, f.get("spans", {}).get(index))}{_marks(ends.get(row_id, []))}</td></tr>'
+        f'<td class="code"><span class="sign">{SIGNS.get(kind, " ")}</span><span class="t">{_code(text, f.get("spans", {}).get(index))}</span>{_marks(ends.get(row_id, []))}</td></tr>'
     )
 
 
@@ -74,7 +86,9 @@ def _table(f, notes):
 
 def render(f, notes):
     classes = "file" + (" focused" if notes else "") + (" generated" if f["gen"] else "")
-    parts = [f'<section class="{classes}" id="f-{f["idx"]}" data-f="{f["idx"]}">', _header(f)]
+    lang = _lang(f["path"])
+    lang_attr = f' data-lang="{lang}"' if lang else ""
+    parts = [f'<section class="{classes}" id="f-{f["idx"]}" data-f="{f["idx"]}"{lang_attr}>', _header(f)]
     if f["gen"]:
         parts.append(f'<p class="gen-note">Generated file, {f["a"] + f["d"]} changed lines. Safe to skim.</p><template class="lazy">')
     parts.append(_table(f, notes))

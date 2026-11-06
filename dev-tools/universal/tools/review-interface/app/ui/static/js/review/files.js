@@ -11,7 +11,7 @@ function initFileSections() {
     $('.path', s).onclick = () => setCollapsed(i, !s.classList.contains('collapsed'));
     $('input[data-read]', s).onchange = e => setRead([i], e.target.checked);
   });
-  $$('button.expand').forEach(b => b.onclick = () => { const t = b.previousElementSibling; t.replaceWith(t.content.cloneNode(true)); b.remove(); });
+  $$('button.expand').forEach(b => b.onclick = () => { const t = b.previousElementSibling; t.replaceWith(t.content.cloneNode(true)); const s = b.closest('section.file'); b.remove(); highlightSection(s); });
 }
 
 function goToFile(i, block = 'start') {

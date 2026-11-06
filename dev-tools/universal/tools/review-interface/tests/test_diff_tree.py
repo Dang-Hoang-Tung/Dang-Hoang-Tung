@@ -129,8 +129,17 @@ class TreeTests(unittest.TestCase):
         leaves = [n for n in lay["nodes"] if n["role"] == "leaf"]
         ys = [n["y"] for n in leaves]
         self.assertEqual(ys, sorted(ys))
-        self.assertEqual(ys[1] - ys[0], tree.NODE_H + tree.STACK_GAP)
+        self.assertEqual(ys[1] - ys[0], tree.NODE_H + tree.ROW_GAP)
         self.assertEqual(len({round(n["x"] - n["w"] * 0, 3) for n in leaves}), 1)
+
+    def test_layout_runs_left_to_right_in_directory_order(self):
+        t = tree.build_tree(self.PATHS, "repo")
+        lay = tree.layout(t, tree_stats(self.PATHS))
+        by = {n["title"]: n for n in lay["nodes"]}
+        self.assertEqual(by["src"]["y"], by["repo"]["y"])
+        self.assertGreater(by["src"]["x"], by["repo"]["x"] + by["repo"]["w"])
+        rows = [n["title"] for n in sorted(lay["nodes"], key=lambda n: (n["y"], n["x"])) if n["role"] == "leaf"]
+        self.assertEqual(rows, [n["title"] for n in lay["nodes"] if n["role"] == "leaf"])
 
     def test_layout_kind_notes_and_gen(self):
         paths = ["a/x.ts", "a/gen.ts"]

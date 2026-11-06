@@ -204,6 +204,12 @@ class ReviewPageTests(unittest.TestCase):
                        "<title>Review #42</title>", "fonts.googleapis.com", 'rel="icon"'):
             self.assertIn(needle, self.page, needle)
 
+    def test_language_and_code_wrapper(self):
+        self.assertIn('id="f-0" data-f="0" data-lang="tsx"', self.page)
+        self.assertIn('<span class="sign">', self.page)
+        self.assertIn('<span class="t">', self.page)
+        self.assertIn("shiki@4.6.0", self.page)
+
     def test_head_has_themes_before_style(self):
         self.assertLess(self.page.index("REVIEW_THEMES"), self.page.index("<style>"))
         self.assertIn("--surface-2:color-mix", self.page)

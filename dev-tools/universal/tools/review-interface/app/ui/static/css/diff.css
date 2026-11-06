@@ -52,3 +52,5 @@ tr.flash td{background-image:linear-gradient(var(--flash),var(--flash))}
 #cbtn{position:absolute;z-index:8;font:600 12px var(--font);background:var(--accent);color:var(--accent-fg);border:0;border-radius:9px;padding:7px 12px;box-shadow:var(--shadow-2)}
 tr.add .hl{background:color-mix(in srgb,var(--diff-add) 45%,transparent);border-radius:3px}
 tr.del .hl{background:color-mix(in srgb,var(--diff-del) 45%,transparent);border-radius:3px}
+.tk{color:var(--shiki-light)}
+.is-dark .tk{color:var(--shiki-dark)}

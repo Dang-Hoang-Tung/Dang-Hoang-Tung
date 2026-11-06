@@ -1,6 +1,7 @@
 function renderAll() { renderReadUI(); renderChecks(); renderThreads(); renderApprove(); }
 
 initFileSections();
+initHighlight();
 initTabs();
 initScrollSpy();
 initTheme();
