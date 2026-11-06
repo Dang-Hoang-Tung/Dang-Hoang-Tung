@@ -1,0 +1,124 @@
+# AI contract
+
+The review interface runs on its own from PR diffs. An AI (or any script) can add to it through files. Nothing here is required.
+
+Find every path with `python3 review.py paths`, or read `<data_dir>/manifest.json` after a build.
+
+## Files
+
+| File | Who writes it | What it's for |
+|---|---|---|
+| `manifest.json` | the tool, on every build | Every PR in the queue with its page, state, insights and diff paths |
+| `diffs/<slug>.diff` | the tool | The PR's unified diff, for reading |
+| `insights/<slug>.json` | an AI, optional | Summary and recommendations shown on the page and in the queue |
+| `state/<slug>.json` | the page and an AI | Comment threads, viewed files, checked recommendations |
+
+`<slug>` is `<owner>-<repo>-<number>`, for example `acme-widgets-29627`.
+
+After writing an insights file, run `review.py build` again (or `review.py build <number>`) so the page picks it up. State changes show up when the reviewer returns to the tab; no rebuild needed.
+
+## Manifest entry
+
+```json
+{
+  "slug": "acme-widgets-29627", "repo": "acme/widgets", "pr": 29627,
+  "title": "...", "url": "https://github.com/...", "author": "login", "head_sha": "76689ab6…",
+  "requested_at": "2026-11-05T13:28:17Z", "ci": "passing|failing|pending|none", "draft": false, "base": "main",
+  "added": 773, "deleted": 336, "files": 26, "effort": "Small|Medium|Large", "minutes": 25,
+  "minutes_source": "insights|estimate", "verdict": "Approve with nits", "risk": "Low|Medium|High|", "findings": {"should": 2, "nit": 1},
+  "insights_status": "missing|current|stale|invalid: <reason>",
+  "page": "…/pages/<slug>.html", "state_file": "…/state/<slug>.json",
+  "insights_file": "…/insights/<slug>.json", "diff_file": "…/diffs/<slug>.diff",
+  "threads": 3, "waiting_threads": 1
+}
+```
+
+Fields: `requested_at` is when the review was last requested of you (ISO time). `minutes_source` says whether `minutes` came from the insights or is an estimate. `verdict` and `risk` come from the insights summary (empty without insights). `findings` counts recommendations per severity.
+
+The manifest itself has `schema` (`review-manifest/1`), `generated_at`, `config`, `contract`, `dirs` (where pages, state, insights, diffs and the root live) and `prs` (the entries above).
+
+`review.py build <n>` updates only that PR: other entries stay as they were, and the queue page is rebuilt from all entries. A PR whose diff cannot be fetched keeps its previous entry.
+
+## Insights file (`review-insights/1`)
+
+```json
+{
+  "schema": "review-insights/1",
+  "repo": "acme/widgets",
+  "pr": 29627,
+  "head_sha": "76689ab",
+  "summary": {
+    "verdict": "Approve with nits",
+    "risk": "Medium",
+    "risk_note": "v2 is flagged, but the layout change is not",
+    "minutes": 25,
+    "tldr": ["What & why: …", "Risk: …"],
+    "questions": ["Which ticket owns the request-page links?"]
+  },
+  "recommendations": [
+    {
+      "id": "auto-approve",
+      "severity": "should",
+      "title": "?action=approve can approve before the review loads",
+      "body": "Markdown. **bold**, `code`, - bullets.",
+      "path": "apps/frontend/…/ApprovalTaskView.tsx",
+      "start_line": 100,
+      "end_line": 117,
+      "draft_comment": "Ready-to-post comment text."
+    }
+  ]
+}
+```
+
+- `head_sha`: the commit you reviewed. Full or at least 7 characters (shorter never matches). If the PR has moved on, the page says the insights are out of date.
+- `severity`: `block`, `should`, `nit`, `question` or `look`.
+- `path`: full path, or a unique file name. Lines refer to the new side of the diff. Leave `path` out for a general note.
+- `id`: optional but recommended. A stable id keeps the reviewer's ticks when you rewrite the file.
+- Only `schema`, `repo`, `pr`, `head_sha` and each recommendation's `severity` and `title` are required. Anything else may be left out.
+- `start_line` and `end_line` are whole numbers (or numeric strings) or null; anything else makes the file invalid.
+
+## State file
+
+The page writes this; an AI may add replies. Use `review.py ai reply`, or write the file atomically (write a temp file, then rename). `review.py` takes a per-PR lock (`state/<slug>.lock`, `flock`) around its own read-modify-write; take the same lock if you write the file yourself. A state file that is not valid JSON is moved to `state/<slug>.corrupt-<time>.json` and the PR starts empty.
+
+```json
+{
+  "threads": [
+    {
+      "id": "lq3k2x9ab", "path": "apps/…/ApprovalTaskView.tsx", "side": "RIGHT", "start_line": 100, "line": 117,
+      "noteKey": "auto-approve", "resolved": false, "resolvedAt": null,
+      "commit": "76689ab6…",
+      "posted": {"url": "https://github.com/…", "message_id": "…", "at": "…"},
+      "posted_messages": {"m1": {"url": "https://github.com/…", "id": 123, "at": "…"}},
+      "messages": [
+        {"id": "m1", "who": "me", "text": "Does anything link here today?", "at": "2026-11-06T12:00:00.000Z"},
+        {"id": "m2", "who": "ai", "text": "Only summary-approval emails.", "at": "2026-11-06T12:01:00.000Z"}
+      ]
+    }
+  ],
+  "read": {"<file path>": {"read": true, "hash": "…", "at": "…"}},
+  "checked": {"<recommendation id>": {"on": true, "at": "…"}}
+}
+```
+
+- `who` is `me` for the reviewer and `ai` for the AI. Message ids must be unique within a thread.
+- A thread is waiting for the AI when it is open and its last message is from `me`. `review.py ai list` shows these.
+- `commit`: the PR head the thread was written on (set by the page). Posting is refused if it differs from the PR's current head.
+- `posted_messages` maps each posted message id to its GitHub comment; `posted` is the latest one, for the page. `posting` is a short-lived marker (`message_id`, `at`) set while a post is in flight; a second post of the same message within 2 minutes is refused. Do not write these by hand.
+- `who` also accepts the legacy value `claude`, read as `ai`.
+- `noteKey` links a thread to a recommendation's `id`.
+- Never delete or rewrite the reviewer's messages; only append.
+
+## Posting to GitHub
+
+A reviewer message that starts with `post:` is posted to the PR as written (without the prefix) when the reviewer sends it: a line comment for a thread on lines, otherwise a conversation comment. An AI can post a thread's latest `post:` message with `review.py ai post <slug> <thread>`. Posting is recorded per message in `posted_messages` (and in `posted`) and is never repeated for the same message.
+
+## Commands for an AI
+
+```
+python3 review.py paths                      # where everything lives
+python3 review.py ai list                    # threads waiting for a reply
+python3 review.py ai reply <slug> <thread> "text"
+python3 review.py ai post <slug> <thread>    # only when the reviewer asked for it
+python3 review.py build --no-open [PR …]     # rebuild pages after writing insights
+```

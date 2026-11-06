@@ -1,0 +1,40 @@
+/* Themes set the base colours (themes.js); every other colour derives from them here. */
+:root{
+  /* base colours — overwritten by the active theme family */
+  --bg:#f6f7f9;--surface:#ffffff;--text:#161b26;--accent:#2f6bff;--accent-fg:#ffffff;
+  --add:#1a7f37;--del:#cf2e2e;--block:#d1242f;--should:#bf6a02;--nit:#6e56cf;--look:#0a8577;--question:#bf3989;
+  --soft:10%;--shadow:rgba(16,24,40,.06);
+  /* derived */
+  --surface-2:color-mix(in srgb,var(--text) 3.5%,var(--surface));
+  --surface-3:color-mix(in srgb,var(--text) 7%,var(--surface));
+  --line:color-mix(in srgb,var(--text) 8%,var(--surface));
+  --line-strong:color-mix(in srgb,var(--text) 15%,var(--surface));
+  --text-2:color-mix(in srgb,var(--text) 74%,var(--surface));
+  --text-3:color-mix(in srgb,var(--text) 50%,var(--surface));
+  --accent-soft:color-mix(in srgb,var(--accent) var(--soft),var(--surface));
+  --block-soft:color-mix(in srgb,var(--block) var(--soft),var(--surface));
+  --should-soft:color-mix(in srgb,var(--should) var(--soft),var(--surface));
+  --nit-soft:color-mix(in srgb,var(--nit) var(--soft),var(--surface));
+  --look-soft:color-mix(in srgb,var(--look) var(--soft),var(--surface));
+  --question-soft:color-mix(in srgb,var(--question) var(--soft),var(--surface));
+  --read:var(--add);--read-soft:color-mix(in srgb,var(--add) var(--soft),var(--surface));
+  --add-fg:var(--add);--add-bg:color-mix(in srgb,var(--add) 7%,var(--surface));--add-num:color-mix(in srgb,var(--add) 13%,var(--surface));
+  --del-fg:var(--del);--del-bg:color-mix(in srgb,var(--del) 7%,var(--surface));--del-num:color-mix(in srgb,var(--del) 13%,var(--surface));
+  --hunk-bg:color-mix(in srgb,var(--accent) 5%,var(--surface));--hunk-fg:color-mix(in srgb,var(--accent) 65%,var(--text));
+  --sel:color-mix(in srgb,var(--accent) 12%,transparent);--flash:color-mix(in srgb,var(--should) 18%,transparent);
+  --me:var(--accent-soft);--claude:color-mix(in srgb,#d97757 10%,var(--surface));--claude-av:#d97757;
+  --glass:color-mix(in srgb,var(--surface) 84%,transparent);--shade:color-mix(in srgb,var(--bg) 30%,rgba(0,0,0,.55));
+  --shadow-1:0 1px 2px var(--shadow);
+  --shadow-2:0 12px 32px var(--shadow),0 2px 8px var(--shadow);
+  --font:"Geist",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"Geist Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --r:12px;--bar:56px;--left:284px;--right:392px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0b0e13;--surface:#11151c;--text:#e4e8ef;--accent:#7aa3ff;--accent-fg:#0b0e13;
+  --add:#4cc77a;--del:#f26d68;--block:#ff6e62;--should:#f0a443;--nit:#a998ff;--look:#46d0bb;--question:#f383c6;
+  --soft:16%;--shadow:rgba(0,0,0,.4);color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0b0e13;--surface:#11151c;--text:#e4e8ef;--accent:#7aa3ff;--accent-fg:#0b0e13;
+  --add:#4cc77a;--del:#f26d68;--block:#ff6e62;--should:#f0a443;--nit:#a998ff;--look:#46d0bb;--question:#f383c6;
+  --soft:16%;--shadow:rgba(0,0,0,.4);color-scheme:dark}

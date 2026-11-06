@@ -1,0 +1,19 @@
+.fabs{position:fixed;right:calc(var(--right) + 22px);bottom:22px;z-index:25;display:flex;gap:8px}
+.fab{display:inline-flex;align-items:center;gap:8px;font:600 13px var(--font);background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--line-strong);border-radius:999px;padding:9px 16px;box-shadow:var(--shadow-2)}
+.fab svg{width:16px;height:16px;color:var(--accent)}
+dialog.modal{border:1px solid var(--line);border-radius:18px;padding:0;background:var(--surface);color:var(--text);width:min(1400px,94vw);max-height:90vh;box-shadow:var(--shadow-2)}
+dialog.modal[open]{animation:pop .16s ease-out}
+dialog.modal::backdrop{background:var(--shade);backdrop-filter:blur(3px)}
+@keyframes pop{from{opacity:0;transform:translateY(6px) scale(.985)}to{opacity:1;transform:none}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line)}
+.modal-head h2{margin:0;font-size:14px;font-weight:600}
+.modal-body{overflow:auto;padding:18px;max-height:calc(90vh - 62px)}
+.treemap{position:relative;height:min(70vh,760px)}
+.tm{position:absolute;padding:8px 10px;border-radius:0;border:2px solid var(--surface);background:var(--surface-2);display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;text-align:left;overflow:hidden;color:var(--text)}
+.tm:hover{filter:brightness(1.04);z-index:1;box-shadow:inset 0 0 0 2px var(--accent)}
+.tm.block{background:var(--block-soft);box-shadow:inset 0 0 0 1px var(--block)}.tm.should{background:var(--should-soft);box-shadow:inset 0 0 0 1px var(--should)}
+.tm.nit{background:var(--nit-soft);box-shadow:inset 0 0 0 1px var(--nit)}.tm.look{background:var(--look-soft);box-shadow:inset 0 0 0 1px var(--look)}.tm.question{background:var(--question-soft);box-shadow:inset 0 0 0 1px var(--question)}
+.tm.gen{background:repeating-linear-gradient(135deg,var(--surface-2) 0 7px,var(--surface-3) 7px 14px);color:var(--text-3)}
+.tm.read{opacity:.5}
+.tmn{font:600 12px var(--mono);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tms{font:500 11px var(--font);color:var(--text-2)}

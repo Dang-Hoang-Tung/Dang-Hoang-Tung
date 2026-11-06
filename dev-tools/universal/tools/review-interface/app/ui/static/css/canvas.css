@@ -1,0 +1,26 @@
+.canvas-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:none}
+.card-head h2{margin:0;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:var(--text-3)}
+.card-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 0}
+.zoom{display:flex;gap:4px}
+.canvas{position:relative;overflow:hidden;margin:10px 12px 0;border-radius:10px;cursor:grab;touch-action:none;height:320px;background:radial-gradient(circle at 1px 1px,var(--line) 1px,transparent 0) 0 0/18px 18px,var(--surface-2)}
+.canvas.dragging{cursor:grabbing}.canvas.dragging *{pointer-events:none}
+.stage{position:absolute;left:0;top:0;transform-origin:0 0}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--text-3);padding:12px 18px 14px;align-items:center}
+.legend>span{display:inline-flex;align-items:center;gap:6px}.legend .muted{margin-left:auto}
+
+svg.tree{display:block;stroke:none}
+svg.tree .edge{fill:none;stroke:var(--line-strong);stroke-width:1.3}
+svg.tree .node{fill:var(--surface);stroke:var(--line-strong);stroke-width:1;}
+svg.tree .node.root{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5}
+svg.tree .node.dir{fill:var(--surface-2)}
+svg.tree .node.gen{stroke-dasharray:4 3}
+svg.tree .node.block{fill:var(--block-soft);stroke:var(--block);stroke-width:1.6}
+svg.tree .node.should{fill:var(--should-soft);stroke:var(--should);stroke-width:1.6}
+svg.tree .node.nit{fill:var(--nit-soft);stroke:var(--nit);stroke-width:1.4}
+svg.tree .node.look{fill:var(--look-soft);stroke:var(--look);stroke-width:1.4}
+svg.tree .node.question{fill:var(--question-soft);stroke:var(--question);stroke-width:1.4}
+svg.tree text{stroke:none}
+svg.tree .nlabel{font:600 12px var(--mono);fill:var(--text);text-anchor:middle}
+svg.tree .nstat{font:500 11px var(--font);fill:var(--text-3);text-anchor:middle}
+svg.tree .a{fill:var(--add-fg)}svg.tree .d{fill:var(--del-fg)}
+svg.tree a{cursor:pointer}svg.tree a:hover .node,svg.tree a:focus .node{stroke:var(--accent);stroke-width:2}

@@ -1,0 +1,16 @@
+.layout{display:grid;grid-template-columns:var(--left) minmax(0,1fr) var(--right);align-items:start}
+aside.left,aside.right{position:sticky;top:var(--bar);height:calc(100vh - var(--bar));display:flex;flex-direction:column;min-height:0}
+aside.left{border-right:1px solid var(--line);background:var(--surface)}
+aside.right{border-left:1px solid var(--line);background:var(--surface)}
+main{min-width:0;padding:22px 26px 120px;display:flex;flex-direction:column;gap:16px}
+
+.resizer{position:absolute;top:0;bottom:0;width:9px;z-index:12;cursor:col-resize;touch-action:none}
+aside.left .resizer{right:-5px}aside.right .resizer{left:-5px}
+.resizer::after{content:"";position:absolute;top:0;bottom:0;left:4px;width:1px;background:transparent;transition:background .15s}
+.resizer:hover::after,.resizer.dragging::after{background:var(--accent);width:2px;left:3.5px}
+body.resizing{cursor:col-resize;user-select:none}
+body.resizing *{cursor:col-resize!important}
+
+@media (max-width:1360px){:root{--left:248px;--right:352px}.chips .hide-md{display:none}}
+@media (max-width:1100px){.layout{grid-template-columns:minmax(0,1fr) var(--right)}aside.left{display:none}}
+@media (max-width:820px){.layout{grid-template-columns:1fr}aside.right{position:static;height:auto;border-left:0;border-top:1px solid var(--line)}.fabs{right:16px}.chips{display:none}main{padding:16px}header.appbar{padding:0 16px}}

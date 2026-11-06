@@ -1,0 +1,16 @@
+{
+  "data_dir": "~/.local/share/review-interface",
+  "port": 47615,
+  "idle_hours": 2,
+  "keep_days": 14,
+  "ai_name": "Claude",
+  "sources": [
+    {
+      "repo": "owner/repo",
+      "clone": "~/code/repo",
+      "search": "review-requested:@me -author:@me"
+    }
+  ],
+  "teams": ["owner/team-slug"],
+  "adapters": {}
+}
