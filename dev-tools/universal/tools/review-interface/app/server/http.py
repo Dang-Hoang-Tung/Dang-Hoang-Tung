@@ -199,12 +199,32 @@ def prune_state(cfg):
             f.unlink()
 
 
-def watch_idle(httpd, cfg, last):
+def housekeeping(httpd, cfg, last):
+    """Prune old state every few hours; stop after `idle_hours` without requests (0 = never stop)."""
+    pruned = time.time()
     while True:
         time.sleep(30)
-        if time.time() - last[0] > cfg["idle_hours"] * 3600:
+        if time.time() - pruned > 6 * 3600:
+            prune_state(cfg)
+            pruned = time.time()
+        if cfg["idle_hours"] > 0 and time.time() - last[0] > cfg["idle_hours"] * 3600:
             httpd.shutdown()
             return
+
+
+def session_token(root):
+    """Reuse the saved token so links and bookmarks survive restarts."""
+    f = root / "token"
+    try:
+        token = f.read_text().strip()
+        if len(token) >= 32:
+            return token
+    except OSError:
+        pass
+    token = secrets.token_urlsafe(24)
+    f.write_text(token)
+    os.chmod(f, 0o600)
+    return token
 
 
 def remove_info(info):
@@ -218,7 +238,7 @@ def remove_info(info):
 def serve(cfg):
     d = dirs(cfg)
     prune_state(cfg)
-    token = secrets.token_urlsafe(24)
+    token = session_token(d["root"])
     last = [time.time()]
     handler = make_handler(cfg, token, lambda: last.__setitem__(0, time.time()))
     try:
@@ -228,7 +248,7 @@ def serve(cfg):
     info = d["root"] / "server.json"
     info.write_text(json.dumps({"pid": os.getpid(), "port": httpd.server_address[1], "token": token, "started": time.time()}))
     os.chmod(info, 0o600)
-    threading.Thread(target=watch_idle, args=(httpd, cfg, last), daemon=True).start()
+    threading.Thread(target=housekeeping, args=(httpd, cfg, last), daemon=True).start()
     try:
         httpd.serve_forever()
     finally:

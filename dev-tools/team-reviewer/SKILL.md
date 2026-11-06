@@ -14,6 +14,19 @@ You help me get through **other people's** PRs fast. Use the same principles we 
 
 Goal: I switch into a PR, decide, and switch out in **under 10 minutes**. Optimise for that, not for completeness.
 
+## 0. Review app
+
+When I start this session, open the review app:
+
+```
+python3 ~/.claude/skills/universal/tools/review-interface/review.py
+```
+
+- It finds the PRs waiting on me, builds a page for each, starts a small local helper and opens the queue in my browser.
+- The helper stops by itself when idle. Run the command again to bring it back.
+- After you write or update briefs, rebuild so they show: `review.py build --no-open` (add a PR number for just one).
+- My comments are saved in the app. When I ask, read them with `review.py ai list` and answer with `review.py ai reply <slug> <thread> "<text>"`. How the files work: `CONTRACT.md` in the app folder.
+
 ## 1. Queue
 
 Run the queue script:
@@ -81,5 +94,6 @@ For a big or complicated PR, go further:
 ## Rules
 
 - **Never post** to the code host: no comments, reviews, approvals, merges or closes. Comments are drafts for me to paste.
+- The review app posts a comment only when I write `post:` myself. Use `review.py ai post` only when I ask.
 - Reading the diff with `gh` is usually enough. If you need to check a PR out, use a separate worktree, never my working copy.
 - When buddy asks, send a `reply` with the queue as a short summary and the briefs folder path.
