@@ -6,7 +6,7 @@
   review.py paths                 print where pages, state, insights and diffs live (for an AI)
   review.py ai list               threads waiting for a reply
   review.py ai reply SLUG THREAD TEXT
-  review.py ai post SLUG THREAD   post the thread's latest `post:` message to GitHub
+  review.py ai post SLUG THREAD   post the thread's latest message marked for posting to GitHub
 
 PRs can be given as 123 (first configured repo) or owner/repo#123. Every command takes --config PATH first.
 """

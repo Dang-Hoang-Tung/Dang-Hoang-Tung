@@ -1,4 +1,4 @@
-function renderAll() { renderReadUI(); renderChecks(); renderThreads(); }
+function renderAll() { renderReadUI(); renderChecks(); renderThreads(); renderApprove(); }
 
 initFileSections();
 initTabs();
@@ -9,6 +9,7 @@ initTreeCanvas();
 initModals();
 initSelection();
 initThreads();
+initApprove();
 addEventListener('focus', reload);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) reload(); });
 renderStore();

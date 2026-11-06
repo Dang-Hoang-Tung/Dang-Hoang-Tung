@@ -14,11 +14,11 @@ class PostConflict(ValueError):
 
 
 def post_body(thread, message_id=None):
-    msgs = [m for m in thread["messages"] if not is_ai(m) and POST_PREFIX.match(m["text"])]
+    msgs = [m for m in thread["messages"] if not is_ai(m) and (m.get("post") is True or POST_PREFIX.match(m["text"]))]
     if message_id:
         msgs = [m for m in msgs if m["id"] == message_id]
     if not msgs:
-        raise ValueError("no message starting with post: in this thread")
+        raise ValueError("no message marked for posting in this thread")
     m = msgs[-1]
     return m, POST_PREFIX.sub("", m["text"], count=1).strip()
 
@@ -54,7 +54,7 @@ def start_post(cfg, meta, thread_id, message_id):
         if m["id"] in (t.get("posted_messages") or {}):
             return {**t["posted_messages"][m["id"]], "message_id": m["id"], "body": body}, m, body, t
         if not body:
-            raise ValueError("nothing to post after post:")
+            raise ValueError("nothing to post")
         marker = t.get("posting")
         if marker and marker.get("message_id") == m["id"] and age_seconds(marker.get("at")) < POSTING_TTL:
             raise PostConflict("already posting")

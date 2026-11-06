@@ -82,6 +82,16 @@ def fetch_api_diff(pr):
     return run("gh", "api", f"repos/{pr['repo']}/pulls/{pr['number']}", "-H", "Accept: application/vnd.github.diff")
 
 
+def submit_approval(repo, pr, commit, body=""):
+    if os.environ.get("REVIEW_POST_DRY_RUN"):
+        return {"url": f"https://example.invalid/{repo}/pull/{pr}#dry-run-approval", "id": 0, "dry_run": True}
+    args = ["gh", "api", "-X", "POST", f"repos/{repo}/pulls/{pr}/reviews", "-f", "event=APPROVE", "-f", f"commit_id={commit}"]
+    if body:
+        args += ["-f", f"body={body}"]
+    res = json.loads(run(*args))
+    return {"url": res["html_url"], "id": res["id"]}
+
+
 def post_comment(repo, pr, commit, thread, body):
     on_lines = bool(thread.get("path") and thread.get("line"))
     if os.environ.get("REVIEW_POST_DRY_RUN"):

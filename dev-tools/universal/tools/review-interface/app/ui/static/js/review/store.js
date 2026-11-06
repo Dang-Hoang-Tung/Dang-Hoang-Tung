@@ -31,7 +31,7 @@ function merge(disk, mine) {
     if ((t.resolvedAt || '') > (d.resolvedAt || '')) { d.resolved = t.resolved; d.resolvedAt = t.resolvedAt; }
     d.posted = d.posted || t.posted;
   }
-  return { pr: PR, commit: SHA, threads: [...byId.values()], read: laterMap(disk.read, mine.read), checked: laterMap(disk.checked, mine.checked) };
+  return { pr: PR, commit: SHA, threads: [...byId.values()], read: laterMap(disk.read, mine.read), checked: laterMap(disk.checked, mine.checked), approval: disk.approval || mine.approval };
 }
 let saving = Promise.resolve();
 function persist() {

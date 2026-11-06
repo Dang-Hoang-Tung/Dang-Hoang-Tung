@@ -38,3 +38,16 @@ header.appbar{position:sticky;top:0;z-index:30;height:var(--bar);display:flex;al
 
 #leftchip.done .a,#leftchip.done .d{display:none}
 #leftchip.done{color:var(--add);background:color-mix(in srgb,var(--add) var(--soft),var(--surface))}
+
+.approve-wrap{position:relative}
+.approve-btn{color:var(--add);background:transparent;border-color:var(--add);font-weight:600}
+.approve-btn:hover{background:color-mix(in srgb,var(--add) 10%,transparent)}
+.approve-btn.solid{background:var(--add);color:var(--surface)}.approve-btn.solid:hover{background:var(--add);filter:brightness(1.08)}
+.approve-btn.done{display:inline-flex;align-items:center;gap:4px;font:600 13px var(--font);padding:6px 12px;border:1px solid var(--add);border-radius:9px;color:var(--add);background:color-mix(in srgb,var(--add) 10%,transparent);white-space:nowrap}
+.approve-btn.done:hover{text-decoration:none}
+.popover{position:absolute;top:calc(100% + 8px);right:0;width:300px;display:flex;flex-direction:column;gap:8px;padding:12px;background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--r);box-shadow:var(--shadow-2);z-index:40}
+.popover[hidden]{display:none}
+.popover textarea{width:100%;min-height:72px;font:13px/1.45 var(--font);background:var(--surface-2);color:var(--text);border:1px solid var(--line);border-radius:9px;padding:8px 10px;resize:vertical}
+.popover textarea:focus{background:var(--surface);border-color:var(--add);outline:0}
+.popover .row{display:flex;gap:6px;justify-content:flex-end}
+.popover .perr{font-size:12px;color:var(--del);background:var(--del-bg);padding:6px 8px;border-radius:8px}

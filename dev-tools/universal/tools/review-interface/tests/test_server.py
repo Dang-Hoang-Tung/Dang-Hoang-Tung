@@ -231,6 +231,41 @@ class ServerTests(ServerBase):
         self.assertNotIn("posted", state.load_state(self.cfg, "acme-widgets-7")["threads"][0])
 
 
+class ApproveRouteTests(ServerBase):
+    SLUG = "acme-widgets-7"
+
+    def approve(self, body, slug=None, **kw):
+        status, _, out = self.req("POST", f"/api/approve/{slug or self.SLUG}", body, kw.get("headers", self.cookie))
+        return status, json.loads(out) if out.startswith(b"{") else out
+
+    def test_codes(self):
+        self.write_manifest({"slug": self.SLUG, "repo": REPO, "pr": 7, "head_sha": HEAD})
+        self.assertEqual(self.approve({"sha": HEAD}, "acme-widgets-99")[0], 404)
+        self.assertEqual(self.approve({"body": "x"})[0], 400)
+        self.assertEqual(self.approve([1])[0], 400)
+        self.assertEqual(self.approve({"sha": "deadbeef00"})[0], 409)
+        status, out = self.approve({"sha": HEAD, "body": "lgtm"})
+        self.assertEqual(status, 200)
+        self.assertTrue(out["approval"]["dry_run"])
+        self.assertEqual(out["state"]["approval"]["body"], "lgtm")
+        status, out = self.approve({"sha": HEAD})
+        self.assertEqual((status, out["error"]), (409, "Already approved at a1b2c3d."))
+
+    def test_auth_rules(self):
+        self.write_manifest({"slug": self.SLUG, "repo": REPO, "pr": 7, "head_sha": HEAD})
+        self.assertEqual(self.approve({"sha": HEAD}, headers={})[0], 403)
+        self.assertEqual(self.approve({"sha": HEAD}, headers={**self.cookie, "Origin": "https://evil.example"})[0], 403)
+
+    def test_gh_failure_502(self):
+        os.environ.pop("REVIEW_POST_DRY_RUN", None)
+        self.write_manifest({"slug": self.SLUG, "repo": REPO, "pr": 7, "head_sha": HEAD})
+        with mock.patch.object(github, "run", side_effect=RuntimeError("gh exploded")):
+            status, out = self.approve({"sha": HEAD})
+        self.assertEqual(status, 502)
+        self.assertIn("gh exploded", out["error"])
+        self.assertNotIn("approval", state.load_state(self.cfg, self.SLUG))
+
+
 class ServerHardeningTests(ServerBase):
     def put(self, headers=None, body=b"{}", path="/api/state/acme-widgets-7", method="PUT"):
         h = {**self.cookie, **(headers or {})}

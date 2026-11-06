@@ -9,7 +9,7 @@ CSS = ["tokens.css", "base.css", "appbar.css", "left-panel.css", "canvas.css", "
 JS = ["shared/dom.js", "shared/markdown.js", "shared/time.js", "shared/theme.js",
       "review/data.js", "review/store.js", "review/read-state.js", "review/files.js", "review/left-panel.js",
       "review/scroll-spy.js", "review/tree-canvas.js", "review/modals.js", "review/treemap.js",
-      "review/selection.js", "review/checks.js", "review/threads.js", "review/resizers.js", "review/main.js"]
+      "review/selection.js", "review/checks.js", "review/threads.js", "review/approve.js", "review/resizers.js", "review/main.js"]
 
 
 def _file_data(f):

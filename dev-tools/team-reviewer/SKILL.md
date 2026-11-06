@@ -95,6 +95,6 @@ For a big or complicated PR, go further:
 ## Rules
 
 - **Never post** to the code host: no comments, reviews, approvals, merges or closes. Comments are drafts for me to paste.
-- The review app posts a comment only when I write `post:` myself. Use `review.py ai post` only when I ask.
+- The review app posts a comment only when I tick "Post GitHub comment" myself, and approves only when I press Approve. Use `review.py ai post` only when I ask. Never approve for me.
 - Reading the diff with `gh` is usually enough. If you need to check a PR out, use a separate worktree, never my working copy.
 - When buddy asks, send a `reply` with the queue as a short summary and the briefs folder path.

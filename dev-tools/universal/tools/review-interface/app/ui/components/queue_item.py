@@ -52,9 +52,10 @@ def data_attrs(item):
 def _row(item):
     href = f'{esc(item["slug"])}.html'
     button = "Brief" if item["has_insights"] else "Details"
+    approved = '<span class="chip approved">Approved</span>' if item.get("approved") else ""
     return (
         f'<a class="qrow" href="{href}"><span class="prnum">#{esc(item["number"])}</span>'
-        f'<span class="t">{esc(item["title"])}</span>'
+        f'<span class="t">{esc(item["title"])}</span>{approved}'
         f'<time class="chip hide-md" data-req datetime="{esc(item["requested_at"])}">{esc(item["requested_at"][:10])}</time>'
         f'<span class="chip mono">{esc(item["head_sha"][:7])}</span><span class="chip">{comments_text(item)}</span>'
         f'<button type="button" class="briefbtn" aria-expanded="false">{button}{icons.CHEVRON_DOWN}</button></a>'

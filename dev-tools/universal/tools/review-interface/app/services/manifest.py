@@ -1,7 +1,7 @@
 import json
 
 from app.config import ROOT, dirs, now
-from app.services.state import atomic_write, state_path, waiting_threads
+from app.services.state import atomic_write, is_approved, state_path, waiting_threads
 
 SUMMARY_KEYS = ("slug", "repo", "pr", "title", "url", "author", "head_sha", "ci", "draft", "base", "added", "deleted", "files",
                 "effort", "minutes", "minutes_source", "verdict", "risk", "findings")
@@ -26,7 +26,8 @@ def build_entry(cfg, summary, requested_at, state):
             "page": str(d["pages"] / f"{s}.html"), "state_file": str(state_path(cfg, s)),
             "insights_file": str(d["insights"] / f"{s}.json"), "insights_status": summary["insights_status"],
             "requested_at": requested_at, "diff_file": str(d["diffs"] / f"{s}.diff"),
-            "threads": len(state.get("threads", [])), "waiting_threads": len(waiting_threads(state))}
+            "threads": len(state.get("threads", [])), "waiting_threads": len(waiting_threads(state)),
+            "approved": is_approved(state, summary["head_sha"])}
 
 
 def write_manifest(cfg, entries):

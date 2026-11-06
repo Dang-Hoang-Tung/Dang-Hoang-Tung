@@ -17,7 +17,7 @@ from urllib.parse import parse_qs, urlparse
 
 from app.config import dirs, load_config
 from app.services import build as builder
-from app.services import events, manifest, posting, state
+from app.services import approval, events, manifest, posting, state
 
 MAX_BODY = 2 * 1024 * 1024
 LOCAL_HOSTS = ("127.0.0.1", "localhost")
@@ -197,6 +197,8 @@ def make_handler(cfg, token, touch):
             if url.path == "/api/refresh":
                 start_refresh(cfg, refresh)
                 return self._json(202, refresh)
+            if url.path.startswith("/api/approve/"):
+                return self._approve(url.path.rsplit("/", 1)[1])
             if not url.path.startswith("/api/post/"):
                 return self._send(404, "not found")
             s = url.path.rsplit("/", 1)[1]
@@ -216,6 +218,24 @@ def make_handler(cfg, token, touch):
             except Exception as e:  # gh failures: show the reason in the thread
                 return self._json(502, {"error": (getattr(e, "stderr", "") or str(e)).strip()[:500]})
             return self._json(200, {"posted": posted, "state": saved})
+
+        def _approve(self, s):
+            meta = manifest.manifest_entry(cfg, s)
+            if not meta:
+                return self._json(404, {"error": "This PR is not in the current build. Run review.py again."})
+            req = self._body()
+            if not isinstance(req, dict):
+                return self._json(400, {"error": "body must be a JSON object"})
+            try:
+                record = approval.approve(cfg, meta, req.get("sha"), req.get("body"))
+                saved = state.load_state(cfg, s)
+            except approval.ApprovalConflict as e:
+                return self._json(409, {"error": str(e)})
+            except ValueError as e:
+                return self._json(400, {"error": str(e)})
+            except Exception as e:  # gh failures: show the reason
+                return self._json(502, {"error": (getattr(e, "stderr", "") or str(e)).strip()[:500]})
+            return self._json(200, {"approval": record, "state": saved})
 
     return Handler
 

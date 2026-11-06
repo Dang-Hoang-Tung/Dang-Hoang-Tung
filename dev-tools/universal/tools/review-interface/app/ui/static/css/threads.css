@@ -25,6 +25,8 @@ button.linked:hover{color:var(--accent);background:var(--surface-2)}
 .compose .row{display:flex;gap:6px;justify-content:flex-end;align-items:center}
 .compose .row .hint{margin-right:auto}
 .compose button.post{background:var(--add);color:var(--surface)}
+.compose .postopt{margin-right:auto;display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-2);cursor:pointer;user-select:none}
+.compose .postopt input{margin:0;accent-color:var(--add)}.compose .postopt input:disabled,.compose .postopt:has(input:disabled){cursor:not-allowed;opacity:.55}
 .posting{margin:10px 12px 0;font-size:12px;color:var(--text-3)}
 .post-error{margin:10px 12px 0;display:flex;gap:8px;align-items:center;justify-content:space-between;font-size:12px;color:var(--del);background:var(--del-bg);padding:6px 8px;border-radius:8px}
 .thread-head .old-commit{font-size:11px;font-weight:600;color:var(--should);white-space:nowrap}

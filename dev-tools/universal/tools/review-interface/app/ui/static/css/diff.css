@@ -30,7 +30,7 @@ body.focus-only section.file:not(.focused){display:none}
 .diffwrap{overflow-x:auto}
 table.diff{border-collapse:collapse;min-width:100%;font:12.5px/1.65 var(--mono);font-variant-numeric:tabular-nums}
 table.diff td{padding:0 12px;vertical-align:top}
-td.num{width:1%;min-width:50px;text-align:right;color:var(--text-3);user-select:none;cursor:pointer;position:relative;padding:0 10px;border-right:1px solid var(--line)}
+td.num{touch-action:pan-y;width:1%;min-width:50px;text-align:right;color:var(--text-3);user-select:none;cursor:pointer;position:relative;padding:0 10px;border-right:1px solid var(--line)}
 td.code{white-space:pre;width:100%;position:relative}
 .sign{color:var(--text-3);user-select:none;margin-right:8px}
 tr.add td{background:var(--add-bg)}tr.add td.num{background:var(--add-num);color:var(--add-fg)}tr.add .sign{color:var(--add-fg)}

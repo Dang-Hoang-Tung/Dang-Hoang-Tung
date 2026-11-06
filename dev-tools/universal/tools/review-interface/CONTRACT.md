@@ -30,11 +30,11 @@ After writing an insights file, run `review.py build` again (or `review.py build
   "insights_status": "missing|current|stale|invalid: <reason>",
   "page": "…/pages/<slug>.html", "state_file": "…/state/<slug>.json",
   "insights_file": "…/insights/<slug>.json", "diff_file": "…/diffs/<slug>.diff",
-  "threads": 3, "waiting_threads": 1
+  "threads": 3, "waiting_threads": 1, "approved": false
 }
 ```
 
-Fields: `requested_at` is when the review was last requested of you (ISO time). `minutes_source` says whether `minutes` came from the insights or is an estimate. `verdict` and `risk` come from the insights summary (empty without insights). `findings` counts recommendations per severity.
+Fields: `requested_at` is when the review was last requested of you (ISO time). `minutes_source` says whether `minutes` came from the insights or is an estimate. `verdict` and `risk` come from the insights summary (empty without insights). `findings` counts recommendations per severity. `approved` is true when the reviewer has approved the PR's current head.
 
 The manifest itself has `schema` (`review-manifest/1`), `generated_at`, `config`, `contract`, `dirs` (where pages, state, insights, diffs and the root live) and `prs` (the entries above).
 
@@ -98,7 +98,8 @@ The page writes this; an AI may add replies. Use `review.py ai reply`, or write 
     }
   ],
   "read": {"<file path>": {"read": true, "hash": "…", "at": "…"}},
-  "checked": {"<recommendation id>": {"on": true, "at": "…"}}
+  "checked": {"<recommendation id>": {"on": true, "at": "…"}},
+  "approval": {"url": "https://github.com/…", "id": 456, "at": "…", "commit": "76689ab6…", "body": "", "dry_run": false}
 }
 ```
 
@@ -106,13 +107,15 @@ The page writes this; an AI may add replies. Use `review.py ai reply`, or write 
 - A thread is waiting for the AI when it is open and its last message is from `me`. `review.py ai list` shows these.
 - `commit`: the PR head the thread was written on (set by the page). Posting is refused if it differs from the PR's current head.
 - `posted_messages` maps each posted message id to its GitHub comment; `posted` is the latest one, for the page. `posting` is a short-lived marker (`message_id`, `at`) set while a post is in flight; a second post of the same message within 2 minutes is refused. Do not write these by hand.
+- A message may carry `"post": true`: the reviewer marked it to be posted to GitHub (see Posting). It must be a boolean.
+- `approval` is written only by the helper when the reviewer approves the PR. **An AI must never approve a PR or write `approval`.** The page ignores `approval` sent in a state save.
 - `who` also accepts the legacy value `claude`, read as `ai`.
 - `noteKey` links a thread to a recommendation's `id`.
 - Never delete or rewrite the reviewer's messages; only append.
 
 ## Posting to GitHub
 
-A reviewer message that starts with `post:` is posted to the PR as written (without the prefix) when the reviewer sends it: a line comment for a thread on lines, otherwise a conversation comment. An AI can post a thread's latest `post:` message with `review.py ai post <slug> <thread>`. Posting is recorded per message in `posted_messages` (and in `posted`) and is never repeated for the same message.
+A reviewer message with `"post": true` is posted to the PR as written when the reviewer sends it (the legacy form, text starting with `post:`, is still accepted and the prefix is stripped): a line comment for a thread on lines, otherwise a conversation comment. An AI can post a thread's latest message marked for posting with `review.py ai post <slug> <thread>`. Posting is recorded per message in `posted_messages` (and in `posted`) and is never repeated for the same message.
 
 ## After a refresh
 
@@ -134,6 +137,6 @@ python3 review.py paths                      # where everything lives
 python3 review.py ai list                    # threads waiting for a reply
 python3 review.py ai changes                 # what changed in the latest rebuild or Refresh
 python3 review.py ai reply <slug> <thread> "text"
-python3 review.py ai post <slug> <thread>    # only when the reviewer asked for it
+python3 review.py ai post <slug> <thread>    # only when the reviewer asked for it; never approve
 python3 review.py build --no-open [PR …]     # rebuild pages after writing insights
 ```

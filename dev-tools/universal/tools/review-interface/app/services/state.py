@@ -80,6 +80,8 @@ def validate_state(mine):
         for m in t["messages"]:
             if not (isinstance(m, dict) and all(isinstance(m.get(k), str) for k in ("id", "at", "text"))):
                 raise ValueError("each message needs string id, at and text")
+            if "post" in m and not isinstance(m["post"], bool):
+                raise ValueError("message post must be true or false")
     for key in ("read", "checked"):
         if not _is_dict_of_dicts(mine.get(key, {})):
             raise ValueError(f"{key} must be an object of objects")
@@ -112,7 +114,7 @@ def merge_state(disk, mine):
             _merge_thread(threads[t["id"]], t)
         else:
             threads[t["id"]] = t
-    out = {**disk, **{k: v for k, v in mine.items() if k not in ("threads", "read", "checked")}}
+    out = {**disk, **{k: v for k, v in mine.items() if k not in ("threads", "read", "checked", "approval")}}
     out.update(threads=list(threads.values()), read=_later(disk.get("read"), mine.get("read")), checked=_later(disk.get("checked"), mine.get("checked")))
     return out
 
@@ -125,6 +127,11 @@ def is_ai(msg):
 def is_posted(thread, message_id):
     posted = thread.get("posted") or {}
     return posted.get("message_id") == message_id or message_id in (thread.get("posted_messages") or {})
+
+
+def is_approved(state, head_sha):
+    commit = (state.get("approval") or {}).get("commit") or ""
+    return len(commit) >= 7 and len(head_sha or "") >= 7 and (commit.startswith(head_sha) or head_sha.startswith(commit))
 
 
 def waiting_threads(state):

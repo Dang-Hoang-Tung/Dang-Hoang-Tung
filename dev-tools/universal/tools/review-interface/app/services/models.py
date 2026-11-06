@@ -4,7 +4,7 @@ from app.config import slug
 from app.domain import LAYERS, SEVERITIES, worst
 from app.services import diff as diffs
 from app.services import github, tree
-from app.services.state import waiting_threads
+from app.services.state import is_approved, waiting_threads
 
 ITEM_KEYS = ("slug", "number", "title", "url", "author", "head_sha", "ci", "draft", "effort", "minutes", "minutes_source",
              "added", "deleted", "files", "verdict", "risk", "findings", "has_insights", "summary")
@@ -169,7 +169,8 @@ def pr_summary(model, ins_status):
 
 def queue_item(summary, requested_at, state):
     item = {k: summary[k] for k in ITEM_KEYS}
-    item.update(requested_at=requested_at, threads=len(state.get("threads", [])), open_threads=len(waiting_threads(state)))
+    item.update(requested_at=requested_at, threads=len(state.get("threads", [])), open_threads=len(waiting_threads(state)),
+                approved=is_approved(state, summary["head_sha"]))
     return item
 
 

@@ -65,3 +65,5 @@
 @keyframes qspin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.qrefresh.busy svg{animation:none}}
 .qrefreshed{font-size:12px;color:var(--add)}
+
+.chip.approved{color:var(--add);background:color-mix(in srgb,var(--add) 10%,var(--surface));border-color:transparent;font-weight:600}

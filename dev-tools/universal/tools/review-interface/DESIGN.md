@@ -19,7 +19,7 @@ app/
   cli.py                        build | serve | paths | ai list/reply/post
   services/
     shell.py                    run(): subprocess with a timeout; the only place gh and git are spawned
-    github.py                   list_pending, requested_at, ci_state, fetch_api_diff, post_comment (all gh calls)
+    github.py                   list_pending, requested_at, ci_state, fetch_api_diff, post_comment, submit_approval (all gh calls)
     git.py                      fetch PR refs into refs/review/*, diff base...head
     diff.py                     parse_diff, generated detection, layer_of, file hash
     tree.py                     build_tree (nested), layout(tree, stats) -> geometry (no SVG)
@@ -27,6 +27,7 @@ app/
     adapters/team_reviewer.py   markdown brief -> insights; sync_briefs
     state.py                    load/save (atomic), per-slug file lock, merge (validated), waiting_threads
     posting.py                  post_body, post_thread (posting marker, per-message idempotency; uses github.post_comment)
+    approval.py                 approve(): stale-head and repeat checks, github.submit_approval, saves state["approval"]
     models.py                   review_model(), queue_model(): build view models from data
     manifest.py                 write/read manifest.json
     build.py                    orchestrates a build; a partial build merges into the existing manifest
@@ -94,7 +95,7 @@ Row ids are `r{file idx}-{row index}`. A binary file has `binary: true` and no r
 }
 item = {"slug", "number", "title", "url", "author", "requested_at": iso, "head_sha", "ci", "draft", "effort", "minutes",
         "minutes_source", "added", "deleted", "files", "verdict", "risk", "findings": {kind: n},
-        "has_insights": bool, "threads": int, "open_threads": int,
+        "has_insights": bool, "threads": int, "open_threads": int, "approved": bool,
         "summary": {"tldr", "questions", "description"}}
 ```
 
@@ -103,6 +104,7 @@ item = {"slug", "number", "title", "url", "author", "requested_at": iso, "head_s
 - `GET /?t=<token>&next=<page>`: sets the session cookie, redirects.
 - `GET /<page>.html`: pages from `<data_dir>/pages`.
 - `GET|PUT /api/state/<slug>`: read; merge-and-save.
-- `POST /api/post/<slug>` `{threadId, messageId?}`: post to GitHub, returns `{posted, state}`.
+- `POST /api/post/<slug>` `{threadId, messageId?}`: post a message marked `post: true` (or with the legacy `post:` prefix) to GitHub, returns `{posted, state}`.
+- `POST /api/approve/<slug>` `{sha, body?}`: approve the PR on GitHub for the current head, returns `{approval, state}`. 409 when `sha` is not the PR's head or it is already approved at this commit; 502 when `gh` fails.
 - `GET /api/ping`.
 All but ping and the token link need the cookie; writes (PUT/POST) need `Origin` equal to `http://<Host>` and `Content-Type: application/json`; bodies over 2 MB get 413; Host must be 127.0.0.1/localhost. `POST /api/post` answers 409 for "already posting" and for a comment written on an older commit. Unexpected errors return JSON 500.

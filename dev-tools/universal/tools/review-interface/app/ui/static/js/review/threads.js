@@ -24,21 +24,21 @@ function startDraft(anchor, noteKey, text) {
   const ta = $('#newtext');
   if (ta) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); ta.scrollIntoView({ block: 'nearest' }); }
 }
-function addThread(text) {
+function addThread(text, post) {
   const { text: _draft, ...anchor } = draftFor;
-  const msg = { id: uid(), who: 'me', text, at: now() };
+  const msg = { id: uid(), who: 'me', text, at: now(), ...(post && { post: true }) };
   const t = { id: uid(), ...anchor, commit: SHA, created: now(), resolved: false, resolvedAt: null, posted: null, messages: [msg] };
   state.threads.push(t);
   draftFor = null; sel = null; activeThread = t.id; delete drafts.new;
   paintSel(); renderThreads(); renderChecks();
-  if (isPost(text)) postThread(t, msg.id); else persist();
+  if (post) postThread(t, msg.id); else persist();
 }
 const liveThread = t => state.threads.find(x => x.id === t.id) || t;
-function addReply(t, text) {
+function addReply(t, text, post) {
   t = liveThread(t);
-  const msg = { id: uid(), who: 'me', text, at: now() };
+  const msg = { id: uid(), who: 'me', text, at: now(), ...(post && { post: true }) };
   delete drafts[t.id]; t.messages.push(msg); renderThreads();
-  if (isPost(text)) postThread(t, msg.id); else persist();
+  if (post) postThread(t, msg.id); else persist();
 }
 function toggleResolved(t) { t = liveThread(t); t.resolved = !t.resolved; t.resolvedAt = now(); renderThreads(); persist(); }
 function focusThread(id) {
@@ -51,12 +51,17 @@ function composer(key, placeholder, value, onSave, onCancel, saveLabel, blocked)
   const ta = el('textarea'); ta.placeholder = placeholder; ta.value = key in drafts ? drafts[key].value : value || ''; ta.dataset.draft = key;
   if (onCancel) ta.id = 'newtext';
   const row = el('div', 'row');
-  row.append(el('span', 'hint', '⌘↵ send · start with post: to post on GitHub'));
+  const opt = el('label', 'postopt'), box = el('input'); box.type = 'checkbox'; box.dataset.postfor = key;
+  box.checked = !blocked && !!(drafts[key] && drafts[key].post);
+  if (blocked) { box.disabled = true; opt.title = blocked; }
+  opt.append(box, 'Post GitHub comment');
+  row.append(opt);
   if (onCancel) { const x = el('button', 'sm', 'Cancel'); x.type = 'button'; x.onclick = onCancel; row.append(x); }
-  const s = el('button', 'primary sm', saveLabel); s.type = 'button';
-  const label = () => { const p = isPost(ta.value); s.textContent = p ? 'Post to GitHub' : saveLabel; s.classList.toggle('post', p); s.disabled = p && !!blocked; s.title = s.disabled ? blocked : ''; };
-  ta.addEventListener('input', () => { drafts[key] = { value: ta.value }; label(); }); label();
-  s.onclick = () => { const v = ta.value.trim(); if (v) onSave(v); };
+  const s = el('button', 'primary sm', saveLabel); s.type = 'button'; s.title = '⌘↵';
+  const label = () => { s.textContent = box.checked ? 'Post' : saveLabel; s.classList.toggle('post', box.checked); };
+  const keep = () => { drafts[key] = { ...drafts[key], value: ta.value, post: box.checked }; label(); };
+  ta.addEventListener('input', keep); box.addEventListener('change', keep); label();
+  s.onclick = () => { const v = ta.value.trim(); if (v) onSave(v, box.checked); };
   ta.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) s.click(); });
   row.append(s);
   c.append(ta, row);
@@ -66,8 +71,9 @@ function renderThreads() {
   const list = $('#list'), top = list.scrollTop, focused = document.activeElement;
   let refocus = null;
   $$('textarea[data-draft]', list).forEach(ta => {
-    if (ta.value) drafts[ta.dataset.draft] = { value: ta.value, start: ta.selectionStart, end: ta.selectionEnd };
-    else delete drafts[ta.dataset.draft];
+    const k = ta.dataset.draft, post = !!(drafts[k] && drafts[k].post);
+    if (ta.value || post) drafts[k] = { value: ta.value, post, start: ta.selectionStart, end: ta.selectionEnd };
+    else delete drafts[k];
     if (ta === focused) refocus = ta.dataset.draft;
   });
   anchorThreads();
@@ -124,7 +130,7 @@ function renderThreads() {
       const d = el('div', 'post-error', ps.error);
       const retry = el('button', 'sm', 'Try again'); retry.type = 'button';
       if (stale(t)) { retry.disabled = true; retry.title = STALE_TIP; }
-      const lastPost = [...t.messages].reverse().find(m => !isAi(m) && isPost(m.text));
+      const lastPost = [...t.messages].reverse().find(m => !isAi(m) && m.post);
       retry.onclick = () => postThread(liveThread(t), lastPost && lastPost.id);
       d.append(retry); box.append(d);
     }

@@ -238,6 +238,27 @@ class ReviewPageTests(unittest.TestCase):
     def test_tree_links_per_leaf(self):
         self.assertEqual(self.page.count('class="tlink"'), 2)
 
+    def test_approve_button_and_popover(self):
+        for needle in ('id="approvebtn"', 'id="approvepop"', 'id="approvetext"', 'Add a comment (optional)', 'id="approvecancel"', 'id="approvego"'):
+            self.assertIn(needle, self.page, needle)
+        js = assets.bundle_js(review_page.JS)
+        self.assertIn("'/api/approve/' + D.slug", js)
+        self.assertIn("JSON.stringify({ sha: D.sha, body", js)
+        self.assertIn("startsWith('https://')", js)
+        self.assertIn("done.href = a.url", js)
+
+    def test_composer_checkbox_and_no_post_prefix(self):
+        js = assets.bundle_js(review_page.JS)
+        self.assertIn("Post GitHub comment", js)
+        self.assertNotIn("start with post:", js)
+        self.assertNotIn("isPost", js)
+        self.assertIn("post: true", js)
+
+    def test_drag_selection_present(self):
+        js = assets.bundle_js(review_page.JS)
+        for needle in ("'pointerdown'", "'pointermove'", "'pointerup'"):
+            self.assertIn(needle, js)
+
     def test_appbar(self):
         self.assertIn("Make the button &lt;great&gt;", self.page)
         self.assertIn("CI passing", self.page)
@@ -288,6 +309,13 @@ class QueuePageTests(unittest.TestCase):
         self.assertIn("(estimated)", self.page)
         self.assertIn("2 comments · 1 open", self.page)
         self.assertIn('data-req datetime="2026-11-01T10:00:00Z"', self.page)
+
+    def test_approved_chip(self):
+        self.assertNotIn('class="chip approved"', self.page)
+        model = queue_model()
+        model["buckets"][0]["items"][0]["approved"] = True
+        page = queue_page.render(model)
+        self.assertEqual(page.count('<span class="chip approved">Approved</span>'), 1)
 
     def test_description_escaped(self):
         self.assertNotIn("<script>alert(1)</script>", self.page)

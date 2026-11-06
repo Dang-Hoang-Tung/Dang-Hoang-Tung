@@ -160,7 +160,10 @@ class QueueModelTests(unittest.TestCase):
         self.assertEqual(item["requested_at"], "2026-11-01T00:00:00Z")
         self.assertEqual(sorted(item), sorted(["slug", "number", "title", "url", "author", "requested_at", "head_sha", "ci", "draft", "effort",
                                                "minutes", "minutes_source", "added", "deleted", "files", "verdict", "risk", "findings",
-                                               "has_insights", "threads", "open_threads", "summary"]))
+                                               "has_insights", "threads", "open_threads", "approved", "summary"]))
+        self.assertFalse(item["approved"])
+        st["approval"] = {"commit": HEAD}
+        self.assertTrue(models.queue_item(summary_for("a-b-1", 1, "bob"), "2026-11-01T00:00:00Z", st)["approved"])
 
 
 class ManifestTests(TmpCase):
@@ -171,6 +174,9 @@ class ManifestTests(TmpCase):
         entry = manifest.build_entry(self.cfg, summary, "2026-11-01T10:00:00Z", state.load_state(self.cfg, "acme-widgets-7"))
         self.assertEqual((entry["slug"], entry["pr"], entry["repo"], entry["requested_at"]), ("acme-widgets-7", 7, REPO, "2026-11-01T10:00:00Z"))
         self.assertEqual((entry["threads"], entry["waiting_threads"], entry["insights_status"]), (1, 1, "missing"))
+        self.assertFalse(entry["approved"])
+        state.save_state(self.cfg, "acme-widgets-7", {"approval": {"commit": HEAD[:7]}})
+        self.assertTrue(manifest.build_entry(self.cfg, summary, "x", state.load_state(self.cfg, "acme-widgets-7"))["approved"])
         for key in ("page", "state_file", "insights_file", "diff_file"):
             self.assertIn("acme-widgets-7", entry[key])
         written = manifest.write_manifest(self.cfg, [entry])
