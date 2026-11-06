@@ -41,7 +41,7 @@ function apply() {
   $('#qnone').hidden = shown > 0 || !items.length;
   $('#qs').value = f.q;
   authorDropdown.set(f.author);
-  $$('[data-effort]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.effort === f.effort)));
+  $$('.seg [data-effort]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.effort === f.effort)));
   $$('[data-tog]').forEach(b => { b.checked = !!f[b.dataset.tog]; });
   const n = TOGGLE_KEYS.filter(k => f[k]).length;
   const badge = $('.fcount'); badge.textContent = n; badge.hidden = !n;
@@ -57,7 +57,7 @@ function initFilters() {
   const host = $('#qa');
   authorDropdown = createDropdown(host, {options: JSON.parse(host.dataset.options), value: f.author, placeholder: 'All authors', onChange: author => set({author})});
   $('#qs').addEventListener('input', e => set({q: e.target.value}));
-  $$('[data-effort]').forEach(b => b.addEventListener('click', () => set({effort: b.dataset.effort})));
+  $$('.seg [data-effort]').forEach(b => b.addEventListener('click', () => set({effort: b.dataset.effort})));
   $$('[data-tog]').forEach(b => b.addEventListener('change', () => set({[b.dataset.tog]: b.checked})));
   initFiltersMenu();
   $$('.qclear:not(#fclear)').forEach(b => b.addEventListener('click', () => set({...blank})));

@@ -448,3 +448,10 @@ class IntralineTests(unittest.TestCase):
         tag = 'src="https://cdn.jsdelivr.net/npm/diff@5.2.0/dist/diff.min.js" integrity="sha384-'
         self.assertIn(tag, page)
         self.assertLess(page.index(tag), page.rindex("initIntraline();"))
+
+
+class QueueEffortFilterTests(unittest.TestCase):
+    def test_effort_handlers_only_target_the_segmented_buttons(self):
+        js = (Path(__file__).resolve().parent.parent / "app/ui/static/js/queue/filters.js").read_text()
+        self.assertNotIn("$$('[data-effort]')", js)
+        self.assertIn("$$('.seg [data-effort]')", js)
