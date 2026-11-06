@@ -1,3 +1,4 @@
+import difflib
 import hashlib
 import re
 
@@ -77,6 +78,39 @@ def header_info(first, lines):
     return path, binary
 
 
+SIMILAR_ENOUGH = 0.4
+
+
+def _changed_ranges(matcher, side):
+    """Character ranges on one side ('a' = old, 'b' = new) that the matcher marks as changed."""
+    out = []
+    for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+        start, end = (i1, i2) if side == "a" else (j1, j2)
+        if tag != "equal" and end > start:
+            out.append([start, end])
+    return out
+
+
+def inline_spans(rows):
+    """{row index: [[start, end], ...]} for removed/added lines that pair up as edits of each other."""
+    spans, i = {}, 0
+    while i < len(rows):
+        if rows[i][0] != "del":
+            i += 1
+            continue
+        dels = []
+        while i < len(rows) and rows[i][0] == "del":
+            dels.append(i); i += 1
+        adds = []
+        while i < len(rows) and rows[i][0] == "add":
+            adds.append(i); i += 1
+        for d, a in zip(dels, adds):
+            m = difflib.SequenceMatcher(None, rows[d][3], rows[a][3], autojunk=False)
+            if m.ratio() >= SIMILAR_ENOUGH:
+                spans[d], spans[a] = _changed_ranges(m, "a"), _changed_ranges(m, "b")
+    return spans
+
+
 def parse_diff(diff, generated):
     gen_re = [re.compile(p) for p in generated]
     files = []
@@ -89,7 +123,7 @@ def parse_diff(diff, generated):
         if lines and lines[-1] == "":
             lines.pop()
         rows, a, d = ([], 0, 0) if binary else parse_file_rows(lines)
-        files.append({"idx": len(files), "path": path, "rows": rows, "a": a, "d": d, "binary": binary,
+        files.append({"idx": len(files), "path": path, "rows": rows, "spans": inline_spans(rows), "a": a, "d": d, "binary": binary,
                       "gen": any(r.search(path) for r in gen_re)})
     return files
 

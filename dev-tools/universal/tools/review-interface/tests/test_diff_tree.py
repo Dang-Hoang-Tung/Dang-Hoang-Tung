@@ -178,3 +178,17 @@ class ParseDiffPathTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class InlineSpanTests(unittest.TestCase):
+    def test_pairs_edited_lines_and_marks_only_changed_characters(self):
+        from app.services.diff import inline_spans
+        rows = [["hunk", None, None, "@@"], ["del", 1, None, "const total = a + b;"], ["add", None, 1, "const total = a + c;"], ["ctx", 2, 2, "}"]]
+        spans = inline_spans(rows)
+        self.assertEqual(spans[1], [[18, 19]])
+        self.assertEqual(spans[2], [[18, 19]])
+
+    def test_unrelated_lines_get_no_spans(self):
+        from app.services.diff import inline_spans
+        rows = [["del", 1, None, "import os"], ["add", None, 1, "export default function Panel() {"]]
+        self.assertEqual(inline_spans(rows), {})

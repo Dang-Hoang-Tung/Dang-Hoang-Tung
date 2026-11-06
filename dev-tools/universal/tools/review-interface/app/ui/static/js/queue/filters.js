@@ -17,7 +17,7 @@ function initFiltersMenu() {
 }
 
 function loadFilters() {
-  try { f = {...blank, ...JSON.parse(localStorage.getItem(FILTER_KEY) || '{}')}; } catch (e) {}
+  try { f = {...blank, ...JSON.parse(sessionStorage.getItem(FILTER_KEY) || '{}')}; } catch (e) {}
 }
 
 const active = () => f.q || f.author || f.effort || f.brief || f.failing || f.nodraft;
@@ -46,7 +46,7 @@ function apply() {
   const n = TOGGLE_KEYS.filter(k => f[k]).length;
   const badge = $('.fcount'); badge.textContent = n; badge.hidden = !n;
   $('#fclear').hidden = !n;
-  try { localStorage.setItem(FILTER_KEY, JSON.stringify(f)); } catch (e) {}
+  try { sessionStorage.setItem(FILTER_KEY, JSON.stringify(f)); } catch (e) {}
 }
 const set = patch => { Object.assign(f, patch); apply(); };
 

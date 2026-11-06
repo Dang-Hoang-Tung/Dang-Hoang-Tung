@@ -121,7 +121,7 @@ def file_model(f, by_file):
     ns = by_file.get(f["path"], [])
     return {"idx": f["idx"], "path": f["path"], "a": f["a"], "d": f["d"], "gen": f["gen"], "layer": diffs.layer_of(f),
             "hash": diffs.file_hash(f["rows"]), "binary": f["binary"], "kind": worst(x["kind"] for x in ns), "notes": [x["key"] for x in ns],
-            "rows": [list(r) for r in f["rows"]]}
+            "rows": [list(r) for r in f["rows"]], "spans": f.get("spans", {})}
 
 
 def review_model(cfg, pr, diff_text, ins, ins_status, user_name):

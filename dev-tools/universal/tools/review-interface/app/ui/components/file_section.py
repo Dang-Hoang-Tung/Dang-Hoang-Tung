@@ -41,6 +41,17 @@ def _marks(notes):
     )
 
 
+def _code(text, ranges):
+    """Line text with changed character ranges wrapped in <span class="hl">."""
+    if not ranges:
+        return esc(text)
+    out, pos = [], 0
+    for start, end in ranges:
+        out.append(esc(text[pos:start]) + f'<span class="hl">{esc(text[start:end])}</span>')
+        pos = end
+    return "".join(out) + esc(text[pos:])
+
+
 def _row(f, index, row, ends, hot):
     kind, old, new, text = row
     if kind == "hunk":
@@ -51,7 +62,7 @@ def _row(f, index, row, ends, hot):
     return (
         f'<tr id="{row_id}" data-f="{f["idx"]}" data-o="{_num(old)}" data-n="{_num(new)}" class="{kind}{hot_class}">'
         f'<td class="num">{_num(old)}</td><td class="num">{_num(new)}</td>'
-        f'<td class="code"><span class="sign">{SIGNS.get(kind, " ")}</span>{esc(text)}{_marks(ends.get(row_id, []))}</td></tr>'
+        f'<td class="code"><span class="sign">{SIGNS.get(kind, " ")}</span>{_code(text, f.get("spans", {}).get(index))}{_marks(ends.get(row_id, []))}</td></tr>'
     )
 
 
