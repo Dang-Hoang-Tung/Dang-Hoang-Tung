@@ -116,7 +116,8 @@ function renderRemaining(n, total) {
   $('.a', chip).textContent = '+' + sum('a');
   $('.d', chip).textContent = '−' + sum('d');
   chip.classList.toggle('done', !left.length);
-  $('.left-files', chip).textContent = !n ? `· ${total} files` : left.length ? `· ${left.length} of ${total} files left` : `All ${total} files viewed`;
+  const done = total - left.length;
+  $('.left-files', chip).textContent = `· ${done}/${total} · ${total ? Math.round(done / total * 100) : 0}%`;
 }
 
 function renderReadUI() {
