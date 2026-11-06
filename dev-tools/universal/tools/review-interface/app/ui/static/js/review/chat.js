@@ -7,12 +7,44 @@ function fitFabs() {
   const box = $('#chatbox');
   document.documentElement.style.setProperty('--chatbox', (box && !box.hidden ? box.offsetHeight : 0) + 'px');
 }
+const CHAT_MIN = 150, CHAT_DEFAULT = 250;
+function chatMax() {
+  const bar = $('header.appbar'), top = bar ? bar.getBoundingClientRect().bottom : 0;
+  return Math.max(CHAT_MIN, (innerHeight - top) * 0.9 - $('#chatbar').offsetHeight - 16);
+}
+function setChatHeight(h, save) {
+  const v = Math.round(Math.min(chatMax(), Math.max(CHAT_MIN, h)));
+  document.documentElement.style.setProperty('--chath', v + 'px');
+  if (save) try { localStorage.setItem('chatHeight', String(v)); } catch (e) { /* ignore */ }
+  fitFabs();
+}
+function initChatGrip() {
+  const grip = $('#chatgrip'), box = $('#chatbox'), chat = $('#chat');
+  let saved = CHAT_DEFAULT;
+  try { saved = Number(localStorage.getItem('chatHeight')) || CHAT_DEFAULT; } catch (e) { /* ignore */ }
+  setChatHeight(saved, false);
+  grip.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    const startY = e.clientY, startH = box.offsetHeight;
+    grip.setPointerCapture(e.pointerId);
+    chat.classList.add('resizing');
+    const move = ev => setChatHeight(startH + (startY - ev.clientY), false);
+    const up = ev => {
+      grip.removeEventListener('pointermove', move); grip.removeEventListener('pointerup', up);
+      chat.classList.remove('resizing');
+      setChatHeight(startH + (startY - ev.clientY), true);
+    };
+    grip.addEventListener('pointermove', move); grip.addEventListener('pointerup', up);
+  });
+  grip.addEventListener('dblclick', () => setChatHeight(CHAT_DEFAULT, true));
+  addEventListener('resize', () => setChatHeight(box.offsetHeight || saved, false));
+}
 function chatOpen() { try { return localStorage.getItem('chatOpen') === '1'; } catch (e) { return false; } }
 function setChatOpen(open) {
   $('#chatbox').hidden = !open;
-  $('#chattoggle').setAttribute('aria-expanded', String(open));
+  $('#chatinput').setAttribute('aria-expanded', String(open));
   try { localStorage.setItem('chatOpen', open ? '1' : '0'); } catch (e) { /* ignore */ }
-  if (open) { renderChat(true); $('#chatinput').focus(); }
+  if (open) renderChat(true);
   fitFabs();
 }
 function renderChat(force) {
@@ -61,7 +93,10 @@ async function pollTick() {
 }
 function initChat() {
   const input = $('#chatinput');
-  $('#chattoggle').onclick = () => setChatOpen($('#chatbox').hidden);
+  input.addEventListener('focus', () => { if ($('#chatbox').hidden) setChatOpen(true); });
+  input.addEventListener('click', () => { if ($('#chatbox').hidden) setChatOpen(true); });
+  initChatGrip();
+  $('#chatclose').onclick = () => { setChatOpen(false); input.blur(); };
   $('#chatsend').onclick = sendChat;
   input.addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); sendChat(); }

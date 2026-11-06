@@ -18,7 +18,7 @@ class ChatTests(unittest.TestCase):
         self.page = review_page.render(review_model())
 
     def test_bar_and_box_render(self):
-        for part in ('id="chatbar"', 'id="chatbox"', 'id="chatinput"', 'id="chatsend"', 'id="chattoggle"', 'id="chatwait"'):
+        for part in ('id="chatbar"', 'id="chatbox"', 'id="chatinput"', 'id="chatsend"', 'id="chatclose"', 'id="chatwait"'):
             self.assertIn(part, self.page)
 
     def test_chat_script_and_css_included(self):
