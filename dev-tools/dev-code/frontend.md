@@ -1,3 +1,0 @@
-- State and data should flow from the top down
-- Anything that is prop-drilled with no consumption in between is a good candidate for using context providers
-- 

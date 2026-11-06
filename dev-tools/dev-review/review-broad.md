@@ -1,20 +1,27 @@
-# Overview
-Concise summary of the Linear ticket (if available).
-Concise summary of the PR.
+# Broad review
 
-# Product
-- Challenge the product decisions and trade-offs made, is there a better approach?
-- Does the change meet the requirements and acceptance criteria of the Linear ticket?
-- Does the change align with the intended user experience, design specifications and product quality?
+Read first: `~/.claude/skills/universal/code/architecture.md`
 
-# Architecture & Infrastructure
-- Challenge the overall architecture and infrastructure, is there a better approach?
-- Is the infrastructure (if relevant) appropriate for the problem at hand, or is it overkill or underpowered?
-- Does the code follow the principles and patterns we aim for (e.g. hexagonal architecture, ports and adapters, DDD)?
-- Are there clear boundaries between domain logic, application services, and infrastructure?
-- Are there any potential security vulnerabilities or risks in the current implementation?
+## Overview
 
-# Verdict
-- Overall, would you recommend approve or request changes or reject?
-- What are the pros and cons of the decisions made?
+- Short summary of the ticket (if there is one).
+- Short summary of the PR.
+
+## Product
+
+- Challenge the product decisions and trade-offs. Is there a better approach?
+- Does the change meet the ticket's requirements and acceptance criteria?
+- Does it match the intended user experience, design and product quality?
+
+## Architecture and infrastructure
+
+- Challenge the architecture and infrastructure. Is there a better approach?
+- Is the infrastructure right for the problem, or is it overkill or underpowered?
+- Does it follow the architecture principles? Are the boundaries between domain, application and infra clear?
+- Are there security risks?
+
+## Verdict
+
+- Verdict (see the list in `dev-review`)?
+- Pros and cons of the decisions made.
 - Which changes are worth addressing?

@@ -1,58 +1,67 @@
 ---
 name: dev-qa
-description: Guides on how to QA, interactively test, and productionise code
+description: Playbook for interactive QA of a change through the real product: frontend, backend or end to end. Use for "QA this ticket", "test this PR", "check it works".
 ---
 
-# Context
+@~/.claude/skills/universal/subagent.md
+@~/.claude/skills/workspace/stack.md
 
-Several things to confirm before starting the QA process:
+# QA
 
-- What is the functionality we're testing? (can be a Linear ticket or a PR)
-- Are we testing the frontend, backend, or end-to-end?
-- Do we have existing data or do we need to create it?
-- What scenarios are we testing? Most of the time, we want to test all the happy paths, and the most prominent unhappy paths or edge cases.
+Goal: prove the change works through the real product, the way a user would hit it.
 
-# Modes
+## 1. Set up
 
-- Auto mode (default): run automatically, and I will only intervene if I need to. You can spin up the local server and run the frontend and backend tests, and check the database for records.
-- Manual mode: I will tell you when to move to the next stage, and you will wait for my instructions.
+Only team-pe deploys.
 
-# Steps
+- Your lead sends team-pe `integrate` with your branch (if you're the lead, you send it). Say if you need the local backend; team-pe decides.
+- Wait for `deployed`. Reply `testing`, then test. When you're done, send `tested` with pass or fail.
+- team-pe not running? Ask buddy (`blocked`) to get it started.
 
-1. Classify the change (backend / frontend / data / e2e) to choose the approach.
-2. Map topology: where each part runs, and which datastore/service it reads and writes.
-3. Identify the exact prerequisite state the feature needs, including auth/ownership and transitive dependencies.
-4. Create that state (reuse-and-tweak → product UI → direct seed), in the place the system reads from.
-5. Obtain credentials; confirm the identity/role matches the path you intend to exercise.
-6. Test deterministic/cheap paths first, then expensive/non-deterministic ones.
-7. Use low-level access for setup and verification; assert via the real interface.
-8. Note what the interface can't reveal (logs, internal state) and cover it another way.
-9. Decide on cleanup.
+## 2. Agree the scope
 
-# General approaches
+Confirm with me:
 
-For all QA, you can mint a a session JWT for my user and use it whether to test frontend or backend.
+- What are we testing? (a ticket, a PR, or the whole branch)
+- Frontend, backend, or end to end?
+- Do we have the data, or do we need to create it?
+- Which scenarios? Usually every happy path, plus the most likely unhappy paths and edge cases.
 
-1. Test the frontend
+## 3. Test
 
-- Run the full stack or just the frontend with a mock shell for the backend
-- Identify the flow we want to test, and on which page we can find it
-- Check UI/UX is working correctly (you can use Playwright chrome extension to launch a browser and test interactively)
+1. Map where each part runs, and which datastore or service it reads and writes.
+2. Find the exact state the feature needs, including auth, ownership and indirect dependencies.
+3. Create that state where the system reads it from. Prefer, in order:
+   - reuse and tweak existing data
+   - create it through the product UI
+   - seed it directly: `python3 ~/.claude/skills/universal/scripts/db.py "<sql>" --apply`, or give me the query
+4. Get credentials (see Auth in the stack file). Check the identity and role match the path you're testing.
+5. Test cheap, predictable paths first, then expensive or unpredictable ones.
+6. Use low-level access (DB, API) for setup and checks. Assert through the real interface.
+7. Note what the interface can't show (logs, internal state) and check it another way.
 
-2. Test the backend
+## By type
 
-- Run the backend
-- Identify the endpoints and lambdas we want to test
-- Create an example payload and send to the API (i.e. a cURL command)
-- Check the DB table (if relevant) for records - can give a SQL query for the user to run
+| Type         | Run                     | How                                                                 | Check                       |
+| ------------ | ----------------------- | ------------------------------------------------------------------- | --------------------------- |
+| Frontend     | Full stack              | Find the flow and its page. Drive a browser with the browser-automation tool.        | The UI behaves correctly, and screenshots match the design |
+| Backend      | Backend services        | Find the endpoints and handlers. Send an example payload (cURL).     | Response, and DB records    |
+| End to end   | Full stack              | Trigger the flow through the UI.                                    | UI, and DB records          |
 
-2. Test end-to-end
+API calls: `python3 ~/.claude/skills/universal/scripts/api.py <METHOD> <service> <path>`. DB checks: `python3 ~/.claude/skills/universal/scripts/db.py "<select>"`.
 
-- Run the full stack
-- Identify the flow we want to test, and on which page we can find it
-- Trigger the flow through the UI/UX
-- Check the DB table (if relevant) for records - can give a SQL query for the user to run
+## 4. Wrap up
 
-# Reference material
+1. Summarise what passed, what failed, and what we couldn't check. Send `tested` to team-pe.
+2. Decide on cleanup of test data with me.
+3. If the whole flow works, offer a **demo snapshot** (see below).
 
-Use REFERENCE.md to understand exactly how the development stack works so you can navigate the QA process.
+## Demo snapshot
+
+Freezes the working code so I can demo it later. Only if I say yes.
+
+- Create an annotated tag on the branch tip: `git tag -a <name> -m "<what this captures>" <branch-tip>`. It won't move on rebase, and its commits won't be garbage-collected.
+- For a PR stack, tag the **top** branch's tip. It already contains the whole stack.
+- Keep it local. Push (`git push origin <tag>`) only if I want to share it.
+- Restore with `git checkout <tag>` or `git checkout -b demo/<x> <tag>`.
+- A tag captures code only. Also note what else the demo needs: sandbox or stage, feature flags, changes in other repos, seeded data.

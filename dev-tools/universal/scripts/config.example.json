@@ -1,0 +1,27 @@
+{
+  "user": {
+    "email": "you@example.com",
+    "branch_tag": "you"
+  },
+  "repos": {
+    "main": "~/code/your-meta-repo/your-app",
+    "worktrees": "~/code/worktrees"
+  },
+  "local": {
+    "env_file": ".env.local",
+    "api_root_key": "API_ROOT_URL",
+    "db_container": "your-app-postgres-1",
+    "db_user": "postgres",
+    "db_name": "postgres"
+  },
+  "migrations_dir": "migrations/",
+  "deploy": {
+    "workflow": "deploy.yml",
+    "url": "https://{label}.{stage}.example.com",
+    "labels": [
+      "app",
+      "api"
+    ]
+  },
+  "migrations_sum_file": null
+}

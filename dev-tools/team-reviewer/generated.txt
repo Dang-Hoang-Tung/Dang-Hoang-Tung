@@ -1,0 +1,13 @@
+# Generated files and lockfiles, left out of PR size. One glob per line.
+*Generated*.ts
+*generated*.ts
+*.gen.ts
+*/generated/*
+*/__generated__/*
+*openapi*.json
+*openapi*.yaml
+*.snap
+pnpm-lock.yaml
+yarn.lock
+package-lock.json
+*.lock
