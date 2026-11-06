@@ -71,27 +71,11 @@ Failed lookups: <PR> — <error>
 
 ## 2. Pre-brief
 
-Write a brief per PR, saved as `~/.claude/agent-files/shared/team-reviewer/briefs/<repo>-<pr>-<sha7>.md`. A brief only counts if its sha7 matches the PR's current commit. Don't re-brief an unchanged PR.
+Run `/dev-review` on every PR in the queue, in parallel: one sub-agent per PR, which runs the personas as the skill says. Don't re-review an unchanged PR.
 
-**How:**
-
-1. **Intent first.** In one sentence, what is the PR trying to do? If you can't tell, that's a finding.
-2. **Read around the diff.** Open the changed files, and check callers and callees. Most real bugs sit where changed code meets unchanged code.
-3. **Check against our principles**, plus the repo's `REVIEW.md` or `CLAUDE.md` if they exist.
-4. **Use other sources** where they help: the tracker, docs, designs, chat (`~/.claude/skills/universal/sources.md`).
-5. **Verify every finding.** Re-read the lines and trace what triggers it. Only keep what you traced. Guesses go under "Ask the author".
-6. **Keep it short.** Follow the limits in the format file.
-7. Follow `dev-review`'s "Don't flag" list and verdicts.
+The brief is the review's summary, saved as `~/.claude/agent-files/shared/team-reviewer/briefs/<repo>-<pr>-<sha7>.md`. A brief only counts if its sha7 matches the PR's current commit. Its Check items become the review app's recommendations: ❌ → 🔴, ⚠️ → 🟡, 💡 → ⚪.
 
 **Format**: `~/.claude/skills/team-reviewer/brief.md`
-
-## 3. Deep review
-
-For a big or complicated PR, go further:
-
-- Use the `/dev-review` personas, including the design persona for UI changes.
-- Split the PR into parts and give each part to a sub-agent.
-- Fold the results into the brief: ❌ → 🔴 Blocking, ⚠️ → 🟡 Should fix, 💡 → ⚪ Nit.
 
 ## Rules
 

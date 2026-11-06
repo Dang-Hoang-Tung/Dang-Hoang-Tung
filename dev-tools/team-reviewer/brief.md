@@ -20,9 +20,9 @@ Time: ~<N> min
 
 Rules:
 
-- About 15 lines, 25 max. Cut, don't pad.
+- Keep each item short. Cut, don't pad.
 - Use my language rules: plain, simple words, as few as possible, no jargon.
-- Check: 5 items max, worst first. 🔴 blocking, 🟡 should fix, ⚪ nit. Nits only if 3 or fewer, else one line "+N nits".
+- Check: the merged `/dev-review` findings, 10 max, worst first. ❌ → 🔴 blocking, ⚠️ → 🟡 should fix, 💡 → ⚪ nit. Fold extra nits into one line "+N nits".
 - Only verified findings. No confidence labels. Guesses go under "Ask the author".
 - Ask the author: 3 max.
 - Empty section: write "None.".
