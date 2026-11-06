@@ -63,8 +63,7 @@ def _tools(pr):
         '<label class="switch"><input type="checkbox" id="hidews">Hide whitespace changes</label>'
         '<div class="ovrow"><span>Theme</span><div class="picker"><button type="button" class="iconbtn sm" id="palettebtn" aria-label="Theme" aria-haspopup="true" aria-expanded="false" title="Theme">'
         f'{icons.PALETTE}</button><div class="menu" id="thememenu" hidden></div></div>'
-        f'<button type="button" class="iconbtn sm" id="themebtn" aria-label="Switch light or dark">{icons.THEME_TOGGLE}</button></div></div></div>'
-        f'<a class="iconbtn" href="{esc(pr["url"])}" target="_blank" rel="noopener" aria-label="Open on GitHub" title="Open on GitHub">{icons.EXTERNAL}</a></div>'
+        f'<button type="button" class="iconbtn sm" id="themebtn" aria-label="Switch light or dark">{icons.THEME_TOGGLE}</button></div></div></div></div>'
     )
 
 

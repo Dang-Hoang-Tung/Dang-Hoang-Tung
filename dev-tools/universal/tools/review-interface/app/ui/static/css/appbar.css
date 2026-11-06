@@ -4,7 +4,9 @@ header.appbar{position:sticky;top:0;z-index:30;height:var(--bar);display:flex;al
 .brand h1:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
 .meta{display:flex;align-items:center;gap:8px;min-width:0;font-size:12px;line-height:1.3;color:var(--text-2);white-space:nowrap;overflow:hidden}
 .meta>*+*::before{content:"·";color:var(--text-3);margin-right:8px}
-.meta .prlink{font:600 12px var(--mono);color:var(--accent)}
+.meta .prlink{font:600 12px var(--mono);color:var(--accent);text-decoration:none}
+.meta .prlink::before{display:inline-block}
+.meta .prlink:hover{text-decoration:underline;text-underline-offset:2px}
 .meta .sha{font-size:11.5px}
 .meta .ci{display:inline-flex;align-items:center;gap:6px}
 .meta .dotc{width:7px;height:7px;border-radius:50%;background:var(--text-3)}

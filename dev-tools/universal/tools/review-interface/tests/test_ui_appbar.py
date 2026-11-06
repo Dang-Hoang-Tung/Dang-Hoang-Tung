@@ -32,7 +32,7 @@ class AppbarTests(unittest.TestCase):
     def test_overflow_menu_holds_controls(self):
         html = page()
         start = html.index('id="overflowmenu"')
-        end = html.index('aria-label="Open on GitHub"')
+        end = html.index('</header>')
         menu = html[start:end]
         for needle in ('id="focus"', 'id="palettebtn"', 'id="thememenu"', 'id="themebtn"'):
             self.assertIn(needle, menu)

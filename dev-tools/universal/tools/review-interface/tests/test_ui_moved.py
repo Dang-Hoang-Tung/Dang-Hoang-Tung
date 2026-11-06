@@ -43,7 +43,7 @@ class MovedTests(unittest.TestCase):
 
     def test_hidews_in_overflow_menu(self):
         html = review_page.render(review_model())
-        menu = html[html.index('id="overflowmenu"'):html.index('aria-label="Open on GitHub"')]
+        menu = html[html.index('id="overflowmenu"'):html.index('</header>')]
         self.assertIn('id="hidews"', menu)
 
     def test_inline_scripts_parse(self):
