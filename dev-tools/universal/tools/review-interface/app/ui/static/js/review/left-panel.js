@@ -103,9 +103,32 @@ function renderLayers() {
   }
 }
 
+let prevDone = null;
+
+function celebrate(bar, edge, big) {
+  const fx = $('#pfx'); if (!fx || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  bar.classList.remove('bump'); void bar.offsetWidth; bar.classList.add('bump');
+  fx.classList.toggle('big', big);
+  const count = big ? 14 : 6, made = [];
+  for (let k = 0; k < count; k++) {
+    const sp = document.createElement('i');
+    const ang = (big ? Math.random() * 2 * Math.PI : -Math.PI / 2 + (Math.random() - .5) * 2.2), dist = (big ? 26 : 16) + Math.random() * 14;
+    sp.style.left = (big ? Math.random() * edge : edge) + 'px';
+    sp.style.setProperty('--dx', Math.cos(ang) * dist + 'px');
+    sp.style.setProperty('--dy', Math.sin(ang) * dist + 'px');
+    fx.append(sp); made.push(sp);
+  }
+  setTimeout(() => { made.forEach(sp => sp.remove()); bar.classList.remove('bump'); }, 800);
+}
+
 function renderProgress() {
   const n = D.order.filter(isRead).length, total = D.order.length;
-  const bar = $('#pbar'); if (bar) bar.style.width = (100 * n) / total + '%';
+  const bar = $('#pbar');
+  if (bar) {
+    bar.style.width = total ? (100 * n) / total + '%' : '0%';
+    if (prevDone !== null && n > prevDone) celebrate(bar, bar.parentElement.offsetWidth * n / total, n === total);
+  }
+  prevDone = n;
   renderRemaining(n, total);
 }
 
@@ -117,7 +140,7 @@ function renderRemaining(n, total) {
   $('.d', chip).textContent = '−' + sum('d');
   chip.classList.toggle('done', !left.length);
   const done = total - left.length;
-  $('.left-files', chip).textContent = `· ${done}/${total} · ${total ? Math.round(done / total * 100) : 0}%`;
+  $('.left-files', chip).textContent = `${done}/${total} · ${total ? Math.round(done / total * 100) : 0}%`;
 }
 
 function renderReadUI() {

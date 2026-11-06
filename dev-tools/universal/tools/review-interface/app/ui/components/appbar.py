@@ -27,8 +27,10 @@ def verdict_chip(verdict):
 
 def size_chip(totals):
     return (
-        f'<span class="chip" id="leftchip" title="Lines and files you haven\'t marked as viewed"><span class="a">+{totals["added_all"]:,}</span><span class="d">−{totals["deleted_all"]:,}</span>'
-        f'<span class="left-files">· {totals["files"]} files</span><span class="topprog"><b id="pbar"></b></span></span>'
+        '<div class="progtop" id="leftchip" title="Files you have marked as viewed. The lines are what is left to read.">'
+        '<span class="pwrap"><span class="ptrack"><b id="pbar"></b></span><span class="pfx" id="pfx" aria-hidden="true"></span></span>'
+        f'<span class="plabel"><span class="left-files">0/{totals["files"]} · 0%</span>'
+        f'<span class="plines"><span class="a">+{totals["added_all"]:,}</span><span class="d">−{totals["deleted_all"]:,}</span></span></span></div>'
     )
 
 

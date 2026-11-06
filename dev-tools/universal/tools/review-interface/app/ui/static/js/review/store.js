@@ -57,6 +57,15 @@ async function postThread(t, messageId) {
   } catch (e) { postState[t.id] = { error: 'Not posted: ' + e.message }; }
   renderThreads();
 }
+async function syncGithub() {
+  if (!served || document.hidden) return;
+  try {
+    const r = await fetch('/api/sync/' + D.slug, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+    if (!r.ok) throw new Error('the helper replied ' + r.status);
+    await saving;
+    await reload();
+  } catch (e) { console.warn('GitHub sync failed:', e.message); }
+}
 async function reload() {
   if (!served) { renderStore(); return; }
   try {

@@ -128,6 +128,17 @@ Each new reviewer message adds one line to `inbox.jsonl`:
 
 A reviewer message with `"post": true` is posted to the PR as written when the reviewer sends it (the legacy form, text starting with `post:`, is still accepted and the prefix is stripped): a line comment for a thread on lines, otherwise a conversation comment. An AI can post a thread's latest message marked for posting with `review.py ai post <slug> <thread>`. Posting is recorded per message in `posted_messages` (and in `posted`) and is never repeated for the same message.
 
+## Thread types
+
+- **Internal** (default): the AI replies; never posted to GitHub.
+- **Synced** (`"synced": true`): posted to GitHub; GitHub people reply. **AI: never reply to synced threads.** `review.py ai list` and the inbox skip them.
+
+The type is fixed once set. Posting into an internal thread that already has messages is refused (400 `internal thread`). The first post makes the thread synced and sets `gh_root` (id of the root GitHub review comment); later posts go as replies to it.
+
+Fields: `synced`, `gh_root`; threads from GitHub also have id `gh-<root id>`, `path`, `line`, `side`, `commit` and `outdated: true` when GitHub no longer maps the comment to a line. GitHub messages: `{"id": "gh-<id>", "who": "github", "author", "text", "at", "gh_id", "url"}`; the reviewer's own comments made on github.com are stored with `who: "me"`.
+
+`POST /api/sync/<slug>` pulls the PR's line-comment threads from GitHub (adds only; throttled to once per 30 s per slug) and returns `{"ok": true, "added": N}`. A build also syncs every PR.
+
 ## After a refresh
 
 Clicking **Refresh** on the queue page (or running `review.py build`) rebuilds every page and appends an event to `events.jsonl`. `review.py ai changes` prints the latest one:

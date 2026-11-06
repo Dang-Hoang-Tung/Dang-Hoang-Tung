@@ -19,7 +19,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
 from app.config import ROOT, dirs, load_config
-from app.services import approval, events, inbox, manifest, posting, state
+from app.services import approval, events, gh_sync, inbox, manifest, posting, state
 
 MAX_BODY = 2 * 1024 * 1024
 LOCAL_HOSTS = ("127.0.0.1", "localhost")
@@ -40,6 +40,7 @@ def same(a, b):
 
 
 REFRESH_LOCK = threading.Lock()
+SYNC_EVERY = 30
 
 
 def start_refresh(cfg, status):
@@ -72,6 +73,7 @@ def cookie_name(port):
 def make_handler(cfg, token, touch):
     refresh = {"running": False, "error": None, "started": None, "finished": None}
     pages = dirs(cfg)["pages"].resolve()
+    synced_at, sync_lock = {}, threading.Lock()
 
     class Handler(BaseHTTPRequestHandler):
         server_version = "review-interface"
@@ -213,6 +215,8 @@ def make_handler(cfg, token, touch):
                 return self._json(202, refresh)
             if url.path.startswith("/api/approve/"):
                 return self._approve(url.path.rsplit("/", 1)[1])
+            if url.path.startswith("/api/sync/"):
+                return self._sync(url.path.rsplit("/", 1)[1])
             if not url.path.startswith("/api/post/"):
                 return self._send(404, "not found")
             s = url.path.rsplit("/", 1)[1]
@@ -232,6 +236,22 @@ def make_handler(cfg, token, touch):
             except Exception as e:  # gh failures: show the reason in the thread
                 return self._json(502, {"error": (getattr(e, "stderr", "") or str(e)).strip()[:500]})
             return self._json(200, {"posted": posted, "state": saved})
+
+        def _sync(self, s):
+            meta = manifest.manifest_entry(cfg, s)
+            if not meta:
+                return self._json(404, {"error": "This PR is not in the current build. Run review.py again."})
+            with sync_lock:
+                if time.time() - synced_at.get(s, 0) < SYNC_EVERY:
+                    return self._json(200, {"ok": True, "added": 0, "throttled": True})
+                synced_at[s] = time.time()
+            try:
+                added = gh_sync.sync(cfg, meta)
+            except Exception as e:
+                with sync_lock:
+                    synced_at.pop(s, None)
+                return self._json(502, {"error": (getattr(e, "stderr", "") or str(e)).strip()[:500]})
+            return self._json(200, {"ok": True, "added": added})
 
         def _approve(self, s):
             meta = manifest.manifest_entry(cfg, s)

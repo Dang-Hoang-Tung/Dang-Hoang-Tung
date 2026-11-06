@@ -50,13 +50,14 @@ function noteCard(n) {
     const lt = el('div', 'thread linked-thread' + (t.resolved ? ' resolved' : ''));
     const meta = el('div', 'thread-head');
     if (stale(t)) { const o = el('span', 'old-commit', 'on an older commit'); o.title = STALE_TIP; meta.append(o); }
-    meta.append(threadState(t), resolveButton(t));
+    meta.append(...syncPills(t), threadState(t), resolveButton(t));
     lt.append(meta);
     messageList(t, lt);
     c.append(lt);
   }
+  const sy = ts.length ? isSynced(ts[0]) : null;
   const blocked = ts.length && stale(ts[0]) ? STALE_TIP : '';
-  c.append(composer('n:' + n.key, 'Reply…', '', (v, post) => addNoteReply(n, v, post), null, 'Reply', blocked));
+  c.append(composer('n:' + n.key, 'Reply…', '', (v, post) => addNoteReply(n, v, post), null, sy ? 'Reply on GitHub' : 'Reply', blocked, sy === null ? null : sy));
   return c;
 }
 const rowShown = id => !!(id && document.getElementById(id));

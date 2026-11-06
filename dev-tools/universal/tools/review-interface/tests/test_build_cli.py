@@ -27,7 +27,7 @@ class BuildHelper(TmpCase):
         review.render.side_effect = lambda m: f"review {m['pr']['slug']}"
         queue.render.side_effect = lambda m: f"queue {len(m['buckets'])}"
         with mock.patch.object(builder, "review_page", review), mock.patch.object(builder, "queue_page", queue), \
-                mock.patch("sys.stdout"), \
+                mock.patch("sys.stdout"), mock.patch("app.services.gh_sync.sync", return_value=0), \
                 mock.patch.object(github, "list_pending", return_value=[pr]), \
                 mock.patch.object(github, "fetch_api_diff", return_value=diff_text), \
                 mock.patch.object(github, "requested_at", return_value="2026-11-02T00:00:00Z"):

@@ -1,5 +1,6 @@
 const drafts = {};
-const stale = t => !!t.commit && t.commit !== SHA;
+const isSynced = t => !!t.synced || String(t.id).startsWith('gh-');
+const stale = t => !isSynced(t) && !!t.commit && t.commit !== SHA;
 const STALE_TIP = 'This thread was started on an older commit, so GitHub would put it on the wrong line. Post it from a new thread.';
 const BUBBLE = '<svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>';
 const anchors = new Map();
@@ -27,8 +28,9 @@ function startDraft(anchor) {
   openCard('new', { pinned: true });
 }
 function createThread(anchor, noteKey, text, post) {
+  const sync = !!post;
   const msg = { id: uid(), who: 'me', text, at: now(), ...(post && { post: true }) };
-  const t = { id: uid(), ...anchor, noteKey, commit: SHA, created: now(), resolved: false, resolvedAt: null, posted: null, messages: [msg] };
+  const t = { id: uid(), ...anchor, noteKey, commit: SHA, created: now(), resolved: false, resolvedAt: null, posted: null, ...(sync && { synced: true }), messages: [msg] };
   state.threads.push(t);
   renderThreads();
   openCard(cardIdFor(t), { pinned: true, focus: false });
@@ -54,20 +56,20 @@ function addNoteReply(n, text, post) {
 }
 function toggleResolved(t) { t = liveThread(t); t.resolved = !t.resolved; t.resolvedAt = now(); renderThreads(); persist(); }
 const where = t => (t.path ? t.path.split('/').pop() : 'General') + (t.line ? ' ' + span(t) : '');
-function composer(key, placeholder, value, onSave, onCancel, saveLabel, blocked) {
+function composer(key, placeholder, value, onSave, onCancel, saveLabel, blocked, fixed = null) {
   const c = el('div', 'compose');
   const ta = el('textarea'); ta.placeholder = placeholder; ta.value = key in drafts ? drafts[key].value : value || ''; ta.dataset.draft = key;
   if (onCancel) ta.id = 'newtext';
   const row = el('div', 'row');
   const opt = el('label', 'postopt'), box = el('input'); box.type = 'checkbox'; box.dataset.postfor = key;
-  box.checked = !blocked && !!(drafts[key] && drafts[key].post);
-  if (blocked) { box.disabled = true; opt.title = blocked; }
+  box.checked = fixed === null ? !blocked && !!(drafts[key] && drafts[key].post) : fixed;
+  if (blocked && fixed === null) { box.disabled = true; opt.title = blocked; }
   opt.append(box, 'Post GitHub comment');
-  row.append(opt);
+  if (fixed === null) row.append(opt);
   if (onCancel) { const x = el('button', 'sm', 'Cancel'); x.type = 'button'; x.onclick = onCancel; row.append(x); }
   const s = el('button', 'primary sm', saveLabel); s.type = 'button'; s.title = '⌘↵';
-  const label = () => { s.textContent = box.checked ? 'Post' : saveLabel; s.classList.toggle('post', box.checked); };
-  const keep = () => { drafts[key] = { ...drafts[key], value: ta.value, post: box.checked }; label(); };
+  const label = () => { s.textContent = fixed ? saveLabel : box.checked ? 'Post' : saveLabel; s.classList.toggle('post', box.checked); };
+  const keep = () => { drafts[key] = { ...drafts[key], value: ta.value, post: fixed === null && box.checked }; label(); };
   ta.addEventListener('input', keep); box.addEventListener('change', keep); label();
   s.onclick = () => { const v = ta.value.trim(); if (v) onSave(v, box.checked); };
   ta.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) s.click(); });
@@ -77,12 +79,15 @@ function composer(key, placeholder, value, onSave, onCancel, saveLabel, blocked)
 }
 function messageList(t, box) {
   for (const m of t.messages) {
-    const d = el('div', 'msg ' + (isAi(m) ? 'claude' : 'me'));
+    const gh = m.who === 'github';
+    const d = el('div', 'msg ' + (isAi(m) ? 'claude' : gh ? 'gh' : 'me'));
     const bub = el('div', 'bubble');
     const meta = el('div', 'meta'); const tm = el('time', null, ago(m.at)); tm.dateTime = m.at;
-    meta.append(el('b', null, isAi(m) ? AI_NAME : ME), tm);
+    const name = isAi(m) ? AI_NAME : gh ? m.author || 'GitHub' : ME;
+    if (gh && String(m.url).startsWith('https://')) { const a = el('a', null, name); a.href = m.url; a.target = '_blank'; a.rel = 'noopener'; meta.append(el('b', null), tm); $('b', meta).append(a); }
+    else meta.append(el('b', null, name), tm);
     bub.append(meta, el('div', 'text', m.text));
-    d.append(el('span', 'avatar', (isAi(m) ? AI_NAME : ME).charAt(0).toUpperCase()), bub);
+    d.append(el('span', 'avatar', name.charAt(0).toUpperCase()), bub);
     box.append(d);
   }
   if (t.posted && t.posted.url) {
@@ -102,6 +107,12 @@ function messageList(t, box) {
     d.append(retry); box.append(d);
   }
 }
+function syncPills(t) {
+  if (!isSynced(t)) return [];
+  const p = [el('span', 'pill gh', 'GitHub')];
+  if (t.outdated) p.push(el('span', 'pill outdated', 'outdated'));
+  return p;
+}
 function threadState(t) {
   const last = t.messages[t.messages.length - 1];
   const st = el('span', 'state', t.resolved ? 'Resolved' : t.posted ? 'Posted' : isAi(last) ? AI_NAME + ' replied' : 'Open');
@@ -118,11 +129,12 @@ function threadCard(t) {
   const head = el('div', 'thread-head');
   head.append(el('span', 'where', where(t)));
   if (stale(t)) { const o = el('span', 'old-commit', 'on an older commit'); o.title = STALE_TIP; head.append(o); }
-  head.append(threadState(t));
+  head.append(...syncPills(t), threadState(t));
   head.title = t.path || '';
   box.append(head);
   messageList(t, box);
-  const c = composer(t.id, 'Reply…', '', v => addReply(t, v), null, 'Reply', stale(t) ? STALE_TIP : '');
+  const sy = isSynced(t);
+  const c = composer(t.id, 'Reply…', '', v => addReply(t, v, sy), null, sy ? 'Reply on GitHub' : 'Send', '', sy);
   $('.row', c).insertBefore(resolveButton(t), $('.row .primary', c));
   box.append(c);
   return box;

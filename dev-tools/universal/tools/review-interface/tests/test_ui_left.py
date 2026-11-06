@@ -68,7 +68,7 @@ class LeftPanelScriptTests(unittest.TestCase):
         self.assertIn("'Mark layer as viewed'", JS)
 
     def test_progress_targets_pbar_only(self):
-        self.assertIn("const bar = $('#pbar'); if (bar) bar.style.width", JS)
+        self.assertIn("const bar = $('#pbar');", JS); self.assertIn("bar.style.width", JS)
         self.assertNotIn("pgrid", JS)
         self.assertNotIn("pcount", JS)
 

@@ -55,10 +55,12 @@ def start_post(cfg, meta, thread_id, message_id):
             return {**t["posted_messages"][m["id"]], "message_id": m["id"], "body": body}, m, body, t
         if not body:
             raise ValueError("nothing to post")
+        if not t.get("synced") and t.get("gh_root") is None and len(t["messages"]) > 1:
+            raise ValueError("internal thread")
         marker = t.get("posting")
         if marker and marker.get("message_id") == m["id"] and age_seconds(marker.get("at")) < POSTING_TTL:
             raise PostConflict("already posting")
-        if t.get("commit") and not same_commit(t["commit"], meta["head_sha"]):
+        if t.get("gh_root") is None and t.get("commit") and not same_commit(t["commit"], meta["head_sha"]):
             raise PostConflict(f"This comment was written on an older commit ({t['commit'][:7]}); open the PR again to comment on the current code.")
         t["posting"] = {"message_id": m["id"], "at": now()}
         save_state(cfg, s, data)
@@ -72,6 +74,9 @@ def finish_post(cfg, meta, thread_id, m, body, res):
         t = find_thread(data, thread_id)
         if res:
             at = now()
+            t["synced"] = True
+            if t.get("gh_root") is None and t.get("path") and t.get("line"):
+                t["gh_root"] = res["id"]
             t.setdefault("posted_messages", {})[m["id"]] = {"url": res["url"], "id": res["id"], "at": at}
             t["posted"] = {**res, "at": at, "message_id": m["id"], "body": body}
         if (t.get("posting") or {}).get("message_id") == m["id"]:
@@ -85,7 +90,10 @@ def post_thread(cfg, meta, thread_id, message_id=None):
     if done:
         return done
     try:
-        res = github.post_comment(meta["repo"], meta["pr"], meta["head_sha"], t, body)
+        if t.get("gh_root") is not None:
+            res = github.post_reply(meta["repo"], meta["pr"], t["gh_root"], body)
+        else:
+            res = github.post_comment(meta["repo"], meta["pr"], meta["head_sha"], t, body)
     except BaseException:
         finish_post(cfg, meta, thread_id, m, body, None)
         raise

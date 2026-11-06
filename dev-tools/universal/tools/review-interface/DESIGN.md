@@ -26,6 +26,7 @@ app/
     insights.py                 schema, validate, load (missing/current/stale/invalid)
     adapters/team_reviewer.py   markdown brief -> insights; sync_briefs
     state.py                    load/save (atomic), per-slug file lock, merge (validated), waiting_threads
+    gh_sync.py                  sync(): GitHub line-comment threads -> state (add only, under the slug lock)
     posting.py                  post_body, post_thread (posting marker, per-message idempotency; uses github.post_comment)
     approval.py                 approve(): stale-head and repeat checks, github.submit_approval, saves state["approval"]
     models.py                   review_model(), queue_model(): build view models from data
@@ -107,6 +108,7 @@ item = {"slug", "number", "title", "url", "author", "requested_at": iso, "head_s
 - `GET /<page>.html`: pages from `<data_dir>/pages`.
 - `GET|PUT /api/state/<slug>`: read; merge-and-save.
 - `POST /api/post/<slug>` `{threadId, messageId?}`: post a message marked `post: true` (or with the legacy `post:` prefix) to GitHub, returns `{posted, state}`.
+- `POST /api/sync/<slug>`: pull GitHub comment threads into state (once per 30 s per slug), returns `{ok, added}`; 502 when `gh` fails.
 - `POST /api/approve/<slug>` `{sha, body?}`: approve the PR on GitHub for the current head, returns `{approval, state}`. 409 when `sha` is not the PR's head or it is already approved at this commit; 502 when `gh` fails.
 - `GET /api/ping`.
 All but ping and the token link need the cookie; writes (PUT/POST) need `Origin` equal to `http://<Host>` and `Content-Type: application/json`; bodies over 2 MB get 413; Host must be 127.0.0.1/localhost. `POST /api/post` answers 409 for "already posting" and for a comment written on an older commit. Unexpected errors return JSON 500.

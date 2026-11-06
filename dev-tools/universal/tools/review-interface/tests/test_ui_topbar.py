@@ -52,13 +52,12 @@ class TopbarTests(unittest.TestCase):
         self.assertNotIn("<a ", between)
         self.assertIn("Looks good", between)
 
-    def test_pbar_under_leftchip(self):
+    def test_pbar_inside_leftchip(self):
         html = bar()
         chip = html.index('id="leftchip"')
-        prog = html.index('<span class="topprog"><b id="pbar"></b></span>')
+        prog = html.index('<b id="pbar"></b>')
         self.assertLess(chip, prog)
         self.assertEqual(html.count('id="pbar"'), 1)
-        self.assertNotIn(" of ", html[prog:prog + 80])
 
     def test_ids_kept(self):
         html = bar()

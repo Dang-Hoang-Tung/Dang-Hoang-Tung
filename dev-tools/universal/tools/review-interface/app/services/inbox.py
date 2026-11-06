@@ -25,8 +25,8 @@ def append(cfg, entries):
 def new_user_messages(before, after):
     """(thread, message) pairs in `after` and not in `before`, written by the reviewer."""
     seen = {(t["id"], m["id"]) for t in before.get("threads", []) for m in t.get("messages", [])}
-    return [(t, m) for t in after.get("threads", []) for m in t.get("messages", [])
-            if (t["id"], m["id"]) not in seen and not state.is_ai(m)]
+    return [(t, m) for t in after.get("threads", []) if not t.get("synced") for m in t.get("messages", [])
+            if (t["id"], m["id"]) not in seen and m.get("who") == "me"]
 
 
 def entries_for(slug, before, after):

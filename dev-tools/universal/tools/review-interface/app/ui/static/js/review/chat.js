@@ -1,7 +1,7 @@
 const CHAT_ID = 'chat';
 const chatThread = () => state.threads.find(t => t.id === CHAT_ID);
 const lastFromMe = t => { const m = t.messages[t.messages.length - 1]; return !!m && !isAi(m); };
-const waitingThreads = () => state.threads.filter(t => !t.resolved && t.messages.length && lastFromMe(t));
+const waitingThreads = () => state.threads.filter(t => !isSynced(t) && !t.resolved && t.messages.length && lastFromMe(t));
 let chatShown = 0;
 function fitFabs() {
   const box = $('#chatbox');

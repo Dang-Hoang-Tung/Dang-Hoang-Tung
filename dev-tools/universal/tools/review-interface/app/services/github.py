@@ -107,3 +107,21 @@ def post_comment(repo, pr, commit, thread, body):
         args = ["gh", "api", "-X", "POST", f"repos/{repo}/issues/{pr}/comments", "-f", f"body={body}"]
     res = json.loads(run(*args))
     return {"url": res["html_url"], "id": res["id"]}
+
+
+def post_reply(repo, pr, root_id, body):
+    if os.environ.get("REVIEW_POST_DRY_RUN"):
+        return {"url": f"https://example.invalid/{repo}/pull/{pr}#dry-run-reply", "id": 0, "dry_run": True}
+    res = json.loads(run("gh", "api", "-X", "POST", f"repos/{repo}/pulls/{pr}/comments/{root_id}/replies", "-f", f"body={body}"))
+    return {"url": res["html_url"], "id": res["id"]}
+
+
+def fetch_review_comments(repo, pr):
+    out, dec, text, i = [], json.JSONDecoder(), run("gh", "api", f"repos/{repo}/pulls/{pr}/comments", "--paginate"), 0
+    while True:
+        while i < len(text) and text[i].isspace():
+            i += 1
+        if i >= len(text):
+            return out
+        page, i = dec.raw_decode(text, i)
+        out += page

@@ -137,7 +137,7 @@ def is_approved(state, head_sha):
 def waiting_threads(state):
     out = []
     for t in state.get("threads", []):
-        if t.get("resolved") or not t.get("messages"):
+        if t.get("resolved") or t.get("synced") or not t.get("messages"):
             continue
         last = t["messages"][-1]
         if not is_ai(last) and not is_posted(t, last["id"]):

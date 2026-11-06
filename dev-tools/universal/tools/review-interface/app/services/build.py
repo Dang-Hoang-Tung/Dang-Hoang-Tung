@@ -6,10 +6,10 @@ from concurrent.futures import ThreadPoolExecutor
 
 from app.config import dirs, slug
 from app.services import diff, events
-from app.services import git, github, manifest, models
+from app.services import gh_sync, git, github, manifest, models
 from app.services.adapters import team_reviewer
 from app.services.insights import load as load_insights
-from app.services.shell import run
+from app.services.shell import run, why
 from app.services.state import load_state
 from app.ui.pages import queue_page, review_page
 
@@ -104,6 +104,10 @@ def build(cfg, only=None, source="cli"):
     for pr in ok:
         try:
             summary = build_pr(cfg, pr, diffs[pr["repo"], pr["number"]], name)
+            try:
+                gh_sync.sync(cfg, {"slug": summary["slug"], "repo": pr["repo"], "pr": pr["number"]})
+            except Exception as e:
+                print(f"  {pr['repo']}#{pr['number']}: comment sync failed: {why(e)}", file=sys.stderr)
             state = load_state(cfg, summary["slug"])
             requested = github.requested_at(cfg, pr)
             merged[summary["slug"]] = manifest.build_entry(cfg, summary, requested, state)
