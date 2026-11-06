@@ -15,9 +15,11 @@ def append(cfg, entries):
     if not entries:
         return
     f = path(cfg)
-    lines = f.read_text().splitlines() if f.exists() else []
-    lines = (lines + [json.dumps(e, separators=(",", ":")) for e in entries])[-KEEP:]
-    f.write_text("\n".join(lines) + "\n")
+    with f.open("a") as out:
+        out.write("".join(json.dumps(e, separators=(",", ":")) + "\n" for e in entries))
+    lines = f.read_text().splitlines()
+    if len(lines) > 2 * KEEP:
+        f.write_text("\n".join(lines[-KEEP:]) + "\n")
 
 
 def new_user_messages(before, after):

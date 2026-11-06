@@ -39,7 +39,7 @@ class InboxTests(TmpCase):
         self.assertEqual((e["kind"], e["path"], e["line"]), ("chat", None, None))
 
     def test_keeps_last_lines(self):
-        inbox.append(self.cfg, [{"n": i} for i in range(inbox.KEEP + 5)])
+        inbox.append(self.cfg, [{"n": i} for i in range(2 * inbox.KEEP + 5)])
         self.assertEqual(len(self.lines()), inbox.KEEP)
 
 
