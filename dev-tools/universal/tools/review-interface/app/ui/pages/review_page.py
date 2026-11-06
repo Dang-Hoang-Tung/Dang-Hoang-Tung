@@ -11,7 +11,8 @@ JSDIFF = ('<script src="https://cdn.jsdelivr.net/npm/diff@5.2.0/dist/diff.min.js
 JS = ["shared/dom.js", "shared/markdown.js", "shared/time.js", "shared/theme.js",
       "review/data.js", "review/store.js", "review/read-state.js", "review/files.js", "review/left-panel.js",
       "review/scroll-spy.js", "review/tree-canvas.js", "review/modals.js", "review/treemap.js",
-      "review/selection.js", "review/checks.js", "review/threads.js", "review/popover.js", "review/nav.js", "review/approve.js", "review/resizers.js", "review/intraline.js", "review/whitespace.js", "review/main.js"]
+      "review/highlight.js", "review/titletip.js", "review/selection.js", "review/checks.js", "review/threads.js", "review/popover.js", "review/nav.js",
+      "review/approve.js", "review/resizers.js", "review/intraline.js", "review/whitespace.js", "review/main.js"]
 
 
 def _file_data(f):

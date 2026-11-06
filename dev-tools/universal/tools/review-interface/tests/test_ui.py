@@ -12,7 +12,7 @@ sys.path.insert(0, str(ROOT))
 
 from app.domain import LAYERS  # noqa: E402
 from app.ui import assets  # noqa: E402
-from app.ui.components import banner, queue_controls, tree_svg  # noqa: E402
+from app.ui.components import banner, file_section, queue_controls, tree_svg  # noqa: E402
 from app.ui.markdown import md_block, md_inline, md_list  # noqa: E402
 from app.ui.pages import queue_page, review_page  # noqa: E402
 
@@ -215,6 +215,21 @@ class ReviewPageTests(unittest.TestCase):
                        "e.key === 'Escape' && cs.id", "Mark checked", "Use as comment", "Post GitHub comment", "addNoteReply",
                        "linkedNote(t)", "'#navcount'", "'#navprev'", "e.key !== 'n' && e.key !== 'p'", "textarea, select"):
             self.assertIn(needle, js, needle)
+
+    def test_language_and_code_wrapper(self):
+        self.assertIn('id="f-0" data-f="0" data-lang="tsx"', self.page)
+        self.assertIn('<span class="sign">', self.page)
+        self.assertIn('<span class="t">', self.page)
+        self.assertIn("shiki@4.6.0", self.page)
+
+    def test_spans_render_hl_inside_t(self):
+        f = {"idx": 0, "path": "a.py", "a": 1, "d": 0, "gen": False, "kind": None, "moved": {},
+             "rows": [("add", None, 1, "ab<c")], "spans": {"0": [[1, 3]]}}
+        out = file_section.render(f, [])
+        self.assertIn('<span class="t">a<span class="hl">b&lt;</span>c</span>', out)
+        self.assertIn('<table class="diff" data-spans="difft">', out)
+        f2 = dict(f, spans={})
+        self.assertNotIn("data-spans", file_section.render(f2, []))
 
     def test_head_has_themes_before_style(self):
         self.assertLess(self.page.index("REVIEW_THEMES"), self.page.index("<style>"))

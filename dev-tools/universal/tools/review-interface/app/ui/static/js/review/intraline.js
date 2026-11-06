@@ -34,11 +34,16 @@ function blockSpans(oldLines, newLines) {
   return { old: lineRanges(a, oldChanged, oldLines.length), new: lineRanges(b, newChanged, newLines.length) };
 }
 
+function plainText(row) {
+  const t = $('.t', row);
+  const node = t && t.childNodes.length === 1 ? t.firstChild : null;
+  return node && node.nodeType === Node.TEXT_NODE ? node : null;
+}
+
 function paintLine(row, ranges) {
   if (!ranges.length) return;
-  const sign = $('.sign', row);
-  const node = sign && sign.nextSibling;
-  if (!node || node.nodeType !== Node.TEXT_NODE) return;
+  const node = plainText(row);
+  if (!node) return;
   const text = node.textContent, frag = document.createDocumentFragment();
   let pos = 0;
   for (const [s, e] of ranges) {
@@ -53,6 +58,7 @@ function paintLine(row, ranges) {
 const plain = (r, kind) => r.classList.contains(kind) && !r.classList.contains('moved');
 
 function highlightTable(table) {
+  if (table.dataset.spans === 'difft') return;
   const rows = [...table.rows];
   for (let i = 0; i < rows.length;) {
     if (!plain(rows[i], 'del')) { i++; continue; }
@@ -60,7 +66,7 @@ function highlightTable(table) {
     while (i < rows.length && plain(rows[i], 'del')) dels.push(rows[i++]);
     while (i < rows.length && plain(rows[i], 'add')) adds.push(rows[i++]);
     if (!adds.length || dels.length + adds.length > MAX_BLOCK_LINES) continue;
-    const text = r => { const s = $('.sign', r); return s && s.nextSibling && s.nextSibling.nodeType === Node.TEXT_NODE ? s.nextSibling.textContent : ''; };
+    const text = r => { const n = plainText(r); return n ? n.textContent : ''; };
     const spans = blockSpans(dels.map(text), adds.map(text));
     if (!spans) continue;
     dels.forEach((r, k) => paintLine(r, spans.old[k]));

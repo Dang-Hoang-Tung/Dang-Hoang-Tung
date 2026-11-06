@@ -59,3 +59,7 @@ tr.ws-hidden{display:none}
 tr.ws-only td{background:transparent}tr.ws-only td.num{background:transparent;color:var(--text-3)}
 tr.ws-only .sign{color:transparent}tr.ws-only .hl{background:none}
 .mvlabel.plain{cursor:default}
+/* Shiki tokens */
+.tk{color:var(--shiki-light)}
+.is-dark .tk{color:var(--shiki-dark)}
+tr.ws-only .tk{color:inherit}

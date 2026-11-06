@@ -7,14 +7,12 @@ function panZoom(box) {
   const fit = () => {
     if (!full) { s = Math.min(1, (box.clientWidth - 32) / W, 208 / H); box.style.height = COMPACT + 'px'; }
     else { s = Math.min(1, (box.clientWidth - 32) / W, 520 / H); box.style.height = Math.min(Math.max(H * s + 32, 200), 560) + 'px'; }
-    x = (box.clientWidth - W * s) / 2; y = 16; apply();
+    x = 16; y = 16; apply();
   };
   const start = () => {
     s = Math.max(Math.min(1, (box.clientWidth - 32) / W), 0.85);
     box.style.height = full ? Math.min(Math.max(H * s + 32, 220), 520) + 'px' : COMPACT + 'px';
-    const root = svg.querySelector('rect.root');
-    const rootX = root ? +root.getAttribute('x') + +root.getAttribute('width') / 2 : 0;
-    x = W * s <= box.clientWidth ? (box.clientWidth - W * s) / 2 : Math.min(16, box.clientWidth / 2 - rootX * s); y = 16; apply();
+    x = 16; y = 16; apply();
   };
   const zoomAt = (f, cx, cy) => { const ns = Math.min(2.5, Math.max(0.15, s * f)); x = cx - ((cx - x) * ns) / s; y = cy - ((cy - y) * ns) / s; s = ns; apply(); };
   box.addEventListener('wheel', e => {

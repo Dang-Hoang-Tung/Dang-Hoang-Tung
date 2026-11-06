@@ -1,7 +1,12 @@
 import hashlib
+import json
+import os
 import re
+import tempfile
+from pathlib import Path
 
 from app.domain import LAYERS  # noqa: F401
+from app.services.shell import FAILURES, run
 
 HUNK = re.compile(r"@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@")
 
@@ -75,6 +80,64 @@ def header_info(first, lines):
         m = re.match(r"a/(.+) b/\1$", first)
         path = m.group(1) if m else None
     return path, binary
+
+
+def _char_col(text, byte_col):
+    return len(text.encode()[:byte_col].decode(errors="ignore"))
+
+
+def _merged(ranges):
+    out = []
+    for start, end in sorted(ranges):
+        if end <= start:
+            continue
+        if out and start <= out[-1][1]:
+            out[-1][1] = max(out[-1][1], end)
+        else:
+            out.append([start, end])
+    return out
+
+
+def difft_spans(rows, data):
+    """{row index: [[start, end], ...]} for removed/added lines, from difftastic's JSON. None when difftastic fell back to plain text."""
+    if str(data.get("language", "Text")).startswith("Text"):
+        return None
+    changes = {"lhs": {}, "rhs": {}}
+    for chunk in data.get("chunks", []):
+        for entry in chunk:
+            for side, line in entry.items():
+                changes[side].setdefault(line["line_number"], []).extend(line["changes"])
+    spans = {}
+    for i, (kind, old, new, text) in enumerate(rows):
+        if kind == "del":
+            found = changes["lhs"].get(old - 1)
+        elif kind == "add":
+            found = changes["rhs"].get(new - 1)
+        else:
+            continue
+        ranges = _merged([_char_col(text, c["start"]), _char_col(text, c["end"])] for c in found or [])
+        unchanged = list(text)
+        for start, end in ranges:
+            unchanged[start:end] = " " * (end - start)
+        if ranges and "".join(unchanged).strip():
+            spans[i] = ranges
+    return spans
+
+
+def run_difft(old, new, name, timeout=10):
+    """difftastic's JSON for two file contents, or None if it is missing, fails or times out."""
+    base = Path(name).name
+    with tempfile.TemporaryDirectory() as tmp:
+        paths = []
+        for side, text in (("old", old), ("new", new)):
+            Path(tmp, side).mkdir()
+            path = Path(tmp, side, base)
+            path.write_text(text)
+            paths.append(str(path))
+        try:
+            return json.loads(run("difft", "--display", "json", *paths, timeout=timeout, env={**os.environ, "DFT_UNSTABLE": "yes"}))
+        except FAILURES + (OSError, ValueError):
+            return None
 
 
 def parse_diff(diff, generated):

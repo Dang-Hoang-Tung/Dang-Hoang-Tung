@@ -104,16 +104,8 @@ function renderLayers() {
 }
 
 function renderProgress() {
-  const grid = $('#pgrid'); grid.textContent = '';
-  for (const i of D.order) {
-    const b = el('button', 'cell ' + (isRead(i) ? 'read' : ringOf(i)) + (D.files[i].gen ? ' gen' : ''));
-    b.type = 'button'; b.dataset.file = i; b.title = D.files[i].path + (isRead(i) ? ' · viewed' : '');
-    b.onclick = () => goToFile(i);
-    grid.append(b);
-  }
   const n = D.order.filter(isRead).length, total = D.order.length;
-  $('#pcount').textContent = `${n} of ${total} · ${Math.round((100 * n) / total)}%`;
-  $('#pbar').style.width = (100 * n) / total + '%';
+  const bar = $('#pbar'); if (bar) bar.style.width = (100 * n) / total + '%';
   renderRemaining(n, total);
 }
 

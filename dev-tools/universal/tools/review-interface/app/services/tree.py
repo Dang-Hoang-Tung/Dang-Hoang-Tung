@@ -2,7 +2,7 @@ import copy
 
 from app.domain import worst
 
-NODE_H, GAP_X, GAP_Y, CHAR_W, PAD, INDENT, STACK_GAP = 42, 16, 56, 7.4, 24, 22, 10
+NODE_H, GAP_X, CHAR_W, PAD, ROW_GAP = 42, 40, 7.4, 24, 10
 
 
 def build_tree(paths, root_name):
@@ -18,7 +18,7 @@ def build_tree(paths, root_name):
         while len(kids) == 1 and not kids[0]["file"] and not is_root and not n["file"]:
             n = {"name": n["name"] + "/" + kids[0]["name"], "file": None, "kids": kids[0]["kids"]}
             kids = n["kids"]
-        return {"name": n["name"], "file": n["file"], "kids": sorted(kids, key=lambda k: (k["file"] is not None, k["name"]))}
+        return {"name": n["name"], "file": n["file"], "kids": sorted(kids, key=lambda k: (k["file"] is not None, k["name"].lower(), k["name"]))}
 
     return compress(root, True)
 
@@ -51,89 +51,48 @@ def stat_info(n, file_stats):
     return {"a": a, "d": d, "notes": notes, "gen": gen, "text": text}
 
 
-def items_of(n):
-    folders = [k for k in n["kids"] if k["kids"]]
-    leaves = [k for k in n["kids"] if not k["kids"]]
-    return folders + ([{"stack": leaves}] if leaves else [])
-
-
-def items_width(its):
-    return sum(i["span"] for i in its) + GAP_X * (len(its) - 1) if its else 0
-
-
 def measure(n, file_stats):
     n["stat"] = stat_info(n, file_stats)
     n["w"] = max(len(label_of(n)) * CHAR_W, len(n["stat"]["text"]) * 6.2) + PAD
-    its = items_of(n)
-    for it in its:
-        if "stack" in it:
-            for leaf in it["stack"]:
-                measure(leaf, file_stats)
-            it["span"] = INDENT + max(leaf["w"] for leaf in it["stack"])
-        else:
-            measure(it, file_stats)
-    n["items"] = its
-    n["span"] = max(n["w"], items_width(its))
+    for k in n["kids"]:
+        measure(k, file_stats)
 
 
-def place(n, left, y):
-    n["y"] = y
-    its = n["items"]
-    kids_w = items_width(its)
-    only_stack = len(its) == 1 and "stack" in its[0]
-    x = left if only_stack else left + (n["span"] - kids_w) / 2
-    cy = y + NODE_H + (STACK_GAP * 2 if only_stack else GAP_Y)
-    for it in its:
-        if "stack" in it:
-            for j, leaf in enumerate(it["stack"]):
-                leaf["y"] = cy + j * (NODE_H + STACK_GAP)
-                leaf["items"] = []
-                leaf["cx"] = x + INDENT + leaf["w"] / 2
-            it["cx"] = x + INDENT / 2
-        else:
-            place(it, x, cy)
-        x += it["span"] + GAP_X
-    n["cx"] = left + n["w"] / 2 if only_stack else left + n["span"] / 2 if not its else (its[0]["cx"] + its[-1]["cx"]) / 2
+def place(n, x, y):
+    """Lay the tree out left to right: each node shares a row with its first child, so rows read in directory order."""
+    n["x"], n["y"] = x, y
+    bottom = y
+    for k in n["kids"]:
+        bottom = place(k, x + n["w"] + GAP_X, bottom)
+    return max(bottom, y + NODE_H + ROW_GAP)
 
 
-def node_geometry(n, file_stats):
+def node_geometry(n, file_stats, role):
     st = n["stat"]
-    role = "leaf" if n["file"] else ("root" if n["y"] == 0 else "dir")
     return {
-        "x": n["cx"] - n["w"] / 2, "y": n["y"], "w": n["w"], "h": NODE_H, "cx": n["cx"],
+        "x": n["x"], "y": n["y"], "w": n["w"], "h": NODE_H, "cx": n["x"] + n["w"] / 2,
         "label": label_of(n), "title": n["file"] or n["name"],
         "file": file_stats[n["file"]]["idx"] if n["file"] else None, "role": role,
         "kind": worst(n["kind"] for n in st["notes"]), "gen": st["gen"], "a": st["a"], "d": st["d"], "notes": len(st["notes"]),
     }
 
 
-def stack_edges(it, top):
-    edges = [f'M{it["cx"]},{top} V{it["stack"][-1]["y"] + NODE_H / 2}']
-    for leaf in it["stack"]:
-        edges.append(f'M{it["cx"]},{leaf["y"] + NODE_H / 2} H{leaf["cx"] - leaf["w"] / 2}')
-    return edges
+def _mid(n):
+    return n["y"] + NODE_H / 2
 
 
-def walk(n, file_stats, nodes, edges):
-    nodes.append(node_geometry(n, file_stats))
-    its = n["items"]
-    if not its:
+def walk(n, file_stats, nodes, edges, role="root"):
+    nodes.append(node_geometry(n, file_stats, role))
+    kids = n["kids"]
+    if not kids:
         return
-    if len(its) == 1 and "stack" in its[0]:
-        edges += stack_edges(its[0], n["y"] + NODE_H)
-        nodes += [node_geometry(leaf, file_stats) for leaf in its[0]["stack"]]
-        return
-    bus = n["y"] + NODE_H + GAP_Y / 2
-    edges.append(f'M{n["cx"]},{n["y"] + NODE_H} V{bus}')
-    if len(its) > 1:
-        edges.append(f'M{its[0]["cx"]},{bus} H{its[-1]["cx"]}')
-    for it in its:
-        if "stack" in it:
-            edges += stack_edges(it, bus)
-            nodes += [node_geometry(leaf, file_stats) for leaf in it["stack"]]
-        else:
-            edges.append(f'M{it["cx"]},{bus} V{it["y"]}')
-            walk(it, file_stats, nodes, edges)
+    bus = kids[0]["x"] - GAP_X / 2
+    edges.append(f'M{n["x"] + n["w"]},{_mid(n)} H{bus}')
+    if len(kids) > 1:
+        edges.append(f"M{bus},{_mid(kids[0])} V{_mid(kids[-1])}")
+    for k in kids:
+        edges.append(f'M{bus},{_mid(k)} H{k["x"]}')
+        walk(k, file_stats, nodes, edges, "leaf" if k["file"] else "dir")
 
 
 def layout(tree, file_stats):
@@ -142,4 +101,4 @@ def layout(tree, file_stats):
     place(root, 0, 0)
     nodes, edges = [], []
     walk(root, file_stats, nodes, edges)
-    return {"width": root["span"], "height": max(n["y"] + n["h"] for n in nodes), "nodes": nodes, "edges": edges}
+    return {"width": max(n["x"] + n["w"] for n in nodes), "height": max(n["y"] + n["h"] for n in nodes), "nodes": nodes, "edges": edges}

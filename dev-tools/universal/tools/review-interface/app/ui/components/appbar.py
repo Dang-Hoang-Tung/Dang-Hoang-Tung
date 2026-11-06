@@ -19,18 +19,34 @@ def short_verdict(verdict):
     return re.split(r"\(|\.| - ", verdict, maxsplit=1)[0].strip() or verdict
 
 
-def chips(pr, totals, verdict):
-    out = [
-        f'<span class="chip hide-md">{esc(pr["author"])}</span>',
-        f'<span class="chip hide-md" id="leftchip" title="Lines and files you haven\'t marked as viewed"><span class="a">+{totals["added_all"]:,}</span><span class="d">−{totals["deleted_all"]:,}</span>'
-        f'<span class="left-files">· {totals["files"]} files</span></span>',
+def verdict_chip(verdict):
+    if not verdict:
+        return ""
+    return f'<span class="chip verdict" title="{esc(verdict)}">{esc(short_verdict(verdict))}</span>'
+
+
+def size_chip(totals):
+    return (
+        f'<span class="chip" id="leftchip" title="Lines and files you haven\'t marked as viewed"><span class="a">+{totals["added_all"]:,}</span><span class="d">−{totals["deleted_all"]:,}</span>'
+        f'<span class="left-files">· {totals["files"]} files</span></span>'
+    )
+
+
+def _ci(ci):
+    if ci == "none":
+        return ""
+    css = "ok" if ci == "passing" else "bad" if ci == "failing" else ""
+    return f'<span class="ci {css}"><span class="dotc"></span>CI {esc(ci)}</span>'
+
+
+def meta_line(pr):
+    parts = [
+        f'<span class="author">{esc(pr["author"])}</span>',
+        f'<a class="prlink" href="{esc(pr["url"])}" target="_blank" rel="noopener" title="Open pull request on GitHub">#{esc(pr["number"])}</a>',
+        f'<span class="mono sha" title="Commit under review">{esc(pr["head_sha"][:7])}</span>',
+        _ci(pr["ci"]),
     ]
-    if pr["ci"] != "none":
-        out.append(_ci_chip(pr["ci"]))
-    if verdict:
-        out.append(f'<span class="chip verdict" title="{esc(verdict)}">{esc(short_verdict(verdict))}</span>')
-    out.append(f'<span class="chip hide-md mono" title="Commit under review">{esc(pr["head_sha"][:7])}</span>')
-    return "".join(out)
+    return '<div class="meta">' + "".join(p for p in parts if p) + "</div>"
 
 
 def _tools(pr):
@@ -53,10 +69,12 @@ def _tools(pr):
 
 
 def render(pr, totals, verdict):
+    title = esc(pr["title"])
     return (
         f'<header class="appbar"><a class="back" href="index.html" title="Back to the review queue">{icons.BACK}Back</a>\n'
-        f'<div class="brand"><span class="prnum">#{esc(pr["number"])}</span><h1 title="{esc(pr["title"])}">{esc(pr["title"])}</h1></div>\n'
-        f'<div class="chips">{chips(pr, totals, verdict)}</div>\n'
+        f'<div class="brand"><h1 id="prtitle" tabindex="0" aria-label="{title}">{title}</h1>{meta_line(pr)}</div>\n'
+        f'<div class="topleft"><div class="topchip">{size_chip(totals)}</div><div class="topprog"><b id="pbar"></b></div></div>\n'
+        f'{verdict_chip(verdict)}\n'
         f'{NAVCHIP}\n'
         f'{_tools(pr)}</header>'
     )

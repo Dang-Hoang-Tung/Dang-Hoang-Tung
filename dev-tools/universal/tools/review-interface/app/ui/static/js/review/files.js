@@ -11,7 +11,11 @@ function initFileSections() {
     $('.path', s).onclick = () => setCollapsed(i, !s.classList.contains('collapsed'));
     $('input[data-read]', s).onchange = e => setRead([i], e.target.checked);
   });
-  $$('button.expand').forEach(b => b.onclick = () => { const t = b.previousElementSibling; t.replaceWith(t.content.cloneNode(true)); b.remove(); applyHideWs(); renderThreads(); });
+  $$('button.expand').forEach(b => b.onclick = () => {
+    const t = b.previousElementSibling, s = b.closest('section.file');
+    t.replaceWith(t.content.cloneNode(true)); b.remove();
+    applyHideWs(); renderThreads(); highlightSection(s);
+  });
 }
 
 function goToFile(i, block = 'start') {

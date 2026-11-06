@@ -1,7 +1,7 @@
 // "Hide whitespace changes": a del row and an add row that differ only in whitespace show as one unchanged row.
 const WS_KEY = 'pr-review-hidews';
 const squash = s => s.replace(/\s+/g, '');
-const rowText = r => { const s = $('.sign', r); return $('.code', r).textContent.slice(s ? s.textContent.length : 0); };
+const rowText = r => { const t = $('.t', r); return t ? t.textContent : ''; };
 
 function pairWsBlock(dels, adds) {
   let i = 0, j = 0;

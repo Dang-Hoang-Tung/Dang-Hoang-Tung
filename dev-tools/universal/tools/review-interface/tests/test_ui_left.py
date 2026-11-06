@@ -23,18 +23,22 @@ def rule(selector):
 
 
 class LeftPanelMarkupTests(unittest.TestCase):
-    def test_count_sits_on_bar_line(self):
+    def test_no_where_you_are_section(self):
         html = left_panel.render()
-        self.assertIn('<div class="prow"><div class="pbar"><b id="pbar"></b></div><span id="pcount"></span></div>', html)
-        self.assertNotIn('<span id="pcount"></span></div><div class="grid"', html)
+        for gone in ("pgrid", "pcount", "Where you are", "progress"):
+            self.assertNotIn(gone, html)
 
-    def test_page_renders_panel(self):
-        self.assertIn('class="prow"', review_page.render(review_model()))
+    def test_page_renders_panel_without_progress(self):
+        page = review_page.render(review_model())
+        self.assertIn('class="left"', page)
+        for gone in ("pgrid", "pcount", "Where you are"):
+            self.assertNotIn(gone, page)
 
 
 class LeftPanelStyleTests(unittest.TestCase):
-    def test_small_cells(self):
-        self.assertIn("minmax(12px,1fr));gap:4px", CSS)
+    def test_no_progress_styles(self):
+        for gone in ("#pcount", ".grid", ".progress", ".pbar"):
+            self.assertNotIn(gone, CSS)
 
     def test_no_strikethrough(self):
         self.assertNotIn("line-through", CSS)
@@ -62,6 +66,11 @@ class LeftPanelScriptTests(unittest.TestCase):
         self.assertIn("'Mark as viewed'", JS)
         self.assertIn("'Mark folder as viewed'", JS)
         self.assertIn("'Mark layer as viewed'", JS)
+
+    def test_progress_targets_pbar_only(self):
+        self.assertIn("const bar = $('#pbar'); if (bar) bar.style.width", JS)
+        self.assertNotIn("pgrid", JS)
+        self.assertNotIn("pcount", JS)
 
     def test_syntax(self):
         node = shutil.which("node")
