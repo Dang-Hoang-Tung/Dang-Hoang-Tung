@@ -1,7 +1,7 @@
 import json
 
 from app.domain import SEVERITIES, SEVERITY_LABELS
-from app.ui.components import appbar, banner, fabs, file_section, left_panel, modals, popover, summary_card, tree_svg
+from app.ui.components import appbar, banner, fabs, file_section, left_panel, modals, popover, summary_card
 from app.ui.pages import document
 
 CSS = ["tokens.css", "base.css", "appbar.css", "left-panel.css", "canvas.css", "cards.css", "diff.css",
@@ -52,7 +52,6 @@ def _main(model):
         "<main>\n"
         '<div class="store" id="store"></div>\n'
         f'{banner.render_all(model["banners"], model["ai_name"])}\n'
-        f'{tree_svg.card(model["tree_layout"])}\n'
         f'{summary_card.render(model["summary"])}\n'
         f"{sections}\n</main>"
     )
@@ -62,7 +61,7 @@ def _body(model):
     return (
         f'{appbar.render(model["pr"], model["totals"], model["summary"].get("verdict"))}\n'
         f'<div class="layout">\n{left_panel.render()}\n{_main(model)}\n</div>\n'
-        f'{fabs.render()}\n{fabs.comment_button()}\n{popover.render()}\n{modals.render()}'
+        f'{fabs.render()}\n{fabs.comment_button()}\n{popover.render()}\n{modals.render(model["tree_layout"], model["summary"])}'
     )
 
 

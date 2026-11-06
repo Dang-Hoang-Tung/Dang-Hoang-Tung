@@ -1,15 +1,11 @@
-let treeModal, mapModal;
+let treeModal, mapModal, briefModal;
 function initModals() {
-  treeModal = $('#treemodal'); mapModal = $('#mapmodal');
+  treeModal = $('#treemodal'); mapModal = $('#mapmodal'); briefModal = $('#briefmodal');
   $$('dialog.modal').forEach(m => {
     $('[data-close]', m).onclick = () => m.close();
     m.addEventListener('click', e => { if (e.target === m) m.close(); });
   });
-  new IntersectionObserver(([e]) => { $('#treebtn').hidden = e.isIntersecting; }).observe($('#treecard'));
-  $('#treebtn').onclick = () => {
-    const body = $('.modal-body', treeModal);
-    if (!body.firstChild) { body.append($('#treecanvas svg').cloneNode(true)); bindTreeLinks(body, () => treeModal.close()); }
-    treeModal.showModal();
-  };
+  $('#treebtn').onclick = () => { treeModal.showModal(); tree.start(); };
   $('#mapbtn').onclick = () => { mapModal.showModal(); requestAnimationFrame(drawTreemap); };
+  $('#briefbtn').onclick = () => briefModal.showModal();
 }

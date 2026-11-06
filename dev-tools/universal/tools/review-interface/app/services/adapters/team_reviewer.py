@@ -54,6 +54,34 @@ def _findings(md):
     return recs
 
 
+_SEV = {"🔴": "block", "🟡": "should", "⚪": "nit"}
+
+
+def _check(md):
+    recs, cur = [], None
+    for ln in _section(md, "Check").split("\n"):
+        m = re.match(r"^\d+\.\s*(🔴|🟡|⚪)\s*(.*)$", ln)
+        if m:
+            head = m.group(2)
+            title, sep, rest = head.rpartition(" — ")
+            if not sep:
+                title, rest = head, head
+            cur = _finding(_SEV[m.group(1)], re.sub(r"\s*`[^`]*`\s*$", "", title).strip() or title, rest)
+            recs.append(cur)
+        elif re.match(r"^\s*\+\d+\s+nits?\b", ln):
+            cur = None
+        elif cur and ln.strip().startswith(">"):
+            cur["draft_comment"] += re.sub(r"^\s*>\s*", "", ln) + "\n"
+        elif cur and ln.strip() and ln.strip() != "None.":
+            cur["body"] += ln.strip() + "\n"
+    return recs
+
+
+def _top_lines(md):
+    head = re.split(r"(?m)^## ", md, maxsplit=1)[0]
+    return [l.strip() for l in head.split("\n") if re.match(r"^(Verdict|What|Risk|Time):", l.strip())]
+
+
 def _look_here(md):
     recs = []
     for ln in _section(md, "Look here").split("\n"):
@@ -68,17 +96,18 @@ def _look_here(md):
 
 
 def brief_to_insights(md, repo, pr, head_sha):
-    tldr = _bullets(_section(md, "30 seconds"))
+    tldr = _top_lines(md) or _bullets(_section(md, "30 seconds"))
     risk_full = _field(tldr, "Risk")
     risk = next((r for r in ("High", "Medium", "Low") if risk_full.startswith(r)), "")
-    tm = re.search(r"(\d+)\s*min", _field(tldr, "Time needed"))
-    recs = _findings(md) + _look_here(md)
+    tm = re.search(r"(\d+)\s*min", (_field(tldr, "Time needed") or _field(tldr, "Time")))
+    recs = _findings(md) + _look_here(md) + _check(md)
+    questions = _bullets(_section(md, "Ask the author")) + _bullets(_section(md, "Questions for the author"))
     for r in recs:
         r["body"], r["draft_comment"] = r["body"].strip(), r["draft_comment"].strip()
     return {
         "schema": SCHEMA, "repo": repo, "pr": pr, "head_sha": head_sha, "source": "team-reviewer-brief",
-        "summary": {"verdict": _field(tldr, "Verdict"), "risk": risk, "risk_note": risk_full, "minutes": int(tm.group(1)) if tm else None,
-                    "tldr": tldr, "questions": _bullets(_section(md, "Questions for the author"))},
+        "summary": {"verdict": _field(tldr, "Verdict"), "what": _field(tldr, "What"), "risk": risk, "risk_note": risk_full, "minutes": int(tm.group(1)) if tm else None,
+                    "tldr": tldr, "questions": questions},
         "recommendations": recs,
     }
 

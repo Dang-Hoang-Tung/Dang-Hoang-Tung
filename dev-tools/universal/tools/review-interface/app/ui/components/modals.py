@@ -1,4 +1,4 @@
-from app.ui.components import icons
+from app.ui.components import icons, summary_card, tree_svg
 
 
 def _close_button():
@@ -10,7 +10,22 @@ def _modal(modal_id, title, body):
             f'<div class="modal-body">{body}</div></dialog>')
 
 
-def render():
-    tree = _modal("treemodal", "Where this change lands", "")
+def _tree_modal(layout):
+    zoom = (
+        '<div class="zoom"><button type="button" class="iconbtn sm" data-zoom="out" aria-label="Zoom out">−</button>'
+        '<button type="button" class="iconbtn sm wide" data-zoom="fit" aria-label="Fit to view">Fit</button>'
+        '<button type="button" class="iconbtn sm" data-zoom="in" aria-label="Zoom in">+</button></div>'
+    )
+    return (
+        '<dialog class="modal tree" id="treemodal"><div class="modal-head"><h2>Where this change lands</h2>'
+        f'<div class="head-tools">{zoom}{_close_button()}</div></div>'
+        f'<div class="modal-body">{tree_svg.canvas(layout)}</div>'
+        f'<div class="modal-foot">{tree_svg.legend()}</div></dialog>'
+    )
+
+
+def render(layout, summary):
+    tree = _tree_modal(layout)
     treemap = _modal("mapmodal", "Treemap · size is lines changed, colour is the top finding", '<div class="treemap" id="treemap"></div>')
-    return f"{tree}\n{treemap}"
+    brief = _modal("briefmodal", "Brief", summary_card.brief_html(summary))
+    return f"{tree}\n{treemap}\n{brief}"

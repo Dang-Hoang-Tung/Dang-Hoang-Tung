@@ -43,12 +43,6 @@ class AppbarTests(unittest.TestCase):
         for needle in ('class="navchip" id="navchip"', 'id="navprev"', 'id="navcount"', 'id="navnext"'):
             self.assertIn(needle, html)
 
-    def test_tree_toggle(self):
-        html = page()
-        card = html[html.index('id="treecard"'):html.index('id="treecanvas"')]
-        self.assertIn('id="treetoggle"', card)
-        self.assertIn(">Expand<", card)
-
     def test_approve_markup_kept(self):
         html = page()
         for needle in ('id="approvebtn"', 'id="approvepop"', 'id="leftchip"'):

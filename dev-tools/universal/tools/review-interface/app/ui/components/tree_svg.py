@@ -44,15 +44,13 @@ def render(layout):
     return f'<svg class="tree" width="{_n(width)}" height="{_n(height)}" viewBox="-2 -2 {_n(width)} {_n(height)}">{edges}{nodes}</svg>'
 
 
-def card(layout):
+def canvas(layout):
+    return f'<div class="canvas" id="treecanvas"><div class="stage">{render(layout)}</div></div>'
+
+
+def legend():
     return (
-        '<section class="canvas-card" id="treecard"><div class="card-head"><h2>Where this change lands</h2><div class="zoom">'
-        '<button type="button" class="iconbtn sm wide" id="treetoggle" aria-expanded="false" aria-label="Expand code tree">Expand</button>'
-        '<button type="button" class="iconbtn sm" data-zoom="out" aria-label="Zoom out">−</button>'
-        '<button type="button" class="iconbtn sm wide" data-zoom="fit" aria-label="Fit to view">Fit</button>'
-        '<button type="button" class="iconbtn sm" data-zoom="in" aria-label="Zoom in">+</button></div></div>\n'
-        f'<div class="canvas" id="treecanvas"><div class="stage">{render(layout)}</div></div>\n'
         '<div class="legend"><span><span class="dot should"></span>Should fix</span><span><span class="dot nit"></span>Nit</span>'
         '<span><span class="dot look"></span>Look here</span><span><span class="dot question"></span>Question</span>'
-        '<span class="muted">Drag to pan · ⌘-scroll to zoom · click a file to jump</span></div></section>'
+        '<span><span class="dot gen"></span>Generated</span></div>'
     )

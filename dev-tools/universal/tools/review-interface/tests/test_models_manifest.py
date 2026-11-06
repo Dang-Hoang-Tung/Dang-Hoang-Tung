@@ -50,7 +50,7 @@ class ReviewModelTests(TmpCase):
     def test_with_insights_notes_mapped(self):
         m = self.model(ins=insights.validate(good_insights()), status="current")
         self.assertTrue(m["summary"]["has_insights"])
-        self.assertIsNone(m["summary"]["description"])
+        self.assertEqual(m["summary"]["description"], "Some **description**")
         self.assertEqual(m["summary"]["tldr"], ["What: widget"])
         self.assertEqual(m["summary"]["questions"], ["Why?"])
         self.assertEqual(len(m["notes"]), 2)

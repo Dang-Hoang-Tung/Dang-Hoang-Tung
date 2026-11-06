@@ -106,7 +106,10 @@ def build_summary(pr, ins, summ, totals):
         "has_insights": bool(ins), "verdict": verdict, "risk": risk, "risk_note": summ.get("risk_note") or "",
         "minutes": minutes, "minutes_source": "insights" if summ.get("minutes") else "estimate",
         "tldr": (summ.get("tldr") or []) if ins else [], "questions": (summ.get("questions") or []) if ins else [],
-        "description": None if ins else (pr.get("body") or None),
+        "what": summ.get("what") or "",
+        "check": [{"severity": r.get("severity"), "title": r.get("title") or "", "path": r.get("path"), "line": r.get("start_line")}
+                  for r in (ins or {}).get("recommendations", []) if r.get("severity") != "look"],
+        "description": pr.get("body") or None,
     }
 
 

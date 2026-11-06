@@ -78,7 +78,7 @@ JS files for a page are concatenated in the listed order and wrapped in one IIFE
                              "kind": str|None, "gen": bool, "a", "d", "notes": int}],
                   "edges": ["M.. V.. H.." path strings]},
   "notes": [{"key", "kind", "title", "body", "comment", "file": idx|None, "start", "end", "rows": [row ids], "endRow"}],
-  "summary": {"has_insights": bool, "verdict", "risk", "risk_note", "minutes", "minutes_source": "insights|estimate",
+  "summary": {"has_insights": bool, "verdict", "what", "risk", "risk_note", "minutes", "minutes_source": "insights|estimate",
               "tldr": [md], "questions": [md], "description": md|None},
   "totals": {"added", "deleted", "files", "added_all", "deleted_all", "effort": "Small|Medium|Large"},
   "banners": [{"type": "draft"} | {"type": "stacked", "base"} | {"type": "stale", "from", "to"} | {"type": "invalid", "reason"}],

@@ -197,7 +197,7 @@ class ReviewPageTests(unittest.TestCase):
         cls.page = review_page.render(review_model())
 
     def test_structure(self):
-        for needle in ('<header class="appbar">', 'id="treecard"', 'id="treecanvas"', 'id="pane-files"', 'id="pane-layers"',
+        for needle in ('<header class="appbar">', 'id="treecanvas"', 'id="pane-files"', 'id="pane-layers"',
                        'id="store"', 'id="pcard"', 'id="notelist"', 'id="treemodal"', 'id="mapmodal"', 'id="treemap"', 'id="cbtn"', 'id="treebtn"', 'id="mapbtn"',
                        'class="summary"', 'id="f-0"', 'id="f-2"', 'class="resizer" data-side="left"',
                        "<title>Review #42</title>", "fonts.googleapis.com", 'rel="icon"'):
@@ -301,7 +301,7 @@ class ReviewPageTests(unittest.TestCase):
     def test_no_insights_card_escapes_description(self):
         summary = dict(review_model()["summary"], has_insights=False, description="Hi <script>alert(1)</script>")
         page = review_page.render(review_model(summary=summary))
-        self.assertIn("About this PR", page)
+        self.assertIn("PR description", page)
         self.assertNotIn("<script>alert(1)</script>", page)
         self.assertIn("&lt;script&gt;alert(1)&lt;/script&gt;", page)
 
