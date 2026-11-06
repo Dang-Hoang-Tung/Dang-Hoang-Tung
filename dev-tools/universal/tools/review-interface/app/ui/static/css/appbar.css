@@ -11,9 +11,9 @@ header.appbar{position:sticky;top:0;z-index:30;height:var(--bar);display:flex;al
 .meta .ci{display:inline-flex;align-items:center;gap:6px}
 .meta .dotc{width:7px;height:7px;border-radius:50%;background:var(--text-3)}
 .meta .ci.ok .dotc{background:var(--add-fg);box-shadow:0 0 0 3px var(--add-num)}.meta .ci.bad .dotc{background:var(--del-fg);box-shadow:0 0 0 3px var(--del-num)}
-.topleft{display:flex;flex-direction:column;gap:5px;flex:none}
-.topchip{display:flex;justify-content:flex-end}
-.topprog{height:3px;border-radius:999px;background:var(--surface-3);overflow:hidden}
+.topleft{display:flex;flex:none}
+#leftchip{position:relative;overflow:hidden}
+.topprog{position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--surface-3)}
 .topprog b{display:block;height:100%;width:0;border-radius:999px;background:var(--add);transition:width .25s}
 .titletip{position:fixed;z-index:60;max-width:min(560px,calc(100vw - 32px));padding:6px 10px;font:500 12.5px/1.4 var(--font);color:var(--text);background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;box-shadow:var(--shadow-2);pointer-events:none;overflow-wrap:anywhere}
 .titletip[hidden]{display:none}
@@ -80,3 +80,9 @@ header.appbar{position:sticky;top:0;z-index:30;height:var(--bar);display:flex;al
 .navchip button{border:0;background:transparent;color:var(--text-2);padding:2px 7px;border-radius:999px;font-size:14px;line-height:1.2}
 .navchip button:hover{background:var(--surface-3);color:var(--text)}
 .navchip span:empty{display:none}
+
+header.appbar :is(.back,.chip,.navchip,.iconbtn,.approve-btn):not(.sm){box-sizing:border-box;height:32px;display:inline-flex;align-items:center;flex:none}
+header.appbar .iconbtn:not(.sm){width:32px;justify-content:center}
+header.appbar .chip{padding:0 12px}
+header.appbar .approve-btn:not(.sm){padding:0 14px;border-radius:9px;font-size:13px}
+header.appbar .tools{gap:8px}

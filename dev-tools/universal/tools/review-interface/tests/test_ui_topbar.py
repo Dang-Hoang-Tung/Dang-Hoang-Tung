@@ -55,7 +55,7 @@ class TopbarTests(unittest.TestCase):
     def test_pbar_under_leftchip(self):
         html = bar()
         chip = html.index('id="leftchip"')
-        prog = html.index('<div class="topprog"><b id="pbar"></b></div>')
+        prog = html.index('<span class="topprog"><b id="pbar"></b></span>')
         self.assertLess(chip, prog)
         self.assertEqual(html.count('id="pbar"'), 1)
         self.assertNotIn(" of ", html[prog:prog + 80])
