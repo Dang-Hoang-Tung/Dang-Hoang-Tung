@@ -103,6 +103,7 @@ def build_parser():
     b = sub.add_parser("build")
     b.add_argument("prs", nargs="*")
     b.add_argument("--no-open", action="store_true")
+    b.add_argument("--source", default="cli", help=argparse.SUPPRESS)
     sub.add_parser("serve")
     sub.add_parser("paths")
     ai = sub.add_parser("ai")
@@ -128,7 +129,7 @@ def normalise_argv(argv):
 
 
 def run_build(cfg, a):
-    m = builder.build(cfg, [parse_pr(x) for x in a.prs] or None)
+    m = builder.build(cfg, [parse_pr(x) for x in a.prs] or None, source=a.source)
     print(f"built {len(m['prs'])} page(s). For an AI: {dirs(cfg)['root'] / 'manifest.json'}")
     if not a.no_open:
         info = ensure_server(cfg)
@@ -162,3 +163,7 @@ def main(argv=None):
             ai_reply(cfg, a.slug, a.thread, a.text)
         elif a.ai_cmd == "post":
             ai_post(cfg, a.slug, a.thread)
+
+
+if __name__ == "__main__":
+    main()

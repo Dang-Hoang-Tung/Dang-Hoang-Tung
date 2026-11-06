@@ -1,4 +1,4 @@
-const LIMITS = { left: [200, 560, 284], right: [300, 720, 392] };
+const LIMITS = { left: [200, 560, 284] };
 function setWidth(side, px) {
   const [min, max] = LIMITS[side];
   const w = Math.round(Math.min(max, Math.max(min, px)));
@@ -7,7 +7,7 @@ function setWidth(side, px) {
 }
 
 function initResizers() {
-  try { for (const side of ['left', 'right']) { const w = +localStorage.getItem('pr-review-w-' + side); if (w) setWidth(side, w); } } catch (_) {}
+  try { for (const side of ['left']) { const w = +localStorage.getItem('pr-review-w-' + side); if (w) setWidth(side, w); } } catch (_) {}
   $$('.resizer').forEach(r => {
     const side = r.dataset.side;
     r.addEventListener('pointerdown', e => {

@@ -198,11 +198,23 @@ class ReviewPageTests(unittest.TestCase):
 
     def test_structure(self):
         for needle in ('<header class="appbar">', 'id="treecard"', 'id="treecanvas"', 'id="pane-files"', 'id="pane-layers"',
-                       'id="checksec"', 'id="list"', 'id="store"', 'id="fileonly"', 'id="focus"', 'id="themebtn"', 'id="palettebtn"',
-                       'id="thememenu"', 'id="treemodal"', 'id="mapmodal"', 'id="treemap"', 'id="cbtn"', 'id="treebtn"', 'id="mapbtn"',
-                       'class="summary"', 'id="f-0"', 'id="f-2"', 'class="resizer" data-side="left"', 'class="resizer" data-side="right"',
+                       'id="store"', 'id="pcard"', 'id="notelist"', 'id="treemodal"', 'id="mapmodal"', 'id="treemap"', 'id="cbtn"', 'id="treebtn"', 'id="mapbtn"',
+                       'class="summary"', 'id="f-0"', 'id="f-2"', 'class="resizer" data-side="left"',
                        "<title>Review #42</title>", "fonts.googleapis.com", 'rel="icon"'):
             self.assertIn(needle, self.page, needle)
+
+    def test_no_right_panel(self):
+        for needle in ("aside.right", 'class="right"', 'data-side="right"', 'id="checksec"', 'id="fileonly"', 'id="list"'):
+            self.assertNotIn(needle, self.page, needle)
+        self.assertIn('<aside class="left"', self.page)
+        self.assertNotIn("--right", self.page)
+
+    def test_icons_cards_and_nav_scripts(self):
+        js = assets.bundle_js(review_page.JS)
+        for needle in ("el('button', 'ti '", "'n:' + n.key", "'t:' + t.id", "function openCard", "function closeCard", "CARD_DELAY",
+                       "e.key === 'Escape' && cs.id", "Mark checked", "Use as comment", "Post GitHub comment", "addNoteReply",
+                       "linkedNote(t)", "'#navcount'", "'#navprev'", "e.key !== 'n' && e.key !== 'p'", "textarea, select"):
+            self.assertIn(needle, js, needle)
 
     def test_head_has_themes_before_style(self):
         self.assertLess(self.page.index("REVIEW_THEMES"), self.page.index("<style>"))
@@ -229,7 +241,7 @@ class ReviewPageTests(unittest.TestCase):
     def test_diff_rows_and_marks(self):
         self.assertIn('id="r0-3"', self.page)
         self.assertIn("hot should", self.page)
-        self.assertIn('class="mk should" data-note="n1"', self.page)
+        self.assertNotIn('class="mk', self.page)
         self.assertIn("old &lt;b&gt;line&lt;/b&gt;", self.page)
         self.assertIn('<template class="lazy">', self.page)
         self.assertIn("Show generated diff", self.page)
@@ -365,6 +377,35 @@ class BundleTests(unittest.TestCase):
         self.assertEqual(js - {"shared/dropdown.js"}, (set(review_page.JS) | set(queue_page.JS)) - {"shared/dropdown.js"})
 
 
+THREADS = ("threads: [{id: 't1', path: 'src/components/Button.tsx', side: 'RIGHT', start_line: 2, line: 2, noteKey: null, commit: '%s', "
+           "resolved: false, resolvedAt: null, posted: null, messages: [{id: 'm1', who: 'me', text: 'Why this?', at: '2026-11-06T12:00:00.000Z'}, "
+           "{id: 'm2', who: 'ai', text: 'Because.', at: '2026-11-06T12:01:00.000Z'}]}, "
+           "{id: 't2', path: 'src/components/Button.tsx', side: 'RIGHT', start_line: 3, line: 3, noteKey: 'n1', commit: '%s', resolved: false, resolvedAt: null, "
+           "posted: null, messages: [{id: 'm3', who: 'me', text: 'About the note', at: '2026-11-06T12:00:00.000Z'}]}]") % (SHA, SHA)
+
+
+def page_with_threads(model):
+    page = review_page.render(model)
+    marker = "threads: []"
+    assert marker in page
+    return page.replace(marker, THREADS, 1)
+
+
+class InlineIconTests(unittest.TestCase):
+    def test_icons_for_notes_and_threads_in_a_real_browser(self):
+        if not Path(CHROME).exists():
+            self.skipTest("Chrome not available")
+        OUT_DIR.mkdir(parents=True, exist_ok=True)
+        path = OUT_DIR / "threads.html"
+        path.write_text(page_with_threads(review_model()))
+        run = subprocess.run([CHROME, "--headless=new", "--disable-gpu", "--window-size=1500,950", "--virtual-time-budget=3000",
+                              "--dump-dom", f"file://{path}"], capture_output=True, text=True, timeout=90)
+        dom = run.stdout
+        self.assertIn('class="ti should" type="button" data-card="n:n1"', dom)
+        self.assertIn('class="ti thread" type="button" data-card="t:t1"', dom)
+        self.assertNotIn('data-card="t:t2"', dom)
+
+
 class ScreenshotTests(unittest.TestCase):
     def test_render_pages_and_screenshot(self):
         OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -384,3 +425,11 @@ class ScreenshotTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class IntralineTests(unittest.TestCase):
+    def test_review_page_loads_pinned_jsdiff_with_integrity_before_the_bundle(self):
+        page = review_page.render(review_model())
+        tag = 'src="https://cdn.jsdelivr.net/npm/diff@5.2.0/dist/diff.min.js" integrity="sha384-'
+        self.assertIn(tag, page)
+        self.assertLess(page.index(tag), page.rindex("initIntraline();"))

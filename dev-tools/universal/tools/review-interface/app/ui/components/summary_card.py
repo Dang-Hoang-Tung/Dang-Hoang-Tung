@@ -11,4 +11,4 @@ def card_html(summary, has_insights):
 
 
 def render(summary):
-    return f'<section class="summary">{card_html(summary, summary["has_insights"])}</section>'
+    return f'<section class="summary">{card_html(summary, summary["has_insights"])}<div class="notes-list" id="notelist"></div></section>'

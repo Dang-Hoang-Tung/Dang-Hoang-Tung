@@ -39,7 +39,7 @@ app/
     assets.py                   bundle(css_files), bundle(js_files): concatenates static files in order
     components/
       appbar.py  banner.py  tree_svg.py  summary_card.py  file_section.py  icons.py
-      left_panel.py  right_panel.py  modals.py  fabs.py
+      left_panel.py  popover.py  modals.py  fabs.py
       queue_controls.py  queue_bucket.py  queue_item.py
     pages/
       review_page.py            render(model) -> html
@@ -47,11 +47,11 @@ app/
     static/
       themes.js                 theme families (loaded in <head>)
       css/   tokens.css base.css appbar.css layout.css left-panel.css canvas.css diff.css
-             cards.css dropdown.css right-panel.css threads.css modals.css queue.css
+             cards.css dropdown.css threads.css modals.css queue.css
       js/    shared/dom.js shared/markdown.js shared/time.js shared/theme.js shared/dropdown.js
              review/data.js review/store.js review/read-state.js review/files.js review/left-panel.js
              review/scroll-spy.js review/tree-canvas.js review/modals.js review/treemap.js
-             review/selection.js review/checks.js review/threads.js review/resizers.js review/main.js
+             review/selection.js review/checks.js review/threads.js review/popover.js review/nav.js review/intraline.js review/resizers.js review/main.js
              queue/filters.js queue/main.js
 tests/
 ```
@@ -68,7 +68,9 @@ JS files for a page are concatenated in the listed order and wrapped in one IIFE
   "user": "Tony", "ai_name": "Claude",
   "layers": [layer names, from domain.LAYERS],
   "files": [{"idx", "path", "a", "d", "gen": bool, "binary": bool, "layer", "hash", "kind": "block|should|nit|question|look|None",
-             "notes": [note keys], "rows": [[kind, old_no|None, new_no|None, text], ...]}],   # kind: hunk|add|del|ctx
+             "notes": [note keys], "rows": [[kind, old_no|None, new_no|None, text], ...],   # kind: hunk|add|del|ctx
+             "moved": {"<row index>": {"dir": "from|to", "file": other file idx|null, "row": first matching row index there|null,
+                                       "path": other path|null, "line": other side's line no|null, "start": bool}}}],
   "order": [file idx in display order],
   "tree": [{"name", "file": idx|None, "kids": [...]}],          # top-level nodes under the repo root, for the left panel
   "tree_layout": {"width", "height",
@@ -82,7 +84,7 @@ JS files for a page are concatenated in the listed order and wrapped in one IIFE
   "banners": [{"type": "draft"} | {"type": "stacked", "base"} | {"type": "stale", "from", "to"} | {"type": "invalid", "reason"}],
 }
 ```
-Row ids are `r{file idx}-{row index}`. A binary file has `binary: true` and no rows. `summary.verdict` is already shortened (first sentence, 40 characters); avatars come from `models.avatar_url`.
+Row ids are `r{file idx}-{row index}`. `moved` (`diff.find_moves`) marks code git detected as moved (`git diff --color-moved=blocks`, indentation changes allowed; `git.diff` runs it next to the plain diff and attaches it as `.moved` on the diff text). `to` is a `del` row whose text was added elsewhere, `from` is an `add` row that came from elsewhere. Runs of moved `del` rows are paired with moved `add` rows whose whitespace-stripped text matches in order, in any file; `file`, `row`, `path`, `line` point at the first row of the matching block. Without a counterpart they are null. `start` is true only on the first row of each block. `moved` is `{}` for diffs from the GitHub API (no clone) and for rows that did not move.
 
 ### Queue page (`models.queue_model`)
 

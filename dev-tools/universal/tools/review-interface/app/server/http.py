@@ -6,6 +6,8 @@ Run from the repo root: python3 -m app.server.http --config PATH
 """
 import argparse
 import json
+import sys
+import subprocess
 import os
 import secrets
 import threading
@@ -15,8 +17,7 @@ from http.cookies import SimpleCookie
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
-from app.config import dirs, load_config
-from app.services import build as builder
+from app.config import ROOT, dirs, load_config
 from app.services import approval, events, manifest, posting, state
 
 MAX_BODY = 2 * 1024 * 1024
@@ -48,14 +49,23 @@ def start_refresh(cfg, status):
         status.update(running=True, error=None, started=time.time())
 
     def work():
+        # A fresh process, so a refresh always uses the code on disk, not what this helper loaded at start.
+        cmd = [sys.executable, "-m", "app.cli", "--config", cfg["config_path"], "build", "--no-open", "--source", "refresh"]
         try:
-            builder.build(cfg, source="refresh")
+            run = subprocess.run(cmd, cwd=str(ROOT), capture_output=True, text=True, timeout=900)
+            if run.returncode:
+                status["error"] = (run.stderr or run.stdout).strip()[-300:] or f"build exited {run.returncode}"
             status["changes"] = events.latest(cfg)
-        except Exception as e:  # report any build failure to the page
+        except (OSError, subprocess.TimeoutExpired) as e:
             status["error"] = str(e)[:300]
         finally:
             status.update(running=False, finished=time.time())
     threading.Thread(target=work, daemon=True).start()
+
+
+def cookie_name(port):
+    """Cookies ignore ports, so each helper uses its own name and two helpers can't log each other out."""
+    return f"rt{port}"
 
 
 def make_handler(cfg, token, touch):
@@ -91,7 +101,8 @@ def make_handler(cfg, token, touch):
                 self._send(403, "bad host")
                 return False
             c = SimpleCookie(self.headers.get("Cookie") or "")
-            if not ("rt" in c and same(c["rt"].value, token)):
+            name = cookie_name(self.server.server_address[1])
+            if not (name in c and same(c[name].value, token)):
                 self._send(403, "Open the review queue with review.py.")
                 return False
             if write:
@@ -135,7 +146,7 @@ def make_handler(cfg, token, touch):
             nxt = q.get("next", ["index.html"])[0].lstrip("/")
             if "/" in nxt or ".." in nxt:
                 nxt = "index.html"
-            return self._send(302, headers={"Location": "/" + nxt, "Set-Cookie": f"rt={token}; Path=/; HttpOnly; SameSite=Strict"})
+            return self._send(302, headers={"Location": "/" + nxt, "Set-Cookie": f"{cookie_name(self.server.server_address[1])}={token}; Path=/; HttpOnly; SameSite=Strict"})
 
         def _get_state(self, path):
             try:

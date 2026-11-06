@@ -28,7 +28,7 @@ body.focus-only section.file:not(.focused){display:none}
 
 /* ---------- diff ---------- */
 .diffwrap{overflow-x:auto}
-table.diff{border-collapse:collapse;min-width:100%;font:12.5px/1.65 var(--mono);font-variant-numeric:tabular-nums}
+table.diff{border-collapse:collapse;min-width:100%;font:12px/20px ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;font-variant-numeric:tabular-nums}
 table.diff td{padding:0 12px;vertical-align:top}
 td.num{touch-action:pan-y;width:1%;min-width:50px;text-align:right;color:var(--text-3);user-select:none;cursor:pointer;position:relative;padding:0 10px;border-right:1px solid var(--line)}
 td.code{white-space:pre;width:100%;position:relative}
@@ -44,11 +44,18 @@ tr.hot.look td.code{box-shadow:inset 3px 0 0 var(--look)}tr.hot.question td.code
 tr.sel td{background-image:linear-gradient(var(--sel),var(--sel))}
 tr.sel td.num{color:var(--accent);font-weight:600;box-shadow:inset 3px 0 0 var(--accent)}
 tr.flash td{background-image:linear-gradient(var(--flash),var(--flash))}
-.mk{position:sticky;float:right;right:10px;margin-left:12px;font:600 9.5px var(--font);letter-spacing:.04em;text-transform:uppercase;padding:1px 7px;border-radius:6px;border:0;line-height:17px}
-.mk.block{background:var(--block-soft);color:var(--block)}.mk.should{background:var(--should-soft);color:var(--should)}
-.mk.nit{background:var(--nit-soft);color:var(--nit)}.mk.look{background:var(--look-soft);color:var(--look)}.mk.question{background:var(--question-soft);color:var(--question)}
-.mk:hover{filter:brightness(.95);box-shadow:var(--shadow-1)}
-.pin{position:sticky;float:right;right:10px;margin-left:8px;font:600 11px var(--font);background:var(--accent);color:var(--accent-fg);border:0;border-radius:999px;padding:0 8px;line-height:18px;box-shadow:var(--shadow-1)}
 #cbtn{position:absolute;z-index:8;font:600 12px var(--font);background:var(--accent);color:var(--accent-fg);border:0;border-radius:9px;padding:7px 12px;box-shadow:var(--shadow-2)}
-tr.add .hl{background:color-mix(in srgb,var(--diff-add) 45%,transparent);border-radius:3px}
-tr.del .hl{background:color-mix(in srgb,var(--diff-del) 45%,transparent);border-radius:3px}
+tr.add .hl{background:var(--add-hl);border-radius:2px}
+tr.del .hl{background:var(--del-hl);border-radius:2px}
+
+/* moved code: neutral tint instead of red/green */
+tr.moved td{background:color-mix(in srgb,var(--nit) 10%,var(--surface))}
+tr.moved td.num{background:color-mix(in srgb,var(--nit) 20%,var(--surface));color:var(--nit)}
+tr.moved .sign{color:var(--text-3);opacity:.7}
+.mvlabel{margin-left:14px;font:600 11px var(--font);color:var(--nit);background:color-mix(in srgb,var(--nit) 14%,var(--surface));border:1px solid color-mix(in srgb,var(--nit) 30%,var(--surface));border-radius:999px;padding:0 8px;line-height:16px;cursor:pointer;user-select:none;vertical-align:1px}
+.mvlabel:hover{background:color-mix(in srgb,var(--nit) 24%,var(--surface))}
+/* whitespace-only changes */
+tr.ws-hidden{display:none}
+tr.ws-only td{background:transparent}tr.ws-only td.num{background:transparent;color:var(--text-3)}
+tr.ws-only .sign{color:transparent}tr.ws-only .hl{background:none}
+.mvlabel.plain{cursor:default}

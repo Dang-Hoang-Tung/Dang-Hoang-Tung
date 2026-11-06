@@ -23,7 +23,10 @@ function fileRow(i, depth, name) {
   row.style.setProperty('--d', depth);
   row.dataset.file = i;
   row.title = D.files[i].path;
-  row.append(checkbox(isRead(i), false, on => setRead([i], on), 'Mark as viewed'), el('span', 'ring ' + ringOf(i)), el('span', 'nm', name));
+  const lead = el('span', 'lead');
+  lead.append(checkbox(isRead(i), false, on => setRead([i], on), 'Mark as viewed'), el('span', 'vmark', '✓'));
+  row.append(lead, el('span', 'nm', name));
+  if (D.files[i].kind) row.append(el('span', 'ring ' + ringOf(i)));
   if (changedSinceRead(i)) row.append(el('span', 'chg', 'changed'));
   row.onclick = () => goToFile(i);
   return row;

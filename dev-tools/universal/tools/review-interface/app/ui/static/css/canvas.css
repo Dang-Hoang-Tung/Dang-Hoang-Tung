@@ -2,7 +2,7 @@
 .card-head h2{margin:0;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:var(--text-3)}
 .card-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 0}
 .zoom{display:flex;gap:4px}
-.canvas{position:relative;overflow:hidden;margin:10px 12px 0;border-radius:10px;cursor:grab;touch-action:none;height:320px;background:radial-gradient(circle at 1px 1px,var(--line) 1px,transparent 0) 0 0/18px 18px,var(--surface-2)}
+.canvas{position:relative;overflow:hidden;margin:10px 12px 0;border-radius:10px;cursor:grab;touch-action:none;height:240px;background:radial-gradient(circle at 1px 1px,var(--line) 1px,transparent 0) 0 0/18px 18px,var(--surface-2)}
 .canvas.dragging{cursor:grabbing}.canvas.dragging *{pointer-events:none}
 .stage{position:absolute;left:0;top:0;transform-origin:0 0}
 .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--text-3);padding:12px 18px 14px;align-items:center}

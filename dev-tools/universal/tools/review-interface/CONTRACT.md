@@ -10,7 +10,7 @@ Find every path with `python3 review.py paths`, or read `<data_dir>/manifest.jso
 |---|---|---|
 | `events.jsonl` | the tool, on every build or Refresh | One line per rebuild: which PRs to re-check (`check`), new, moved (new commits) and gone PRs, and PRs whose insights are missing or stale |
 | `manifest.json` | the tool, on every build | Every PR in the queue with its page, state, insights and diff paths |
-| `diffs/<slug>.diff` | the tool | The PR's unified diff, for reading |
+| `diffs/<slug>.diff` | the tool | The PR's unified diff (git's histogram algorithm, 12 lines of context), for reading |
 | `insights/<slug>.json` | an AI, optional | Summary and recommendations shown on the page and in the queue |
 | `state/<slug>.json` | the page and an AI | Comment threads, viewed files, checked recommendations |
 

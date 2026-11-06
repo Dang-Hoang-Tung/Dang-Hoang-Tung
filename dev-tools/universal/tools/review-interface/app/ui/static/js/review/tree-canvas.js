@@ -1,16 +1,17 @@
+const COMPACT = 240;
 function panZoom(box) {
   const stage = $('.stage', box), svg = $('svg', stage);
   const W = +svg.getAttribute('width'), H = +svg.getAttribute('height');
-  let s = 1, x = 0, y = 0, drag = null, moved = false;
+  let full = false, s = 1, x = 0, y = 0, drag = null, moved = false;
   const apply = () => { stage.style.transform = `translate(${x}px,${y}px) scale(${s})`; };
   const fit = () => {
-    s = Math.min(1, (box.clientWidth - 32) / W, 520 / H);
-    box.style.height = Math.min(Math.max(H * s + 32, 200), 560) + 'px';
+    if (!full) { s = Math.min(1, (box.clientWidth - 32) / W, 208 / H); box.style.height = COMPACT + 'px'; }
+    else { s = Math.min(1, (box.clientWidth - 32) / W, 520 / H); box.style.height = Math.min(Math.max(H * s + 32, 200), 560) + 'px'; }
     x = (box.clientWidth - W * s) / 2; y = 16; apply();
   };
   const start = () => {
     s = Math.max(Math.min(1, (box.clientWidth - 32) / W), 0.85);
-    box.style.height = Math.min(Math.max(H * s + 32, 220), 520) + 'px';
+    box.style.height = full ? Math.min(Math.max(H * s + 32, 220), 520) + 'px' : COMPACT + 'px';
     const root = svg.querySelector('rect.root');
     const rootX = root ? +root.getAttribute('x') + +root.getAttribute('width') / 2 : 0;
     x = W * s <= box.clientWidth ? (box.clientWidth - W * s) / 2 : Math.min(16, box.clientWidth / 2 - rootX * s); y = 16; apply();
@@ -29,7 +30,7 @@ function panZoom(box) {
   });
   addEventListener('pointerup', () => { drag = null; box.classList.remove('dragging'); });
   box.addEventListener('click', e => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
-  return { fit, start, zoom: f => zoomAt(f, box.clientWidth / 2, box.clientHeight / 2) };
+  return { fit, start, toggle: () => { full = !full; start(); return full; }, zoom: f => zoomAt(f, box.clientWidth / 2, box.clientHeight / 2) };
 }
 
 let tree;
@@ -43,6 +44,8 @@ function bindTreeLinks(root, after) {
 function initTreeCanvas() {
   tree = panZoom($('#treecanvas'));
   $$('[data-zoom]').forEach(b => b.onclick = () => (b.dataset.zoom === 'fit' ? tree.fit() : tree.zoom(b.dataset.zoom === 'in' ? 1.25 : 0.8)));
+  const tg = $('#treetoggle');
+  if (tg) tg.onclick = () => { const on = tree.toggle(); tg.textContent = on ? 'Collapse' : 'Expand'; tg.setAttribute('aria-expanded', String(on)); tg.setAttribute('aria-label', on ? 'Collapse code tree' : 'Expand code tree'); };
   addEventListener('resize', () => tree.start());
   bindTreeLinks($('#treecanvas'));
 }

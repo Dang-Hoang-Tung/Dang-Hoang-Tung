@@ -13,62 +13,65 @@ function noteLoc(n) {
   return fileName(n.file) + at;
 }
 const threadsFor = key => state.threads.filter(t => t.noteKey === key);
-function renderChecks() {
-  const box = $('#checks'); box.textContent = '';
-  const done = D.notes.filter(n => isChecked(n.key)).length;
-  $('#checkcount').textContent = D.notes.length ? `${done}/${D.notes.length}` : '';
-  if (!D.notes.length) { box.append(el('p', 'empty', D.has_insights ? 'No recommendations for this PR.' : 'No recommendations yet. They appear here when an AI adds insights for this PR.')); return; }
-  const ordered = [...D.notes].sort((a, b) => (isChecked(a.key) - isChecked(b.key)) || (RANK.indexOf(a.kind) - RANK.indexOf(b.kind)));
-  for (const n of ordered) {
-    const c = el('article', 'rec ' + n.kind + (isChecked(n.key) ? ' done' : '') + (activeNote === n.key ? ' active' : ''));
-    c.id = 'rec-' + n.key;
-    const head = el('div', 'rec-head');
-    const cb = el('input', 'rd'); cb.type = 'checkbox'; cb.checked = isChecked(n.key); cb.setAttribute('aria-label', 'Mark as checked');
-    cb.onchange = () => setChecked(n.key, cb.checked);
-    head.append(cb, el('span', 'tag ' + n.kind, LABEL[n.kind]));
-    const loc = el('button', 'rec-loc', noteLoc(n)); loc.type = 'button';
-    loc.onclick = () => { activeNote = n.key; renderChecks(); if (n.rows.length) goToRows(n.rows); else if (n.file != null) goToFile(n.file); };
-    head.append(loc);
-    c.append(head, el('div', 'rec-title', n.title));
-    if (n.body) c.append(clamped('rec-body', md(n.body)));
-    if (n.comment) {
-      const d = el('div', 'draft');
-      const lab = el('div', 'draft-label', 'Draft comment');
-      const copy = el('button', 'ghost sm', 'Copy'); copy.type = 'button';
-      copy.onclick = () => navigator.clipboard.writeText(n.comment.replace(/\s*\n\s*/g, ' ').trim()).then(() => { copy.textContent = 'Copied'; setTimeout(() => (copy.textContent = 'Copy'), 1200); }, () => {});
-      lab.append(copy);
-      d.append(lab, clamped('draft-text', md(n.comment)));
-      c.append(d);
-    }
-    const actions = el('div', 'rec-actions');
-    const ts = threadsFor(n.key);
-    if (ts.length) {
-      const l = el('button', 'ghost sm', `💬 ${ts.length} thread${ts.length > 1 ? 's' : ''}`); l.type = 'button';
-      l.onclick = () => focusThread(ts[0].id);
-      actions.append(l);
-    }
-    actions.append(el('span', 'grow'));
-    if (n.comment) {
-      const use = el('button', 'sm', 'Use as comment'); use.type = 'button';
-      use.onclick = () => startDraft(anchorFor(n), n.key, n.comment.replace(/\s*\n\s*/g, ' ').trim());
-      actions.append(use);
-    }
-    const reply = el('button', 'primary sm', 'Reply'); reply.type = 'button';
-    reply.onclick = () => startDraft(anchorFor(n), n.key, '');
-    actions.append(reply);
-    c.append(actions);
-    box.append(c);
-  }
-}
+const noteText = n => n.comment.replace(/\s*\n\s*/g, ' ').trim();
 function anchorFor(n) {
   const rows = n.rows.map(id => document.getElementById(id)).filter(Boolean);
   if (rows.length) return describe(rows);
   return { file: n.file, path: n.file != null ? D.files[n.file].path : null, side: 'RIGHT', start_line: n.start, line: n.end || n.start, rows: [], endRow: null };
 }
-function openNote(key) {
-  activeNote = key;
-  $('#checksec').open = true;
-  renderChecks();
-  const c = document.getElementById('rec-' + key);
-  if (c) c.scrollIntoView({ block: 'nearest', behavior: reduced ? 'auto' : 'smooth' });
+function draftBlock(n) {
+  const d = el('div', 'draft');
+  const lab = el('div', 'draft-label', 'Draft comment');
+  const copy = el('button', 'ghost sm', 'Copy'); copy.type = 'button';
+  copy.onclick = () => navigator.clipboard.writeText(noteText(n)).then(() => { copy.textContent = 'Copied'; setTimeout(() => (copy.textContent = 'Copy'), 1200); }, () => {});
+  const use = el('button', 'ghost sm', 'Use as comment'); use.type = 'button';
+  use.onclick = () => { const k = 'n:' + n.key; drafts[k] = { value: noteText(n), post: false }; refreshCard(k); };
+  const acts = el('span', 'draft-acts'); acts.append(copy, use);
+  lab.append(acts);
+  d.append(lab, clamped('draft-text', md(n.comment)));
+  return d;
+}
+function noteCard(n) {
+  const c = el('article', 'rec ' + n.kind);
+  const head = el('div', 'rec-head');
+  head.append(el('span', 'tag ' + n.kind, LABEL[n.kind]));
+  const loc = el('button', 'rec-loc', noteLoc(n)); loc.type = 'button';
+  loc.onclick = () => { if (n.rows.length) goToRows(n.rows, true); else if (n.file != null) goToFile(n.file); placeCard(); };
+  head.append(loc);
+  c.append(head, el('div', 'rec-title', n.title));
+  if (n.body) c.append(clamped('rec-body', md(n.body)));
+  if (n.comment) c.append(draftBlock(n));
+  const chk = el('label', 'postopt markchk'), cb = el('input', 'rd'); cb.type = 'checkbox'; cb.checked = isChecked(n.key);
+  cb.onchange = () => setChecked(n.key, cb.checked);
+  chk.append(cb, 'Mark checked');
+  c.append(chk);
+  const ts = threadsFor(n.key);
+  for (const t of ts) {
+    const lt = el('div', 'thread linked-thread' + (t.resolved ? ' resolved' : ''));
+    const meta = el('div', 'thread-head');
+    if (stale(t)) { const o = el('span', 'old-commit', 'on an older commit'); o.title = STALE_TIP; meta.append(o); }
+    meta.append(threadState(t), resolveButton(t));
+    lt.append(meta);
+    messageList(t, lt);
+    c.append(lt);
+  }
+  const blocked = ts.length && stale(ts[0]) ? STALE_TIP : '';
+  c.append(composer('n:' + n.key, 'Reply…', '', (v, post) => addNoteReply(n, v, post), null, 'Reply', blocked));
+  return c;
+}
+const rowShown = id => !!(id && document.getElementById(id));
+function renderNoteList() {
+  const box = $('#notelist'); if (!box) return;
+  box.textContent = '';
+  const items = [];
+  for (const n of D.notes) if (!rowShown(n.endRow)) items.push({ id: 'n:' + n.key, tag: el('span', 'tag ' + n.kind, LABEL[n.kind]), title: n.title, loc: noteLoc(n), done: isChecked(n.key) });
+  for (const t of state.threads) if (!linkedNote(t) && !anchors.has(t.id)) items.push({ id: 't:' + t.id, tag: el('span', 'tag thread', 'Comment'), title: t.messages[0].text, loc: where(t), done: t.resolved });
+  if (!items.length) return;
+  box.append(el('h3', null, 'Notes'));
+  for (const it of items) {
+    const b = el('button', 'nrow' + (it.done ? ' done' : '')); b.type = 'button';
+    b.append(it.tag, el('span', 'nt', it.title), el('span', 'nloc', it.loc));
+    b.onclick = () => openCard(it.id, { pinned: true, centred: true });
+    box.append(b);
+  }
 }

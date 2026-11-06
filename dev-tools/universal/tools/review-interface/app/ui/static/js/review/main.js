@@ -1,6 +1,8 @@
-function renderAll() { renderReadUI(); renderChecks(); renderThreads(); renderApprove(); }
+function renderAll() { renderReadUI(); renderThreads(); renderApprove(); }
 
 initFileSections();
+initIntraline();
+initHideWs();
 initTabs();
 initScrollSpy();
 initTheme();
@@ -8,7 +10,8 @@ initResizers();
 initTreeCanvas();
 initModals();
 initSelection();
-initThreads();
+initPopover();
+initNav();
 initApprove();
 addEventListener('focus', reload);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) reload(); });

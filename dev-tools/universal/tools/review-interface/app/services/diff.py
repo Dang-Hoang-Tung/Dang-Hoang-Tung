@@ -1,4 +1,3 @@
-import difflib
 import hashlib
 import re
 
@@ -78,39 +77,6 @@ def header_info(first, lines):
     return path, binary
 
 
-SIMILAR_ENOUGH = 0.4
-
-
-def _changed_ranges(matcher, side):
-    """Character ranges on one side ('a' = old, 'b' = new) that the matcher marks as changed."""
-    out = []
-    for tag, i1, i2, j1, j2 in matcher.get_opcodes():
-        start, end = (i1, i2) if side == "a" else (j1, j2)
-        if tag != "equal" and end > start:
-            out.append([start, end])
-    return out
-
-
-def inline_spans(rows):
-    """{row index: [[start, end], ...]} for removed/added lines that pair up as edits of each other."""
-    spans, i = {}, 0
-    while i < len(rows):
-        if rows[i][0] != "del":
-            i += 1
-            continue
-        dels = []
-        while i < len(rows) and rows[i][0] == "del":
-            dels.append(i); i += 1
-        adds = []
-        while i < len(rows) and rows[i][0] == "add":
-            adds.append(i); i += 1
-        for d, a in zip(dels, adds):
-            m = difflib.SequenceMatcher(None, rows[d][3], rows[a][3], autojunk=False)
-            if m.ratio() >= SIMILAR_ENOUGH:
-                spans[d], spans[a] = _changed_ranges(m, "a"), _changed_ranges(m, "b")
-    return spans
-
-
 def parse_diff(diff, generated):
     gen_re = [re.compile(p) for p in generated]
     files = []
@@ -123,9 +89,105 @@ def parse_diff(diff, generated):
         if lines and lines[-1] == "":
             lines.pop()
         rows, a, d = ([], 0, 0) if binary else parse_file_rows(lines)
-        files.append({"idx": len(files), "path": path, "rows": rows, "spans": inline_spans(rows), "a": a, "d": d, "binary": binary,
+        files.append({"idx": len(files), "path": path, "rows": rows, "a": a, "d": d, "binary": binary,
                       "gen": any(r.search(path) for r in gen_re)})
     return files
+
+
+ANSI = re.compile(r"\x1b\[[0-9;]*m")
+OLD_MOVED, NEW_MOVED = "35", "36"
+MAX_CANDIDATES = 50
+
+
+def moved_lines(colored):
+    """{path: {"old": set of old line numbers, "new": set of new line numbers}} for lines git coloured as moved."""
+    out = {}
+    for chunk in re.split(r"(?m)^(?:\x1b\[[0-9;]*m)*diff --git ", colored)[1:]:
+        raw = chunk.split("\n")
+        plain = [ANSI.sub("", ln) for ln in raw]
+        path, binary = header_info(plain[0], plain[1:])
+        if not path or binary:
+            continue
+        old, new, started = 0, 0, False
+        hit = out.setdefault(path, {"old": set(), "new": set()})
+        for ln, p in zip(raw[1:], plain[1:]):
+            h = HUNK.match(p)
+            if h:
+                old, new, started = int(h.group(1)), int(h.group(2)), True
+                continue
+            if not started or not p or p[0] == "\\":
+                continue
+            color = re.match(r"\x1b\[(\d+)m", ln)
+            color = color.group(1) if color else ""
+            if p[0] == "-":
+                if color == OLD_MOVED:
+                    hit["old"].add(old)
+                old += 1
+            elif p[0] == "+":
+                if color == NEW_MOVED:
+                    hit["new"].add(new)
+                new += 1
+            else:
+                old, new = old + 1, new + 1
+    return out
+
+
+def find_moves(files, colored=None):
+    """Per file, {row index (str): {dir, file, row, path, line, start}} for rows git coloured as moved.
+
+    `colored` is `git diff --color-moved` output. Runs of moved del rows are paired with moved add rows whose
+    whitespace-stripped text matches in order; unpaired rows get null file, row, path and line.
+    """
+    moved = [{} for _ in files]
+    if not colored:
+        return moved
+    flagged = moved_lines(colored)
+    text = [[r[3].strip() for r in f["rows"]] for f in files]
+    kinds = []
+    for f in files:
+        hit = flagged.get(f["path"], {"old": (), "new": ()})
+        kinds.append([("del" if r[0] == "del" and r[1] in hit["old"] else "add" if r[0] == "add" and r[2] in hit["new"] else None)
+                      for r in f["rows"]])
+    adds = {}
+    for fi in range(len(files)):
+        for ri, k in enumerate(kinds[fi]):
+            if k == "add":
+                adds.setdefault(text[fi][ri], []).append((fi, ri))
+    paired = [set() for _ in files]
+
+    def extend(fi, i, fj, j):
+        n = 0
+        while (i + n < len(kinds[fi]) and j + n < len(kinds[fj]) and kinds[fi][i + n] == "del" and kinds[fj][j + n] == "add"
+               and i + n not in paired[fi] and j + n not in paired[fj] and text[fi][i + n] == text[fj][j + n]):
+            n += 1
+        return n
+
+    for fi, f in enumerate(files):
+        i = 0
+        while i < len(kinds[fi]):
+            if kinds[fi][i] != "del" or i in paired[fi]:
+                i += 1
+                continue
+            best, (fj, j) = 0, (0, 0)
+            for cj, cr in adds.get(text[fi][i], [])[:MAX_CANDIDATES]:
+                n = extend(fi, i, cj, cr)
+                if n > best:
+                    best, (fj, j) = n, (cj, cr)
+            for k in range(best):
+                paired[fi].add(i + k)
+                paired[fj].add(j + k)
+                moved[fi][str(i + k)] = {"dir": "to", "file": fj, "row": j, "path": files[fj]["path"],
+                                         "line": files[fj]["rows"][j][2], "start": k == 0}
+                moved[fj][str(j + k)] = {"dir": "from", "file": fi, "row": i, "path": f["path"],
+                                         "line": f["rows"][i][1], "start": k == 0}
+            i += max(best, 1)
+    for fi in range(len(files)):
+        for ri, k in enumerate(kinds[fi]):
+            if k and ri not in paired[fi]:
+                first = ri == 0 or kinds[fi][ri - 1] != k or (ri - 1) in paired[fi]
+                moved[fi][str(ri)] = {"dir": "to" if k == "del" else "from", "file": None, "row": None, "path": None,
+                                      "line": None, "start": first}
+    return moved
 
 
 def layer_of(f):

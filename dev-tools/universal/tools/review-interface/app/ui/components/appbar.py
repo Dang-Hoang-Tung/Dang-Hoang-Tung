@@ -1,3 +1,5 @@
+import re
+
 from app.ui.components import icons
 from app.ui.html import esc
 
@@ -5,6 +7,16 @@ from app.ui.html import esc
 def _ci_chip(ci):
     css = "ok" if ci == "passing" else "bad" if ci == "failing" else ""
     return f'<span class="chip {css}"><span class="dotc"></span>CI {esc(ci)}</span>'
+
+
+NAVCHIP = (
+    '<div class="navchip" id="navchip"><button type="button" id="navprev" aria-label="Previous note or comment">‹</button>'
+    '<span id="navcount"></span><button type="button" id="navnext" aria-label="Next note or comment">›</button></div>'
+)
+
+
+def short_verdict(verdict):
+    return re.split(r"\(|\.| - ", verdict, maxsplit=1)[0].strip() or verdict
 
 
 def chips(pr, totals, verdict):
@@ -16,7 +28,7 @@ def chips(pr, totals, verdict):
     if pr["ci"] != "none":
         out.append(_ci_chip(pr["ci"]))
     if verdict:
-        out.append(f'<span class="chip verdict">{esc(verdict)}</span>')
+        out.append(f'<span class="chip verdict" title="{esc(verdict)}">{esc(short_verdict(verdict))}</span>')
     out.append(f'<span class="chip hide-md mono" title="Commit under review">{esc(pr["head_sha"][:7])}</span>')
     return "".join(out)
 
@@ -29,10 +41,13 @@ def _tools(pr):
         '<div class="perr" id="approveerr" role="alert" hidden></div>'
         '<div class="row"><button type="button" class="sm" id="approvecancel">Cancel</button>'
         '<button type="submit" class="approve-btn solid sm" id="approvego">Approve</button></div></form></div>'
+        '<div class="overflow" id="overflow"><button type="button" class="iconbtn" id="morebtn" aria-label="More options" aria-haspopup="true" aria-expanded="false" title="More">⋯</button>'
+        '<div class="menu ovmenu" id="overflowmenu" hidden>'
         '<label class="switch"><input type="checkbox" id="focus">Focused only</label>'
-        '<div class="picker"><button type="button" class="iconbtn" id="palettebtn" aria-label="Theme" aria-haspopup="true" aria-expanded="false" title="Theme">'
+        '<label class="switch"><input type="checkbox" id="hidews">Hide whitespace changes</label>'
+        '<div class="ovrow"><span>Theme</span><div class="picker"><button type="button" class="iconbtn sm" id="palettebtn" aria-label="Theme" aria-haspopup="true" aria-expanded="false" title="Theme">'
         f'{icons.PALETTE}</button><div class="menu" id="thememenu" hidden></div></div>'
-        f'<button type="button" class="iconbtn" id="themebtn" aria-label="Switch light or dark">{icons.THEME_TOGGLE}</button>'
+        f'<button type="button" class="iconbtn sm" id="themebtn" aria-label="Switch light or dark">{icons.THEME_TOGGLE}</button></div></div></div>'
         f'<a class="iconbtn" href="{esc(pr["url"])}" target="_blank" rel="noopener" aria-label="Open on GitHub" title="Open on GitHub">{icons.EXTERNAL}</a></div>'
     )
 
@@ -42,5 +57,6 @@ def render(pr, totals, verdict):
         f'<header class="appbar"><a class="back" href="index.html" title="Back to the review queue">{icons.BACK}Back</a>\n'
         f'<div class="brand"><span class="prnum">#{esc(pr["number"])}</span><h1 title="{esc(pr["title"])}">{esc(pr["title"])}</h1></div>\n'
         f'<div class="chips">{chips(pr, totals, verdict)}</div>\n'
+        f'{NAVCHIP}\n'
         f'{_tools(pr)}</header>'
     )

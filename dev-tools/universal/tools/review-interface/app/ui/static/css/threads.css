@@ -2,13 +2,10 @@
 .thread.here{border-color:color-mix(in srgb,var(--accent) 40%,var(--line))}
 .thread.active{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
 .thread.resolved{opacity:.55}
-.thread-head{display:flex;gap:8px;align-items:center;padding:9px 12px;cursor:pointer;background:var(--surface-2)}
-.thread-head:hover .where{color:var(--accent)}
+.thread-head{display:flex;gap:8px;align-items:center;padding:9px 12px;background:var(--surface-2)}
 .thread-head .where{font:600 12px var(--mono);overflow-wrap:anywhere}
 .thread-head .state{margin-left:auto;font-size:11px;font-weight:600;color:var(--text-3);white-space:nowrap}
 .thread-head .state.replied{color:var(--accent)}.thread-head .state.posted{color:var(--look)}
-.linked{display:block;width:100%;text-align:left;margin:0;padding:6px 12px;font-size:11.5px;color:var(--text-2);background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-button.linked:hover{color:var(--accent);background:var(--surface-2)}
 .msg{display:flex;gap:10px;padding:10px 12px 0}
 .avatar{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font:700 11px var(--font);color:#fff;background:var(--accent)}
 .msg.claude .avatar{background:var(--claude-av)}

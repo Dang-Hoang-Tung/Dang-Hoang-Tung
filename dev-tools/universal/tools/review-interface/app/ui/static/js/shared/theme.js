@@ -31,6 +31,11 @@ function initTheme() {
     paletteBtn.setAttribute('aria-expanded', String(!menu.hidden));
     if (!menu.hidden) renderThemeMenu();
   };
+  const more = $('#morebtn'), ov = $('#overflowmenu');
+  const setOv = open => { ov.hidden = !open; more.setAttribute('aria-expanded', String(open)); if (!open) { menu.hidden = true; paletteBtn.setAttribute('aria-expanded', 'false'); } };
+  more.onclick = e => { e.stopPropagation(); setOv(ov.hidden); };
+  document.addEventListener('click', e => { if (!ov.hidden && !e.target.closest('#overflow')) setOv(false); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !ov.hidden && menu.hidden) { setOv(false); more.focus(); } });
   document.addEventListener('click', e => { if (!menu.hidden && !e.target.closest('.picker')) { menu.hidden = true; paletteBtn.setAttribute('aria-expanded', 'false'); } });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !menu.hidden) { menu.hidden = true; paletteBtn.focus(); } });
 }

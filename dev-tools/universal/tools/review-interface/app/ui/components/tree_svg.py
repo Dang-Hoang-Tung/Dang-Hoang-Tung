@@ -47,6 +47,7 @@ def render(layout):
 def card(layout):
     return (
         '<section class="canvas-card" id="treecard"><div class="card-head"><h2>Where this change lands</h2><div class="zoom">'
+        '<button type="button" class="iconbtn sm wide" id="treetoggle" aria-expanded="false" aria-label="Expand code tree">Expand</button>'
         '<button type="button" class="iconbtn sm" data-zoom="out" aria-label="Zoom out">−</button>'
         '<button type="button" class="iconbtn sm wide" data-zoom="fit" aria-label="Fit to view">Fit</button>'
         '<button type="button" class="iconbtn sm" data-zoom="in" aria-label="Zoom in">+</button></div></div>\n'

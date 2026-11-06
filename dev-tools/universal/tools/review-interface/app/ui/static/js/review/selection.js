@@ -1,5 +1,5 @@
 let drag = null, skipClick = false;
-let sel = null, draftFor = null, activeThread = null, activeNote = null;
+let sel = null, draftFor = null;
 const cbtn = $('#cbtn');
 const rowsOf = (a, b) => {
   const all = [...a.closest('table').rows];
@@ -24,7 +24,7 @@ function paintSel() {
   cbtn.textContent = 'Comment on ' + span(describe(rows));
   cbtn.style.top = rect.bottom + scrollY + 6 + 'px';
   cbtn.style.left = rect.left + scrollX + 110 + 'px';
-  cbtn.hidden = false;
+  cbtn.hidden = cs.id === 'new';
 }
 
 function initSelection() {
@@ -61,10 +61,8 @@ function initSelection() {
       else sel = { a: tr, b: tr };
       paintSel();
     }
-    const mk = e.target.closest('button.mk');
-    if (mk) openNote(mk.dataset.note);
   });
-  cbtn.onclick = () => { if (sel) startDraft(describe(rowsOf(sel.a, sel.b)), null, ''); };
+  cbtn.onclick = () => { if (sel) startDraft(describe(rowsOf(sel.a, sel.b))); };
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('dialog[open]') && sel) { sel = null; paintSel(); } });
   addEventListener('resize', () => { if (sel) paintSel(); });
 }

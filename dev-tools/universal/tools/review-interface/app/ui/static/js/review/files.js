@@ -11,7 +11,7 @@ function initFileSections() {
     $('.path', s).onclick = () => setCollapsed(i, !s.classList.contains('collapsed'));
     $('input[data-read]', s).onchange = e => setRead([i], e.target.checked);
   });
-  $$('button.expand').forEach(b => b.onclick = () => { const t = b.previousElementSibling; t.replaceWith(t.content.cloneNode(true)); b.remove(); });
+  $$('button.expand').forEach(b => b.onclick = () => { const t = b.previousElementSibling; t.replaceWith(t.content.cloneNode(true)); b.remove(); applyHideWs(); renderThreads(); });
 }
 
 function goToFile(i, block = 'start') {
@@ -19,11 +19,19 @@ function goToFile(i, block = 'start') {
   setCollapsed(i, false);
   s.scrollIntoView({ block, behavior: reduced ? 'auto' : 'smooth' });
 }
-function goToRows(rowIds) {
+function goToRows(rowIds, instant) {
   const end = rowIds.length && document.getElementById(rowIds[rowIds.length - 1]);
   if (!end) return;
   setCollapsed(+end.dataset.f, false);
   $$('tr.flash').forEach(r => r.classList.remove('flash'));
   rowIds.forEach(id => { const r = document.getElementById(id); if (r) r.classList.add('flash'); });
-  end.scrollIntoView({ block: 'center', behavior: reduced ? 'auto' : 'smooth' });
+  end.scrollIntoView({ block: 'center', behavior: reduced || instant ? 'auto' : 'smooth' });
 }
+function goToMoved(btn) {
+  const id = btn.dataset.target;
+  setCollapsed(+btn.dataset.file, false);
+  if (!document.getElementById(id)) { goToFile(+btn.dataset.file); return; }
+  goToRows([id]);
+  setTimeout(() => { const r = document.getElementById(id); if (r) r.classList.remove('flash'); }, 1600);
+}
+document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('button.mvlabel[data-target]'); if (b) goToMoved(b); });

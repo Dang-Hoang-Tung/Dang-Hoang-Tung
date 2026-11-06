@@ -7,4 +7,4 @@ function setRead(ids, read) {
   renderReadUI(); persist();
 }
 const isChecked = k => !!(state.checked[k] && state.checked[k].on);
-function setChecked(k, on) { state.checked[k] = { on, at: now() }; renderChecks(); persist(); }
+function setChecked(k, on) { state.checked[k] = { on, at: now() }; renderThreads(); persist(); }

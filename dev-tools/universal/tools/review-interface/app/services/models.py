@@ -117,16 +117,17 @@ def build_totals(files):
             "deleted_all": sum(f["d"] for f in files), "effort": effort_of(added)}
 
 
-def file_model(f, by_file):
+def file_model(f, by_file, moved):
     ns = by_file.get(f["path"], [])
     return {"idx": f["idx"], "path": f["path"], "a": f["a"], "d": f["d"], "gen": f["gen"], "layer": diffs.layer_of(f),
             "hash": diffs.file_hash(f["rows"]), "binary": f["binary"], "kind": worst(x["kind"] for x in ns), "notes": [x["key"] for x in ns],
-            "rows": [list(r) for r in f["rows"]], "spans": f.get("spans", {})}
+            "rows": [list(r) for r in f["rows"]], "moved": moved}
 
 
 def review_model(cfg, pr, diff_text, ins, ins_status, user_name):
     repo, n = pr["repo"], pr["number"]
     files = diffs.parse_diff(diff_text, cfg["generated"])
+    moves = diffs.find_moves(files, getattr(diff_text, "moved", None))
     paths = [f["path"] for f in files]
     idx = {f["path"]: f["idx"] for f in files}
     notes = build_notes(ins, paths)
@@ -141,7 +142,7 @@ def review_model(cfg, pr, diff_text, ins, ins_status, user_name):
                "author": (pr.get("author") or {}).get("login", ""), "head_sha": pr["headRefOid"], "base": pr.get("baseRefName"),
                "draft": bool(pr.get("isDraft")), "ci": github.ci_state(pr.get("statusCheckRollup"))},
         "user": user_name, "ai_name": cfg["ai_name"], "layers": LAYERS,
-        "files": [file_model(f, by_file) for f in files],
+        "files": [file_model(f, by_file, moves[f["idx"]]) for f in files],
         "order": display_order(top_nodes, files),
         "tree": top_nodes,
         "tree_layout": tree.layout(root, file_stats),

@@ -74,6 +74,5 @@ function renderStore(msg) {
   box.textContent = '';
   box.classList.toggle('ok', online);
   if (!served) box.append(el('span', null, 'This page was opened as a file, so nothing is saved. Open the queue with review.py.'));
-  else if (online && !msg) box.append(el('span', 'hint', 'Saved automatically.'));
   if (msg) box.append(el('span', 'hint warn', msg));
 }

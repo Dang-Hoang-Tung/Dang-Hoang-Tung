@@ -11,7 +11,7 @@ function computeCurrent() {
     const s = $$('section.file').find(x => x.offsetParent !== null && x.getBoundingClientRect().top > 0 && x.getBoundingClientRect().top < innerHeight * 0.5);
     if (s) cur = +s.dataset.f;
   }
-  if (cur !== current) { current = cur; markCurrent(); syncThreads(); }
+  if (cur !== current) { current = cur; markCurrent(); }
 }
 function markCurrent() {
   $$('.left [data-file], .progress [data-file]').forEach(e => e.classList.toggle('current', current !== null && +e.dataset.file === current));

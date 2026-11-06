@@ -41,7 +41,7 @@ class ServerBase(TmpCase):
         (self.pages / "index.html").write_text("<h1>queue</h1>")
         (self.pages / "acme-widgets-7.html").write_text("<h1>pr</h1>")
         (Path(self.tmp) / "secret.txt").write_text("secret")
-        self.cookie = {"Cookie": f"rt={TOKEN}"}
+        self.cookie = {"Cookie": f"rt{self.port}={TOKEN}"}
 
     def _stop(self, t):
         self.httpd.shutdown()
@@ -86,7 +86,7 @@ class ServerTests(ServerBase):
         status, headers, _ = self.req("GET", f"/?t={TOKEN}")
         self.assertEqual(status, 302)
         self.assertEqual(headers["Location"], "/index.html")
-        self.assertIn(f"rt={TOKEN}", headers["Set-Cookie"])
+        self.assertIn(f"rt{self.port}={TOKEN}", headers["Set-Cookie"])
         self.assertIn("HttpOnly", headers["Set-Cookie"])
         self.assertIn("SameSite=Strict", headers["Set-Cookie"])
 

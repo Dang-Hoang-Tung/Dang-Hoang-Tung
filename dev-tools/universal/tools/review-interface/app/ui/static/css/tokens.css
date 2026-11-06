@@ -18,9 +18,9 @@
   --look-soft:color-mix(in srgb,var(--look) var(--soft),var(--surface));
   --question-soft:color-mix(in srgb,var(--question) var(--soft),var(--surface));
   --read:var(--add);--read-soft:color-mix(in srgb,var(--add) var(--soft),var(--surface));
-  --diff-add:#34d399;--diff-del:#fb7185;--diff-mix:calc(var(--soft) + 4%);
-  --add-fg:var(--add);--add-bg:color-mix(in srgb,var(--diff-add) var(--diff-mix),var(--surface));--add-num:color-mix(in srgb,var(--diff-add) calc(var(--diff-mix) + 8%),var(--surface));
-  --del-fg:var(--del);--del-bg:color-mix(in srgb,var(--diff-del) var(--diff-mix),var(--surface));--del-num:color-mix(in srgb,var(--diff-del) calc(var(--diff-mix) + 8%),var(--surface));
+  /* GitHub's diff colours */
+  --add-fg:var(--add);--add-bg:#e6ffec;--add-num:#ccffd8;--add-hl:#abf2bc;
+  --del-fg:var(--del);--del-bg:#ffebe9;--del-num:#ffd7d5;--del-hl:rgba(255,129,130,.4);
   --hunk-bg:color-mix(in srgb,var(--accent) 5%,var(--surface));--hunk-fg:color-mix(in srgb,var(--accent) 65%,var(--text));
   --sel:color-mix(in srgb,var(--accent) 12%,transparent);--flash:color-mix(in srgb,var(--should) 18%,transparent);
   --me:var(--accent-soft);--claude:color-mix(in srgb,#d97757 10%,var(--surface));--claude-av:#d97757;
@@ -29,7 +29,7 @@
   --shadow-2:0 12px 32px var(--shadow),0 2px 8px var(--shadow);
   --font:"Geist",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"Geist Mono",ui-monospace,"SF Mono",Menlo,monospace;
-  --r:12px;--bar:56px;--left:284px;--right:392px;
+  --r:12px;--bar:56px;--left:284px;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0b0e13;--surface:#11151c;--text:#e4e8ef;--accent:#7aa3ff;--accent-fg:#0b0e13;
@@ -39,3 +39,5 @@
   --bg:#0b0e13;--surface:#11151c;--text:#e4e8ef;--accent:#7aa3ff;--accent-fg:#0b0e13;
   --add:#4cc77a;--del:#f26d68;--block:#ff6e62;--should:#f0a443;--nit:#a998ff;--look:#46d0bb;--question:#f383c6;
   --soft:16%;--shadow:rgba(0,0,0,.4);color-scheme:dark}
+:root.is-dark{--add-bg:rgba(46,160,67,.15);--add-num:rgba(63,185,80,.3);--add-hl:rgba(46,160,67,.4);
+  --del-bg:rgba(248,81,73,.1);--del-num:rgba(248,81,73,.3);--del-hl:rgba(248,81,73,.4)}

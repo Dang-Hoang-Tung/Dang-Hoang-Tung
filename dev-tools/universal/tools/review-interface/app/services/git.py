@@ -1,6 +1,16 @@
 from pathlib import Path
 
-from app.services.shell import run
+from app.services.shell import FAILURES, run
+
+MOVED_COLORS = [f"color.diff.{k}={v}" for k, v in (
+    ("oldMoved", "magenta"), ("newMoved", "cyan"), ("oldMovedAlternative", "magenta"), ("newMovedAlternative", "cyan"),
+    ("oldMovedDimmed", "magenta"), ("newMovedDimmed", "cyan"), ("oldMovedAlternativeDimmed", "magenta"),
+    ("newMovedAlternativeDimmed", "cyan"), ("old", "red"), ("new", "green"))]
+
+
+class Diff(str):
+    """The plain diff text; `moved` holds the same diff coloured by `--color-moved`, or None."""
+    moved = None
 
 
 def has_clone(src):
@@ -8,8 +18,19 @@ def has_clone(src):
     return bool(clone and Path(clone, ".git").exists())
 
 
+def diff(clone, rng):
+    out = Diff(run("git", "-C", clone, "diff", "--histogram", "-U12", rng, timeout=120))
+    cfg = [a for c in MOVED_COLORS for a in ("-c", c)]
+    try:
+        out.moved = run("git", "-C", clone, *cfg, "diff", "--color=always", "--ws-error-highlight=none", "--histogram",
+                        "--color-moved=blocks", "--color-moved-ws=allow-indentation-change", "-U12", rng, timeout=120)
+    except FAILURES:
+        out.moved = None
+    return out
+
+
 def fetch_diff(pr):
     clone, n = pr["source"]["clone"], pr["number"]
     head_ref, base_ref = f"refs/review/pr-{n}", f"refs/review/base-{n}"
     run("git", "-C", clone, "fetch", "-q", "--no-tags", "origin", f"+pull/{n}/head:{head_ref}", f"+refs/heads/{pr['baseRefName']}:{base_ref}", timeout=300)
-    return run("git", "-C", clone, "diff", "-U12", f"{base_ref}...{head_ref}", timeout=120)
+    return diff(clone, f"{base_ref}...{head_ref}")
