@@ -50,5 +50,5 @@ tr.flash td{background-image:linear-gradient(var(--flash),var(--flash))}
 .mk:hover{filter:brightness(.95);box-shadow:var(--shadow-1)}
 .pin{position:sticky;float:right;right:10px;margin-left:8px;font:600 11px var(--font);background:var(--accent);color:var(--accent-fg);border:0;border-radius:999px;padding:0 8px;line-height:18px;box-shadow:var(--shadow-1)}
 #cbtn{position:absolute;z-index:8;font:600 12px var(--font);background:var(--accent);color:var(--accent-fg);border:0;border-radius:9px;padding:7px 12px;box-shadow:var(--shadow-2)}
-tr.add .hl{background:color-mix(in srgb,var(--add) 32%,transparent);border-radius:2px}
-tr.del .hl{background:color-mix(in srgb,var(--del) 32%,transparent);border-radius:2px}
+tr.add .hl{background:color-mix(in srgb,var(--diff-add) 45%,transparent);border-radius:3px}
+tr.del .hl{background:color-mix(in srgb,var(--diff-del) 45%,transparent);border-radius:3px}

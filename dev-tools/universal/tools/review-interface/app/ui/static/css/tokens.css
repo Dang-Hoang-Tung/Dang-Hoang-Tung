@@ -18,8 +18,9 @@
   --look-soft:color-mix(in srgb,var(--look) var(--soft),var(--surface));
   --question-soft:color-mix(in srgb,var(--question) var(--soft),var(--surface));
   --read:var(--add);--read-soft:color-mix(in srgb,var(--add) var(--soft),var(--surface));
-  --add-fg:var(--add);--add-bg:color-mix(in srgb,var(--add) 7%,var(--surface));--add-num:color-mix(in srgb,var(--add) 13%,var(--surface));
-  --del-fg:var(--del);--del-bg:color-mix(in srgb,var(--del) 7%,var(--surface));--del-num:color-mix(in srgb,var(--del) 13%,var(--surface));
+  --diff-add:#34d399;--diff-del:#fb7185;--diff-mix:calc(var(--soft) + 4%);
+  --add-fg:var(--add);--add-bg:color-mix(in srgb,var(--diff-add) var(--diff-mix),var(--surface));--add-num:color-mix(in srgb,var(--diff-add) calc(var(--diff-mix) + 8%),var(--surface));
+  --del-fg:var(--del);--del-bg:color-mix(in srgb,var(--diff-del) var(--diff-mix),var(--surface));--del-num:color-mix(in srgb,var(--diff-del) calc(var(--diff-mix) + 8%),var(--surface));
   --hunk-bg:color-mix(in srgb,var(--accent) 5%,var(--surface));--hunk-fg:color-mix(in srgb,var(--accent) 65%,var(--text));
   --sel:color-mix(in srgb,var(--accent) 12%,transparent);--flash:color-mix(in srgb,var(--should) 18%,transparent);
   --me:var(--accent-soft);--claude:color-mix(in srgb,#d97757 10%,var(--surface));--claude-av:#d97757;
