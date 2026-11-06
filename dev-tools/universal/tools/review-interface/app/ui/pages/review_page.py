@@ -1,17 +1,17 @@
 import json
 
 from app.domain import SEVERITIES, SEVERITY_LABELS
-from app.ui.components import appbar, banner, fabs, file_section, left_panel, modals, popover, summary_card
+from app.ui.components import appbar, banner, chatbar, fabs, file_section, left_panel, modals, popover, summary_card
 from app.ui.pages import document
 
 CSS = ["tokens.css", "base.css", "appbar.css", "left-panel.css", "canvas.css", "cards.css", "diff.css",
-       "threads.css", "popover.css", "modals.css", "layout.css"]
+       "threads.css", "popover.css", "modals.css", "chat.css", "layout.css"]
 JSDIFF = ('<script src="https://cdn.jsdelivr.net/npm/diff@5.2.0/dist/diff.min.js" '
           'integrity="sha384-lJJVaUgxmk/PVfQnAsGN1QuJZrE+n6bg2EMu33yVZOJ2av/3UzTHbmnPCI7ENJYa" crossorigin="anonymous"></script>\n')
 JS = ["shared/dom.js", "shared/markdown.js", "shared/time.js", "shared/theme.js",
       "review/data.js", "review/store.js", "review/read-state.js", "review/files.js", "review/left-panel.js",
       "review/scroll-spy.js", "review/tree-canvas.js", "review/modals.js", "review/treemap.js",
-      "review/highlight.js", "review/titletip.js", "review/selection.js", "review/checks.js", "review/threads.js", "review/popover.js", "review/nav.js",
+      "review/highlight.js", "review/titletip.js", "review/selection.js", "review/checks.js", "review/threads.js", "review/chat.js", "review/popover.js", "review/nav.js",
       "review/approve.js", "review/resizers.js", "review/intraline.js", "review/whitespace.js", "review/main.js"]
 
 
@@ -61,7 +61,7 @@ def _body(model):
     return (
         f'{appbar.render(model["pr"], model["totals"], model["summary"].get("verdict"))}\n'
         f'<div class="layout">\n{left_panel.render()}\n{_main(model)}\n</div>\n'
-        f'{fabs.render()}\n{fabs.comment_button()}\n{popover.render()}\n{modals.render(model["tree_layout"], model["summary"])}'
+        f'{fabs.render()}\n{fabs.comment_button()}\n{popover.render()}\n{chatbar.render(model["ai_name"])}\n{modals.render(model["tree_layout"], model["summary"])}'
     )
 
 

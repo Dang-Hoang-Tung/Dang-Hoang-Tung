@@ -7,7 +7,7 @@ function navItems() {
     items.push({ id: 'n:' + n.key, rows: shown ? n.rows : [], pos: shown ? pos(n.endRow) : -1 });
   }
   for (const t of state.threads) {
-    if (linkedNote(t)) continue;
+    if (t.id === CHAT_ID || linkedNote(t)) continue;
     const a = anchors.get(t.id);
     items.push({ id: 't:' + t.id, rows: a ? a.rows : [], pos: a ? pos(a.endRow) : -1 });
   }
@@ -16,7 +16,7 @@ function navItems() {
 function paintNav() {
   const count = $('#navcount');
   if (!count) return;
-  const n = D.notes.length, m = state.threads.length;
+  const n = D.notes.length, m = state.threads.filter(t => t.id !== CHAT_ID).length;
   count.textContent = `${n} note${n === 1 ? '' : 's'} · ${m} comment${m === 1 ? '' : 's'}`;
   const none = !navItems().length;
   for (const id of ['#navprev', '#navnext']) { const b = $(id); if (b) b.disabled = none; }

@@ -65,7 +65,7 @@ function renderNoteList() {
   box.textContent = '';
   const items = [];
   for (const n of D.notes) if (!rowShown(n.endRow)) items.push({ id: 'n:' + n.key, tag: el('span', 'tag ' + n.kind, LABEL[n.kind]), title: n.title, loc: noteLoc(n), done: isChecked(n.key) });
-  for (const t of state.threads) if (!linkedNote(t) && !anchors.has(t.id)) items.push({ id: 't:' + t.id, tag: el('span', 'tag thread', 'Comment'), title: t.messages[0].text, loc: where(t), done: t.resolved });
+  for (const t of state.threads) if (t.id !== CHAT_ID && !linkedNote(t) && !anchors.has(t.id)) items.push({ id: 't:' + t.id, tag: el('span', 'tag thread', 'Comment'), title: t.messages[0].text, loc: where(t), done: t.resolved });
   if (!items.length) return;
   box.append(el('h3', null, 'Notes'));
   for (const it of items) {

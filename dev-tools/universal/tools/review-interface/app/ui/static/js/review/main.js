@@ -14,6 +14,7 @@ initSelection();
 initPopover();
 initNav();
 initApprove();
+initChat();
 addEventListener('focus', reload);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) reload(); });
 renderStore();

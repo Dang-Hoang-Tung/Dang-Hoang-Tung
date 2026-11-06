@@ -177,4 +177,6 @@ function renderThreads() {
   renderNoteList();
   paintNav();
   refreshCard(refocus);
+  renderChat();
+  watchReplies();
 }

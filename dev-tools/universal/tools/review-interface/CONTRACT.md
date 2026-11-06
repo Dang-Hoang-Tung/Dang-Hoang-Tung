@@ -9,6 +9,7 @@ Find every path with `python3 review.py paths`, or read `<data_dir>/manifest.jso
 | File | Who writes it | What it's for |
 |---|---|---|
 | `events.jsonl` | the tool, on every build or Refresh | One line per rebuild: which PRs to re-check (`check`), new, moved (new commits) and gone PRs, and PRs whose insights are missing or stale |
+| `inbox.jsonl` | the page server, when the reviewer writes | One line per new reviewer message. Watch it with `tail -F`; keeps the last 500 lines |
 | `manifest.json` | the tool, on every build | Every PR in the queue with its page, state, insights and diff paths |
 | `diffs/<slug>.diff` | the tool | The PR's unified diff (git's histogram algorithm, 12 lines of context), for reading |
 | `insights/<slug>.json` | an AI, optional | Summary and recommendations shown on the page and in the queue |
@@ -112,6 +113,16 @@ The page writes this; an AI may add replies. Use `review.py ai reply`, or write 
 - `who` also accepts the legacy value `claude`, read as `ai`.
 - `noteKey` links a thread to a recommendation's `id`.
 - Never delete or rewrite the reviewer's messages; only append.
+
+## Inbox
+
+Each new reviewer message adds one line to `inbox.jsonl`:
+
+```json
+{"at": "…", "slug": "acme-widgets-29627", "pr": 29627, "thread": "lq3k2x9ab", "kind": "comment", "path": "apps/…/X.tsx", "line": 117, "text": "…"}
+```
+
+`kind` is `chat` for the PR-wide chat, otherwise `comment`. The chat is a normal thread with id `chat` and no `path` or `line`; answer it with `review.py ai reply <slug> chat "text"`.
 
 ## Posting to GitHub
 

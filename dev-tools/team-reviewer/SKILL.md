@@ -26,7 +26,8 @@ python3 ~/.claude/skills/universal/tools/review-interface/review.py
 - The helper stops by itself when idle. Run the command again to bring it back.
 - After you write or update briefs, rebuild so they show: `review.py build --no-open` (add a PR number for just one).
 - When I hit **Refresh** on the queue, run `review.py ai changes`. Re-check only the PRs in `check` (new, or new commits) and update their briefs.
-- My comments are saved in the app. When I ask, read them with `review.py ai list` and answer with `review.py ai reply <slug> <thread> "<text>"`. How the files work: `CONTRACT.md` in the app folder.
+- Watch my messages. Start a Monitor on `tail -n0 -F <data dir>/inbox.jsonl` (path from `review.py paths`), 30 min timeout, and re-arm it when it expires. Each line is a comment or chat message from me.
+- Answer each one with `review.py ai reply <slug> <thread> "<text>"`. The chat bar is thread `chat`. Keep replies short, in my language style. How the files work: `CONTRACT.md` in the app folder.
 
 ## 1. Queue
 

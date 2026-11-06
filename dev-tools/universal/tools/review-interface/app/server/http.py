@@ -5,6 +5,7 @@ Stops after `idle_hours` without requests. State files untouched for `keep_days`
 Run from the repo root: python3 -m app.server.http --config PATH
 """
 import argparse
+import copy
 import json
 import sys
 import subprocess
@@ -18,7 +19,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
 from app.config import ROOT, dirs, load_config
-from app.services import approval, events, manifest, posting, state
+from app.services import approval, events, inbox, manifest, posting, state
 
 MAX_BODY = 2 * 1024 * 1024
 LOCAL_HOSTS = ("127.0.0.1", "localhost")
@@ -192,8 +193,10 @@ def make_handler(cfg, token, touch):
             try:
                 mine = self._body()
                 with state.locked(cfg, s):
-                    merged = state.merge_state(state.load_state(cfg, s), mine)
+                    before = state.load_state(cfg, s)
+                    merged = state.merge_state(copy.deepcopy(before), mine)
                     state.save_state(cfg, s, merged)
+                    inbox.append(cfg, inbox.entries_for(s, before, merged))
             except ValueError as e:
                 return self._send(400, str(e))
             return self._json(200, merged)
