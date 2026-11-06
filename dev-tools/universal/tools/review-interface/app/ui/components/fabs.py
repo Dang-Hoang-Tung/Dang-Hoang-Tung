@@ -3,9 +3,9 @@ from app.ui.components import icons
 
 def render():
     return (
-        f'<div class="fabs"><button type="button" class="fab" id="treebtn">{icons.TREE}<span>Code tree</span></button>'
-        f'<button type="button" class="fab" id="mapbtn">{icons.MAP}<span>Treemap</span></button>'
-        '<button type="button" class="fab" id="briefbtn"><span>Brief</span></button></div>'
+        f'<div class="fabs"><button type="button" class="fab" id="briefbtn">{icons.BRIEF}<span>Brief</span></button>'
+        f'<button type="button" class="fab" id="treebtn">{icons.TREE}<span>Code tree</span></button>'
+        f'<button type="button" class="fab" id="mapbtn">{icons.MAP}<span>Treemap</span></button></div>'
     )
 
 

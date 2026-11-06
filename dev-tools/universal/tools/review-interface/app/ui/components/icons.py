@@ -5,6 +5,7 @@ PALETTE = svg_icon('<path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.8 1.6-1.6 0-.9-.6-1
 EXTERNAL = svg_icon('<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>')
 TREE = svg_icon('<rect x="9" y="2" width="6" height="5" rx="1.5"/><rect x="2" y="17" width="6" height="5" rx="1.5"/><rect x="16" y="17" width="6" height="5" rx="1.5"/><path d="M12 7v5M5 17v-2.5a2.5 2.5 0 0 1 2.5-2.5h9a2.5 2.5 0 0 1 2.5 2.5V17"/>')
 MAP = svg_icon('<rect x="3" y="3" width="10" height="11" rx="1.5"/><rect x="15" y="3" width="6" height="7" rx="1.5"/><rect x="15" y="12" width="6" height="9" rx="1.5"/><rect x="3" y="16" width="10" height="5" rx="1.5"/>')
+BRIEF = svg_icon('<path d="M7 3h7l5 5v12a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v5h5M9 13h6M9 17h4"/>')
 CLOSE = svg_icon('<path d="M6 6l12 12M18 6L6 18"/>')
 CHEVRON_DOWN = svg_icon('<path d="M6 9l6 6 6-6"/>')
 THEME_TOGGLE = (
