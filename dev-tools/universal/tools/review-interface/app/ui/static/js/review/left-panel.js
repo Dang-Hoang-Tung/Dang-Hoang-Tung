@@ -105,20 +105,29 @@ function renderLayers() {
 
 let prevDone = null;
 
+const SPARK_COLOURS = ['var(--add)', '#ffd54a', '#ffffff', '#7ee2a8'];
 function celebrate(bar, edge, big) {
   const fx = $('#pfx'); if (!fx || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  bar.classList.remove('bump'); void bar.offsetWidth; bar.classList.add('bump');
-  fx.classList.toggle('big', big);
-  const count = big ? 14 : 6, made = [];
+  const wrap = fx.parentElement;
+  bar.classList.remove('bump'); wrap.classList.remove('glow'); void bar.offsetWidth;
+  bar.classList.add('bump'); wrap.classList.add('glow');
+  const count = big ? 40 : 16, made = [];
   for (let k = 0; k < count; k++) {
     const sp = document.createElement('i');
-    const ang = (big ? Math.random() * 2 * Math.PI : -Math.PI / 2 + (Math.random() - .5) * 2.2), dist = (big ? 26 : 16) + Math.random() * 14;
-    sp.style.left = (big ? Math.random() * edge : edge) + 'px';
+    sp.textContent = Math.random() < .7 ? '✦' : '•';
+    const ang = big ? Math.random() * 2 * Math.PI : -Math.PI / 2 + (Math.random() - .5) * 2.8;
+    const dist = (big ? 45 : 28) + Math.random() * (big ? 55 : 30);
+    sp.style.left = (big ? Math.random() * wrap.offsetWidth : edge) + 'px';
     sp.style.setProperty('--dx', Math.cos(ang) * dist + 'px');
     sp.style.setProperty('--dy', Math.sin(ang) * dist + 'px');
+    sp.style.setProperty('--sz', (big ? 12 : 10) + Math.random() * (big ? 12 : 8) + 'px');
+    sp.style.setProperty('--c', SPARK_COLOURS[k % SPARK_COLOURS.length]);
+    sp.style.setProperty('--rot', (Math.random() < .5 ? -1 : 1) * (90 + Math.random() * 270) + 'deg');
+    sp.style.setProperty('--t', 1.1 + Math.random() * .7 + 's');
+    sp.style.setProperty('--delay', (big ? Math.random() * .5 : .35 + Math.random() * .3) + 's');
     fx.append(sp); made.push(sp);
   }
-  setTimeout(() => { made.forEach(sp => sp.remove()); bar.classList.remove('bump'); }, 800);
+  setTimeout(() => { made.forEach(sp => sp.remove()); bar.classList.remove('bump'); wrap.classList.remove('glow'); }, 2300);
 }
 
 function renderProgress() {
