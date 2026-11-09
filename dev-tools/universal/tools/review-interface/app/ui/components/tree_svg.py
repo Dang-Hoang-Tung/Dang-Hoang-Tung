@@ -1,3 +1,4 @@
+from app.services.tree import CHAR_W, ICON_W
 from app.ui.components import icons
 from app.ui.html import esc
 
@@ -20,21 +21,26 @@ def _node_classes(node):
     return f'node {node["role"]} {kind}{" gen" if node["gen"] else ""}'
 
 
-def _status_mark(node, x, y):
+def _label_x(node):
+    return node["cx"] + (ICON_W / 2 if node.get("file") is not None else 0)
+
+
+def _status_mark(node, y):
     if node.get("file") is None:
         return ""
     icon = icons.FILE_STATUS.get(node.get("status") or "modified", icons.FILE_STATUS["modified"])
-    return icon.replace("<svg ", f'<svg x="{_n(x + 6)}" y="{_n(y + 6)}" width="12" height="12" ', 1)
+    left = _label_x(node) - len(node["label"]) * CHAR_W / 2 - ICON_W + 2
+    return icon.replace("<svg ", f'<svg x="{_n(left)}" y="{_n(y + 7)}" width="13" height="13" ', 1)
 
 
 def _node_body(node):
     x, y, cx = node["x"], node["y"], node["cx"]
     return (
         f'<rect class="{_node_classes(node)}" x="{_n(x)}" y="{_n(y)}" width="{_n(node["w"])}" height="{_n(node["h"])}" rx="7"/>'
-        f'<text class="nlabel" x="{_n(cx)}" y="{_n(y + 18)}">{esc(node["label"])}</text>'
+        f'<text class="nlabel" x="{_n(_label_x(node))}" y="{_n(y + 18)}">{esc(node["label"])}</text>'
         f'<text class="nstat" x="{_n(cx)}" y="{_n(y + 33)}"><tspan class="a">+{node["a"]}</tspan> <tspan class="d">−{node["d"]}</tspan>'
         f'{_notes_text(node["notes"])}{" · generated" if node["gen"] else ""}</text>'
-        f'{_status_mark(node, x, y)}<title>{esc(node["title"])}</title>'
+        f'{_status_mark(node, y)}<title>{esc(node["title"])}</title>'
     )
 
 

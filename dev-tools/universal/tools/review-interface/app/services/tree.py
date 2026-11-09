@@ -3,6 +3,7 @@ import copy
 from app.domain import worst
 
 NODE_H, GAP_X, CHAR_W, PAD, ROW_GAP = 42, 40, 7.4, 24, 10
+ICON_W = 18
 
 
 def build_tree(paths, root_name):
@@ -53,7 +54,8 @@ def stat_info(n, file_stats):
 
 def measure(n, file_stats):
     n["stat"] = stat_info(n, file_stats)
-    n["w"] = max(len(label_of(n)) * CHAR_W, len(n["stat"]["text"]) * 6.2) + PAD
+    icon = ICON_W if n["file"] else 0
+    n["w"] = max(len(label_of(n)) * CHAR_W + icon, len(n["stat"]["text"]) * 6.2) + PAD
     for k in n["kids"]:
         measure(k, file_stats)
 

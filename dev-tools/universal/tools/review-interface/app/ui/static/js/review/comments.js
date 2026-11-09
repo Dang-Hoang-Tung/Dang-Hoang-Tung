@@ -31,20 +31,40 @@ function commentThread(t) {
   return box;
 }
 
+const foldedGroups = new Set();
+function commentGroup(path, ts) {
+  const key = path || '';
+  const g = el('section', 'cgroup' + (foldedGroups.has(key) ? ' folded' : ''));
+  const head = el('div', 'chead');
+  const fold = el('button', 'cfold'); fold.type = 'button';
+  const body = el('div', 'cbody'); body.id = 'cg-' + Math.random().toString(36).slice(2, 8);
+  const paint = () => {
+    const open = !g.classList.contains('folded');
+    fold.setAttribute('aria-expanded', String(open)); fold.setAttribute('aria-controls', body.id);
+    fold.setAttribute('aria-label', (open ? 'Collapse ' : 'Expand ') + (path || 'General'));
+  };
+  fold.onclick = () => { g.classList.toggle('folded'); if (g.classList.contains('folded')) foldedGroups.add(key); else foldedGroups.delete(key); paint(); };
+  const i = path ? D.files.findIndex(f => f.path === path) : -1;
+  const name = el(i >= 0 ? 'button' : 'span', 'cpath');
+  if (i >= 0) {
+    name.type = 'button'; name.title = 'Open this file';
+    name.onclick = () => openFromComments(path, ts.find(t => t.line));
+    name.append(statusIcon(i));
+  }
+  name.append(el('span', 'cname', path || 'General'));
+  head.append(fold, name, el('span', 'ccount', ts.length + (ts.length === 1 ? ' thread' : ' threads')));
+  head.onclick = e => { if (e.target === head) fold.click(); };
+  body.append(...ts.map(commentThread));
+  g.append(head, body);
+  paint();
+  return g;
+}
+
 function renderComments() {
   const list = $('#clist');
   const groups = commentGroups();
   if (!groups.length) { list.replaceChildren(el('p', 'cempty', 'No comments yet.')); return; }
-  list.replaceChildren(...groups.map(([path, ts]) => {
-    const g = el('section', 'cgroup');
-    const known = D.files.some(f => f.path === path);
-    const h = el(known ? 'button' : 'h3', 'cpath');
-    if (known) h.append(statusIcon(D.files.findIndex(f => f.path === path)));
-    h.append(path || 'General');
-    if (known) { h.type = 'button'; h.title = 'Open this file'; h.onclick = () => openFromComments(path, ts.find(t => t.line)); }
-    g.append(h, ...ts.map(commentThread));
-    return g;
-  }));
+  list.replaceChildren(...groups.map(([path, ts]) => commentGroup(path, ts)));
 }
 
 function initComments() {
