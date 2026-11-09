@@ -10,7 +10,11 @@ def _modal(modal_id, title, body):
             f'<div class="modal-body">{body}</div></dialog>')
 
 
-def _tree_modal(layout):
+def _collapse_toggle():
+    return '<label class="switch treecollapse"><input type="checkbox" id="treecollapse">Collapse folders</label>'
+
+
+def _tree_modal(layout, full=None):
     zoom = (
         '<div class="zoom"><button type="button" class="iconbtn sm" data-zoom="out" aria-label="Zoom out">−</button>'
         '<button type="button" class="iconbtn sm wide" data-zoom="fit" aria-label="Fit to view">Fit</button>'
@@ -18,14 +22,14 @@ def _tree_modal(layout):
     )
     return (
         '<dialog class="modal tree" id="treemodal"><div class="modal-head"><h2>Where this change lands</h2>'
-        f'<div class="head-tools">{zoom}{_close_button()}</div></div>'
-        f'<div class="modal-body">{tree_svg.canvas(layout)}</div>'
+        f'<div class="head-tools">{_collapse_toggle() if full else ""}{zoom}{_close_button()}</div></div>'
+        f'<div class="modal-body">{tree_svg.canvas(layout, full)}</div>'
         f'<div class="modal-foot">{tree_svg.legend()}</div></dialog>'
     )
 
 
-def render(layout, summary):
-    tree = _tree_modal(layout)
+def render(layout, summary, full_layout=None):
+    tree = _tree_modal(layout, full_layout)
     treemap = _modal("mapmodal", "Treemap · size is lines changed, colour is the top finding", '<div class="treemap" id="treemap"></div>')
     brief = _modal("briefmodal", "AI Brief", summary_card.brief_html(summary))
     comments = _modal("commentsmodal", "PR comments", '<div class="clist" id="clist"></div>')

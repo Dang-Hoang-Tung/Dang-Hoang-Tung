@@ -63,7 +63,7 @@ def _body(model):
     return (
         f'{appbar.render(model["pr"], model["totals"], model["summary"].get("minutes"))}\n'
         f'<div class="layout">\n{left_panel.render()}\n{_main(model)}\n</div>\n'
-        f'{fabs.render()}\n{fabs.comment_button()}\n{popover.render()}\n{chatbar.render(model["ai_name"])}\n{modals.render(model["tree_layout"], model["summary"])}'
+        f'{fabs.render()}\n{fabs.comment_button()}\n{popover.render()}\n{chatbar.render(model["ai_name"])}\n{modals.render(model["tree_layout"], model["summary"], model.get("tree_layout_full"))}'
     )
 
 

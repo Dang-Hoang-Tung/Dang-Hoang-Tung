@@ -172,8 +172,12 @@ class TreeTests(unittest.TestCase):
         svg = tree_svg.render(tree_layout())
         self.assertEqual(svg.count('class="tlink"'), 2)
         self.assertIn('data-file="0"', svg)
-        self.assertIn('rect class="node root should"', svg)
-        self.assertIn('node leaf  gen', svg)
+        self.assertIn('rect class="node folder root" ', svg)
+        self.assertIn('rect class="node folder dir" ', svg)
+        self.assertIn('rect class="node file should" ', svg)
+        self.assertIn('rect class="node file gen" ', svg)
+        self.assertEqual(svg.count('class="ficon"'), 2)
+        self.assertNotIn("folder root should", svg)
         self.assertIn('class="nlabel"', svg)
         self.assertIn("<title>src/components/Button.tsx</title>", svg)
         self.assertIn('viewBox="-2 -2 334 234"', svg)
@@ -334,15 +338,19 @@ class QueuePageTests(unittest.TestCase):
         self.assertIn("2 should fix", self.page)
         self.assertIn("1 nit<", self.page)
         self.assertIn("(estimated)", self.page)
-        self.assertIn("2 comments · 1 open", self.page)
+        self.assertNotIn("comments", self.page.split('class="qbody"')[0])
+        self.assertNotIn('class="chip mono"', self.page)
         self.assertIn('data-req datetime="2026-11-01T10:00:00Z"', self.page)
+        self.assertLess(self.page.index("data-opened"), self.page.index("data-req"))
 
     def test_approved_chip(self):
         self.assertNotIn('class="chip approved"', self.page)
         model = queue_model()
         model["buckets"][0]["items"][0]["approved"] = True
         page = queue_page.render(model)
-        self.assertEqual(page.count('<span class="chip approved">Approved</span>'), 1)
+        self.assertEqual(page.count('<span class="chip approved">✓ Approved</span>'), 1)
+        self.assertEqual(page.count('class="qitem approved"'), 1)
+        self.assertLess(page.index("✓ Approved"), page.index("data-opened"))
 
     def test_description_escaped(self):
         self.assertNotIn("<script>alert(1)</script>", self.page)

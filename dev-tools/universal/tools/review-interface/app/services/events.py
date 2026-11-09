@@ -28,10 +28,13 @@ def rebuild_event(previous, entries, source, partial):
 
 
 def append(cfg, event):
+    """Appends, so `tail -F` sees only the new line; trims only when the file has doubled."""
     f = path(cfg)
-    lines = f.read_text().splitlines() if f.exists() else []
-    lines = (lines + [json.dumps(event)])[-KEEP:]
-    f.write_text("\n".join(lines) + "\n")
+    with f.open("a") as out:
+        out.write(json.dumps(event) + "\n")
+    lines = f.read_text().splitlines()
+    if len(lines) > 2 * KEEP:
+        f.write_text("\n".join(lines[-KEEP:]) + "\n")
 
 
 def latest(cfg):

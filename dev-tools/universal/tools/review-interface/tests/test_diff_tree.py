@@ -188,3 +188,26 @@ class ParseDiffPathTests(unittest.TestCase):
 if __name__ == "__main__":
     unittest.main()
 
+
+
+class FullTreeTests(unittest.TestCase):
+    PATHS = ["apps/web/src/a.ts", "apps/web/src/deep/x/b.ts", "packages/ui/c.ts"]
+
+    def stats(self):
+        return {p: {"idx": i, "a": 1, "d": 0, "gen": False, "status": "modified", "notes": []} for i, p in enumerate(self.PATHS)}
+
+    def test_no_collapse_keeps_every_folder(self):
+        from app.services import tree
+        full = tree.build_tree(self.PATHS, "repo", collapse=False)
+        self.assertEqual([k["name"] for k in full["kids"]], ["apps", "packages"])
+        self.assertEqual(tree.build_tree(self.PATHS, "repo")["kids"][0]["name"], "apps/web/src")
+
+    def test_same_depth_same_x(self):
+        from app.services import tree
+        lay = tree.layout(tree.build_tree(self.PATHS, "repo", collapse=False), self.stats(), aligned=True)
+        x = {n["title"]: n["x"] for n in lay["nodes"]}
+        self.assertEqual(x["apps"], x["packages"])
+        self.assertEqual(x["web"], x["ui"])
+        self.assertEqual(x["src"], x["packages/ui/c.ts"])
+        self.assertLess(x["apps"], x["web"])
+        self.assertLess(x["web"], x["src"])

@@ -1,4 +1,7 @@
+import tempfile
 import unittest
+import unittest.mock
+from pathlib import Path
 
 from helpers import *  # noqa: F401,F403  (sys.path setup)
 from app.services import events
@@ -23,3 +26,16 @@ class RebuildEventTests(unittest.TestCase):
         previous = {e["slug"]: e for e in (entry(1, "aaa"), entry(2, "bbb"))}
         ev = events.rebuild_event(previous, [entry(1, "aaa")], "cli", partial=True)
         self.assertEqual((ev["gone"], ev["check"]), ([], []))
+
+
+class AppendOnlyTests(unittest.TestCase):
+    def test_append_never_rewrites_existing_lines(self):
+        with tempfile.TemporaryDirectory() as d:
+            f = Path(d) / "events.jsonl"
+            with unittest.mock.patch.object(events, "path", lambda cfg: f):
+                events.append({}, {"n": 1})
+                ino, size = f.stat().st_ino, f.stat().st_size
+                events.append({}, {"n": 2})
+                self.assertEqual(f.stat().st_ino, ino)
+                self.assertTrue(f.read_text().startswith('{"n": 1}\n{"n": 2}'))
+                self.assertGreater(f.stat().st_size, size)

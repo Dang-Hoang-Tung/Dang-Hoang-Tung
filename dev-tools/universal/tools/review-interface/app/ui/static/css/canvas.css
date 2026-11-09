@@ -6,10 +6,15 @@
 .canvas.dragging{cursor:grabbing}.canvas.dragging *{pointer-events:none}
 .stage{position:absolute;left:0;top:0;transform-origin:0 0}
 svg.tree{display:block;stroke:none}
+svg.tree[hidden]{display:none}
+.treecollapse{margin-right:6px}
 svg.tree .edge{fill:none;stroke:var(--line-strong);stroke-width:1.3}
 svg.tree .node{fill:var(--surface);stroke:var(--line-strong);stroke-width:1;}
-svg.tree .node.root{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5}
-svg.tree .node.dir{fill:var(--surface-2)}
+svg.tree .node.folder{fill:var(--surface-3);stroke:none}
+svg.tree .node.folder.root{fill:var(--accent-soft)}
+svg.tree g:has(.folder) .nlabel{font-weight:500;fill:var(--text-2)}
+svg.tree .ficon{color:var(--text-3)}
+svg.tree g:has(.root) .ficon{color:var(--accent)}
 svg.tree .node.gen{stroke-dasharray:4 3}
 svg.tree .node.block{fill:var(--block-soft);stroke:var(--block);stroke-width:1.6}
 svg.tree .node.should{fill:var(--should-soft);stroke:var(--should);stroke-width:1.6}

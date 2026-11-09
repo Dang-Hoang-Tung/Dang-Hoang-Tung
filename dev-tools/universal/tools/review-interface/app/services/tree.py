@@ -6,7 +6,7 @@ NODE_H, GAP_X, CHAR_W, PAD, ROW_GAP = 42, 40, 7.4, 24, 10
 ICON_W = 18
 
 
-def build_tree(paths, root_name):
+def build_tree(paths, root_name, collapse=True):
     root = {"name": root_name, "children": {}, "file": None}
     for p in paths:
         node = root
@@ -16,7 +16,7 @@ def build_tree(paths, root_name):
 
     def compress(n, is_root=False):
         kids = [compress(c) for c in n["children"].values()]
-        while len(kids) == 1 and not kids[0]["file"] and not is_root and not n["file"]:
+        while collapse and len(kids) == 1 and not kids[0]["file"] and not is_root and not n["file"]:
             n = {"name": n["name"] + "/" + kids[0]["name"], "file": None, "kids": kids[0]["kids"]}
             kids = n["kids"]
         return {"name": n["name"], "file": n["file"], "kids": sorted(kids, key=lambda k: (k["file"] is not None, k["name"].lower(), k["name"]))}
@@ -54,8 +54,7 @@ def stat_info(n, file_stats):
 
 def measure(n, file_stats):
     n["stat"] = stat_info(n, file_stats)
-    icon = ICON_W if n["file"] else 0
-    n["w"] = max(len(label_of(n)) * CHAR_W + icon, len(n["stat"]["text"]) * 6.2) + PAD
+    n["w"] = max(len(label_of(n)) * CHAR_W + ICON_W, len(n["stat"]["text"]) * 6.2) + PAD
     for k in n["kids"]:
         measure(k, file_stats)
 
@@ -66,6 +65,32 @@ def place(n, x, y):
     bottom = y
     for k in n["kids"]:
         bottom = place(k, x + n["w"] + GAP_X, bottom)
+    return max(bottom, y + NODE_H + ROW_GAP)
+
+
+def column_xs(root):
+    """x of each depth's column: every node at a depth starts at the same x, so levels line up across branches."""
+    widths = []
+
+    def collect(n, depth):
+        if depth == len(widths):
+            widths.append(0)
+        widths[depth] = max(widths[depth], n["w"])
+        for k in n["kids"]:
+            collect(k, depth + 1)
+    collect(root, 0)
+    xs, x = [], 0
+    for w in widths:
+        xs.append(x)
+        x += w + GAP_X
+    return xs
+
+
+def place_aligned(n, xs, y, depth=0):
+    n["x"], n["y"] = xs[depth], y
+    bottom = y
+    for k in n["kids"]:
+        bottom = place_aligned(k, xs, bottom, depth + 1)
     return max(bottom, y + NODE_H + ROW_GAP)
 
 
@@ -98,10 +123,13 @@ def walk(n, file_stats, nodes, edges, role="root"):
         walk(k, file_stats, nodes, edges, "leaf" if k["file"] else "dir")
 
 
-def layout(tree, file_stats):
+def layout(tree, file_stats, aligned=False):
     root = copy.deepcopy(tree)
     measure(root, file_stats)
-    place(root, 0, 0)
+    if aligned:
+        place_aligned(root, column_xs(root), 0)
+    else:
+        place(root, 0, 0)
     nodes, edges = [], []
     walk(root, file_stats, nodes, edges)
     return {"width": max(n["x"] + n["w"] for n in nodes), "height": max(n["y"] + n["h"] for n in nodes), "nodes": nodes, "edges": edges}

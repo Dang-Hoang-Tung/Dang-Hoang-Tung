@@ -1,6 +1,9 @@
 function panZoom(box) {
-  const stage = $('.stage', box), svg = $('svg', stage);
-  const W = +svg.getAttribute('width'), H = +svg.getAttribute('height');
+  const stage = $('.stage', box);
+  const shown = () => $('svg.tree:not([hidden])', stage) || $('svg', stage);
+  let W, H;
+  const measure = () => { const svg = shown(); W = +svg.getAttribute('width'); H = +svg.getAttribute('height'); };
+  measure();
   const PAD = 16;
   let s = 1, x = PAD, y = PAD, drag = null, moved = false;
   const apply = () => { stage.style.transform = `translate(${x}px,${y}px) scale(${s})`; };
@@ -24,7 +27,7 @@ function panZoom(box) {
   });
   addEventListener('pointerup', () => { drag = null; box.classList.remove('dragging'); });
   box.addEventListener('click', e => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
-  return { fit, start, zoom: f => zoomAt(f, box.clientWidth / 2, box.clientHeight / 2) };
+  return { fit, start, measure, zoom: f => zoomAt(f, box.clientWidth / 2, box.clientHeight / 2) };
 }
 
 let tree;
@@ -35,8 +38,21 @@ function bindTreeLinks(root, after) {
     a.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
   });
 }
+const COLLAPSE_KEY = 'pr-review-tree-collapse';
+function showTreeMode(collapsed) {
+  $$('#treecanvas svg.tree[data-mode]').forEach(s => s.toggleAttribute('hidden', s.dataset.mode !== (collapsed ? 'collapsed' : 'full')));
+}
 function initTreeCanvas() {
   const canvas = $('#treecanvas');
+  const box = $('#treecollapse');
+  if (box) {
+    try { box.checked = localStorage.getItem(COLLAPSE_KEY) === '1'; } catch (_) {}
+    showTreeMode(box.checked);
+    box.onchange = () => {
+      try { localStorage.setItem(COLLAPSE_KEY, box.checked ? '1' : '0'); } catch (_) {}
+      showTreeMode(box.checked); tree.measure(); tree.start();
+    };
+  }
   tree = panZoom(canvas);
   $$('[data-zoom]').forEach(b => b.onclick = () => (b.dataset.zoom === 'fit' ? tree.fit() : tree.zoom(b.dataset.zoom === 'in' ? 1.25 : 0.8)));
   bindTreeLinks(canvas, () => $('#treemodal').close());

@@ -139,9 +139,9 @@ class QueueModelTests(unittest.TestCase):
         q = models.queue_model(items, "Tony")
         self.assertEqual(q["user"], "Tony")
         self.assertEqual(q["total_minutes"], 25)
-        self.assertEqual(q["authors"], ["Alice", "alice", "bob"])
+        self.assertEqual(q["authors"], ["bob", "Alice", "alice"])
         self.assertEqual([b["author"] for b in q["buckets"]], q["authors"])
-        bob = q["buckets"][2]
+        bob = q["buckets"][0]
         self.assertEqual([i["number"] for i in bob["items"]], [3, 1])
 
     def test_avatar_strips_app_prefix(self):
@@ -160,13 +160,27 @@ class QueueModelTests(unittest.TestCase):
         self.assertEqual(item["requested_at"], "2026-11-01T00:00:00Z")
         self.assertEqual(sorted(item), sorted(["slug", "number", "title", "url", "author", "requested_at", "head_sha", "ci", "draft", "effort",
                                                "minutes", "minutes_source", "added", "deleted", "files", "verdict", "risk", "findings",
-                                               "has_insights", "threads", "open_threads", "approved", "summary"]))
+                                               "has_insights", "threads", "open_threads", "approved", "summary", "created"]))
         self.assertFalse(item["approved"])
+        self.assertEqual(item["created"], "2026-11-01T00:00:00Z")
+
         st["approval"] = {"commit": HEAD}
         self.assertTrue(models.queue_item(summary_for("a-b-1", 1, "bob"), "2026-11-01T00:00:00Z", st)["approved"])
 
 
 class ManifestTests(TmpCase):
+
+    def test_buckets_by_count_then_oldest_pr(self):
+        mk = lambda n, author, created: {"author": author, "minutes": 1, "created": created, "requested_at": created, "number": n}
+        model = models.queue_model([mk(1, "amy", "2026-11-05T00:00:00Z"), mk(2, "bea", "2026-10-01T00:00:00Z"),
+                                    mk(3, "cal", "2026-11-01T00:00:00Z"), mk(4, "cal", "2026-11-02T00:00:00Z")], "Tony")
+        self.assertEqual(model["authors"], ["cal", "bea", "amy"])
+
+    def test_bucket_sorted_by_opened_oldest_first(self):
+        mk = lambda n, created, req: {"author": "bob", "minutes": 1, "created": created, "requested_at": req, "number": n}
+        model = models.queue_model([mk(1, "2026-11-05T00:00:00Z", "2026-11-01T00:00:00Z"),
+                                    mk(2, "2026-10-01T00:00:00Z", "2026-11-06T00:00:00Z")], "Tony")
+        self.assertEqual([i["number"] for i in model["buckets"][0]["items"]], [2, 1])
     def test_entry_and_roundtrip(self):
         m = models.review_model(self.cfg, make_pr(), DIFF, None, "missing", "x")
         summary = models.pr_summary(m, "missing")

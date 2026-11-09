@@ -141,7 +141,7 @@ Fields: `synced`, `gh_root`; threads from GitHub also have id `gh-<root id>`, `p
 
 ## After a refresh
 
-Clicking **Refresh** on the queue page (or running `review.py build`) rebuilds every page and appends an event to `events.jsonl`. `review.py ai changes` prints the latest one:
+Clicking **Refresh** on the queue page, the queue's own refresh every 15 minutes while it is open, or running `review.py build` rebuilds every page and appends an event to `events.jsonl`. It only ever appends, so `tail -F` on it shows each new event once. `review.py ai changes` prints the latest one:
 
 ```json
 {"type": "rebuild", "source": "refresh", "at": "…", "partial": false,

@@ -67,3 +67,6 @@
 .qrefreshed{font-size:12px;color:var(--add)}
 
 .chip.approved{color:var(--add);background:color-mix(in srgb,var(--add) 10%,var(--surface));border-color:transparent;font-weight:600}
+.qitem.approved{border-color:color-mix(in srgb,var(--add) 55%,var(--line));background:color-mix(in srgb,var(--add) 9%,var(--surface))}
+.qitem.approved .qrow .t{color:var(--add)}
+.qitem.approved .chip:not(.approved){background:color-mix(in srgb,var(--add) 6%,var(--surface-2))}

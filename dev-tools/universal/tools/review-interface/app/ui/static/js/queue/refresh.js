@@ -1,3 +1,6 @@
+const AUTO_EVERY = 15 * 60 * 1000;
+const LAST_KEY = 'review-last-refresh';
+
 function initRefresh() {
   const btn = $('#qrefresh');
   if (!btn || !location.protocol.startsWith('http')) return;
@@ -26,10 +29,18 @@ function initRefresh() {
       if (s.running) continue;
       if (s.error) throw new Error(s.error);
       try { sessionStorage.setItem('review-refreshed', JSON.stringify((s.changes && s.changes.check) || [])); } catch (e) {}
+      stamp();
       location.reload();
       return;
     }
   };
+  const stamp = () => { try { localStorage.setItem(LAST_KEY, String(Date.now())); } catch (e) {} };
+  const last = () => { try { return +localStorage.getItem(LAST_KEY) || 0; } catch (e) { return 0; } };
+  if (!last()) stamp();
+  const due = () => { if (!document.hidden && !btn.disabled && Date.now() - last() >= AUTO_EVERY) { stamp(); btn.click(); } };
+  setInterval(due, 30000);
+  document.addEventListener('visibilitychange', due);
+  btn.title = 'Refreshes on its own every 15 minutes while this page is open';
   const fail = e => { busy(false); label.textContent = 'Refresh failed'; btn.title = e.message; };
   btn.addEventListener('click', () => { busy(true); call('POST').then(waitForBuild).catch(fail); });
   call('GET').then(s => { if (s.running) { busy(true); waitForBuild().catch(fail); } }).catch(() => {});

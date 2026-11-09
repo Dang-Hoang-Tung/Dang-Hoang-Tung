@@ -12,11 +12,6 @@ FINDING_LABELS = {
 }
 
 
-def comments_text(item):
-    total, open_count = item["threads"], item["open_threads"]
-    return f'{total} comment{"" if total == 1 else "s"}' + (f" · {open_count} open" if open_count else "")
-
-
 def finding_pills(findings):
     out = []
     for kind in SEVERITIES:
@@ -49,15 +44,18 @@ def data_attrs(item):
             f'data-brief="{int(item["has_insights"])}" data-ci="{esc(item["ci"])}" data-draft="{int(item["draft"])}" data-min="{item["minutes"]}"')
 
 
+APPROVED_CHIP = '<span class="chip approved">✓ Approved</span>'
+
+
 def _row(item):
     href = f'{esc(item["slug"])}.html'
     button = "Brief" if item["has_insights"] else "Details"
-    approved = '<span class="chip approved">Approved</span>' if item.get("approved") else ""
+    opened = item.get("created") or item["requested_at"]
     return (
         f'<a class="qrow" href="{href}"><span class="prnum">#{esc(item["number"])}</span>'
-        f'<span class="t">{esc(item["title"])}</span>{approved}'
+        f'<span class="t">{esc(item["title"])}</span>{APPROVED_CHIP if item.get("approved") else ""}'
+        f'<time class="chip hide-md" data-opened datetime="{esc(opened)}">{esc(opened[:10])}</time>'
         f'<time class="chip hide-md" data-req datetime="{esc(item["requested_at"])}">{esc(item["requested_at"][:10])}</time>'
-        f'<span class="chip mono">{esc(item["head_sha"][:7])}</span><span class="chip">{comments_text(item)}</span>'
         f'<button type="button" class="briefbtn" aria-expanded="false">{button}{icons.CHEVRON_DOWN}</button></a>'
     )
 
@@ -71,4 +69,6 @@ def _body(item):
 
 
 def render(item):
-    return f'<div class="qitem" {data_attrs(item)}>{_row(item)}{_body(item)}</div>'
+    cls = "qitem approved" if item.get("approved") else "qitem"
+    return (f'<div class="{cls}" data-slug="{esc(item["slug"])}" data-sha="{esc(item["head_sha"])}" {data_attrs(item)}>'
+            f'{_row(item)}{_body(item)}</div>')
