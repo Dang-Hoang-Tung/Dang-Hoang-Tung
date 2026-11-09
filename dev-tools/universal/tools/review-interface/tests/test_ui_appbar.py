@@ -20,14 +20,25 @@ def page(verdict=VERDICT):
 
 
 class AppbarTests(unittest.TestCase):
-    def test_short_verdict(self):
-        self.assertEqual(appbar.short_verdict(VERDICT), "Approve with nits")
-        self.assertEqual(appbar.short_verdict("Needs work - see notes"), "Needs work")
-        self.assertEqual(appbar.short_verdict("Approve"), "Approve")
-
-    def test_verdict_chip_and_title(self):
+    def test_timer_replaces_verdict(self):
         html = page()
-        self.assertIn(f'<span class="chip verdict" title="{VERDICT.replace("(", "(")}">Approve with nits</span>', html)
+        self.assertNotIn('chip verdict', html)
+        self.assertIn('id="timer"', html)
+        self.assertIn('data-default="720"', html)
+        self.assertIn('<span id="timerval">12:00</span>', html)
+
+    def test_timer_defaults_to_ten_minutes(self):
+        self.assertIn('data-default="600"', appbar.timer_chip(None))
+
+    def test_timeup_popup_options(self):
+        html = page()
+        for label, mins in (("Just a minute!", 1), ("Give me 5 more mins", 5), ("I need a solid 10 mins", 10)):
+            self.assertIn(f'<button type="button" data-add="{mins}">{label}</button>', html)
+        self.assertIn('id="timeupclose"', html)
+        self.assertIn("used all the time you allocated", html)
+
+    def test_brief_button_label(self):
+        self.assertIn("<span>AI Brief</span>", page())
 
     def test_overflow_menu_holds_controls(self):
         html = page()

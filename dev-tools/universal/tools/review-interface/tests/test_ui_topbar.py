@@ -14,7 +14,7 @@ from test_ui import SHA, review_model  # noqa: E402
 def bar(**pr):
     model = review_model()
     model["pr"].update(pr)
-    return appbar.render(model["pr"], model["totals"], model["summary"]["verdict"])
+    return appbar.render(model["pr"], model["totals"], model["summary"]["minutes"])
 
 
 class TopbarTests(unittest.TestCase):
@@ -45,12 +45,9 @@ class TopbarTests(unittest.TestCase):
         self.assertIn('aria-label="Make the button &lt;great&gt;"', h1)
         self.assertLess(html.index("<h1"), html.index('<div class="meta">'))
 
-    def test_verdict_next_to_navchip(self):
+    def test_timer_before_navchip(self):
         html = bar()
-        between = html[html.index('<span class="chip verdict"'):html.index('<div class="navchip"')]
-        self.assertNotIn("<div", between)
-        self.assertNotIn("<a ", between)
-        self.assertIn("Looks good", between)
+        self.assertLess(html.index('id="timer"'), html.index('<div class="navchip"'))
 
     def test_pbar_inside_leftchip(self):
         html = bar()

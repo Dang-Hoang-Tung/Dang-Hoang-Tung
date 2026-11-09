@@ -1,0 +1,27 @@
+.timer{position:relative;display:inline-flex;align-items:center;gap:4px;flex:none}
+header.appbar .timerchip{gap:6px;font:600 13px var(--mono);color:var(--text);cursor:pointer;min-width:84px;justify-content:center}
+.timerchip:hover{background:var(--surface-3)}
+.timerchip .tico{font-family:var(--font);font-size:13px}
+.timerplay{box-sizing:border-box;width:32px;height:32px;display:inline-grid;place-items:center;padding:0;border:1px solid var(--line);border-radius:999px;background:var(--surface-2);color:var(--text-2);font-size:11px;cursor:pointer}
+.timerplay:hover:not(:disabled){background:var(--surface-3);color:var(--text)}
+.timerplay:disabled{opacity:.4;cursor:default}
+.timer.running .timerchip{border-color:color-mix(in srgb,var(--accent) 45%,var(--line));background:var(--accent-soft)}
+.timer.low .timerchip{color:var(--should);border-color:var(--should);background:var(--should-soft)}
+.timer.over .timerchip{color:#fff;background:var(--del);border-color:var(--del);animation:tflash .9s ease-in-out infinite}
+@keyframes tflash{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--del) 60%,transparent);filter:none}50%{box-shadow:0 0 0 7px transparent;filter:brightness(1.25)}}
+.timerpop{right:auto;left:0;width:230px}
+.timerpop .trow{display:flex;gap:8px}
+.timerpop label{flex:1;display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.04em}
+.timerpop input{width:100%;box-sizing:border-box;font:600 16px var(--mono);background:var(--surface-2);color:var(--text);border:1px solid var(--line);border-radius:9px;padding:6px 8px}
+.timerpop input:focus{background:var(--surface);border-color:var(--accent);outline:0}
+.timerpop .solid{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.timeup{position:fixed;top:calc(var(--bar) + 18px);left:50%;transform:translateX(-50%);z-index:60;width:min(420px,calc(100vw - 32px));box-sizing:border-box;padding:18px 18px 16px;background:var(--surface);border:1px solid var(--del);border-radius:16px;box-shadow:var(--shadow-2),0 0 0 4px color-mix(in srgb,var(--del) 18%,transparent);animation:tpop .35s cubic-bezier(.2,1.4,.4,1)}
+.timeup[hidden]{display:none}
+.timeup p{margin:0 24px 14px 0;font-size:14px;font-weight:600;line-height:1.45;color:var(--text)}
+.timeupx{position:absolute;top:8px;right:8px;width:28px;height:28px;border:0;border-radius:8px;background:transparent;color:var(--text-3);font-size:18px;line-height:1;cursor:pointer}
+.timeupx:hover{background:var(--surface-3);color:var(--text)}
+.timeupbtns{display:flex;flex-wrap:wrap;gap:8px}
+.timeupbtns button{flex:1 1 auto;padding:8px 10px;border:1px solid var(--line-strong);border-radius:9px;background:var(--surface-2);color:var(--text);font:600 12px var(--font);cursor:pointer;white-space:nowrap}
+.timeupbtns button:hover{background:var(--accent-soft);border-color:var(--accent)}
+@keyframes tpop{from{opacity:0;transform:translate(-50%,-10px) scale(.96)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
+@media (prefers-reduced-motion:reduce){.timer.over .timerchip,.timeup{animation:none}}

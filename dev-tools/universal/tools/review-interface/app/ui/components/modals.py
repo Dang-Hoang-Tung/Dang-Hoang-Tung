@@ -27,5 +27,5 @@ def _tree_modal(layout):
 def render(layout, summary):
     tree = _tree_modal(layout)
     treemap = _modal("mapmodal", "Treemap · size is lines changed, colour is the top finding", '<div class="treemap" id="treemap"></div>')
-    brief = _modal("briefmodal", "Brief", summary_card.brief_html(summary))
+    brief = _modal("briefmodal", "AI Brief", summary_card.brief_html(summary))
     return f"{tree}\n{treemap}\n{brief}"

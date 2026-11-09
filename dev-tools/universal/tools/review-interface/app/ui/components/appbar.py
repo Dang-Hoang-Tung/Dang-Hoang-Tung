@@ -1,5 +1,3 @@
-import re
-
 from app.ui.components import icons
 from app.ui.html import esc
 
@@ -15,14 +13,26 @@ NAVCHIP = (
 )
 
 
-def short_verdict(verdict):
-    return re.split(r"\(|\.| - ", verdict, maxsplit=1)[0].strip() or verdict
-
-
-def verdict_chip(verdict):
-    if not verdict:
-        return ""
-    return f'<span class="chip verdict" title="{esc(verdict)}">{esc(short_verdict(verdict))}</span>'
+def timer_chip(minutes):
+    secs = max(1, int(minutes or 10)) * 60
+    return (
+        f'<div class="timer" id="timer" data-default="{secs}">'
+        '<button type="button" class="chip timerchip" id="timerbtn" aria-haspopup="true" aria-expanded="false" title="Review timer: click to set">'
+        f'<span class="tico" aria-hidden="true">⏱</span><span id="timerval">{secs // 60}:00</span></button>'
+        '<button type="button" class="timerplay" id="timerplay" aria-label="Start timer" title="Start">▶</button>'
+        '<form class="popover timerpop" id="timerpop" hidden><div class="trow">'
+        '<label>Min<input type="number" id="timermin" min="0" max="180" inputmode="numeric"></label>'
+        '<label>Sec<input type="number" id="timersec" min="0" max="59" inputmode="numeric"></label></div>'
+        '<div class="row"><button type="button" class="sm" id="timerreset">Reset</button>'
+        '<button type="submit" class="sm solid" id="timerset">Set &amp; start</button></div></form>'
+        '<div class="timeup" id="timeup" role="alertdialog" aria-labelledby="timeupmsg" hidden>'
+        '<button type="button" class="timeupx" id="timeupclose" aria-label="Close">×</button>'
+        '<p id="timeupmsg">⏰ Time\'s up! You used all the time you allocated to this review.</p>'
+        '<div class="timeupbtns"><button type="button" data-add="1">Just a minute!</button>'
+        '<button type="button" data-add="5">Give me 5 more mins</button>'
+        '<button type="button" data-add="10">I need a solid 10 mins</button></div></div>'
+        '</div>'
+    )
 
 
 def size_chip(totals):
@@ -71,13 +81,13 @@ def _tools(pr):
     )
 
 
-def render(pr, totals, verdict):
+def render(pr, totals, minutes=None):
     title = esc(pr["title"])
     return (
         f'<header class="appbar"><a class="back" href="index.html" title="Back to the review queue">{icons.BACK}Back</a>\n'
         f'<div class="brand"><h1 id="prtitle" tabindex="0" aria-label="{title}">{title}</h1>{meta_line(pr)}</div>\n'
         f'<div class="topleft">{size_chip(totals)}</div>\n'
-        f'{verdict_chip(verdict)}\n'
+        f'{timer_chip(minutes)}\n'
         f'{NAVCHIP}\n'
         f'{_tools(pr)}</header>'
     )

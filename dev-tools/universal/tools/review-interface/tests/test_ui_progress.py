@@ -19,7 +19,7 @@ CSS = (ROOT / "app/ui/static/css/appbar.css").read_text()
 
 def bar_html():
     model = review_model()
-    return appbar.render(model["pr"], model["totals"], model["summary"]["verdict"])
+    return appbar.render(model["pr"], model["totals"], model["summary"]["minutes"])
 
 
 class ProgressBarTests(unittest.TestCase):
