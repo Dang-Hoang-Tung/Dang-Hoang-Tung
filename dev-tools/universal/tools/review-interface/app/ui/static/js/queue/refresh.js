@@ -1,7 +1,16 @@
 const AUTO_EVERY = 15 * 60 * 1000;
 const LAST_KEY = 'review-last-refresh';
 
+function renderLastRefreshed() {
+  const t = $('#qlast');
+  if (!t) return;
+  t.textContent = '· Last refreshed ' + ago(t.dateTime, { days: 30 });
+  t.title = 'Last refreshed ' + new Date(t.dateTime).toLocaleString();
+}
+
 function initRefresh() {
+  renderLastRefreshed();
+  setInterval(renderLastRefreshed, 30000);
   const btn = $('#qrefresh');
   if (!btn || !location.protocol.startsWith('http')) return;
   btn.hidden = false;

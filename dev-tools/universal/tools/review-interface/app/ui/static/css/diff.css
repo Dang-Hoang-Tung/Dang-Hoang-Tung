@@ -61,7 +61,7 @@ tr.ws-only td{background:transparent}tr.ws-only td.num{background:transparent;co
 tr.ws-only .sign{color:transparent}tr.ws-only .hl{background:none}
 .mvlabel.plain{cursor:default}
 /* Shiki tokens */
-.tk{color:color-mix(in srgb,var(--shiki-light) 85%,#000)}
-.is-dark .tk{color:color-mix(in srgb,var(--shiki-dark) 78%,#fff)}
+.tk{color:color-mix(in srgb,var(--shiki-light) 80%,#000)}
+.is-dark .tk{color:color-mix(in srgb,var(--shiki-dark) 70%,#fff)}
 tr.ws-only .tk{color:inherit}
 td.code :is(.ti,.mvlabel,.hl,.tk,.implink){text-indent:0}

@@ -103,7 +103,7 @@ class ReviewModelTests(TmpCase):
         m = self.model()
         gen = next(f for f in m["files"] if f["path"].endswith("api.ts"))
         self.assertTrue(gen["gen"])
-        self.assertEqual(gen["layer"], "Generated")
+        self.assertNotEqual(gen["layer"], "Generated")
         self.assertEqual(m["order"][-1], gen["idx"])
         self.assertEqual(sorted(m["order"]), [0, 1, 2])
 

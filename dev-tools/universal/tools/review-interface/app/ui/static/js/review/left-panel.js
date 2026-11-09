@@ -34,6 +34,7 @@ function fileRow(i, depth, name) {
   const lead = el('span', 'lead');
   lead.append(checkbox(isRead(i), false, on => setRead([i], on), 'Mark as viewed'), el('span', 'vmark', '✓'));
   row.append(lead, statusIcon(i), el('span', 'nm', name));
+  if (D.files[i].gen) row.append(el('span', 'tgen', 'generated'));
   if (D.files[i].kind) row.append(el('span', 'ring ' + ringOf(i)));
   if (changedSinceRead(i)) row.append(el('span', 'chg', 'changed'));
   row.onclick = () => goToFile(i);
@@ -59,10 +60,8 @@ function folderRow(name, depth, files, key, dflt, label) {
 
 function renderFiles() {
   const pane = $('#pane-files'); pane.textContent = '';
-  const gen = [];
   const draw = (n, depth, parent, path) => {
-    const fs = leaves(n).filter(i => !D.files[i].gen);
-    leaves(n).filter(i => D.files[i].gen).forEach(i => { if (!gen.includes(i)) gen.push(i); });
+    const fs = leaves(n);
     if (!fs.length) return;
     if (n.file != null) { parent.append(fileRow(n.file, depth, n.name)); return; }
     const key = 'f:' + path + n.name;
@@ -80,13 +79,6 @@ function renderFiles() {
     draw(top, 0, grp, '');
     if (grp.childNodes.length) pane.append(grp);
   }
-  if (gen.length) {
-    const grp = el('div', 'tgroup gen');
-    const { wrap, kids } = folderRow(`Generated · ${gen.length} file${gen.length > 1 ? 's' : ''}`, 0, gen, 'f:__generated', true, 'Mark generated files as viewed');
-    gen.forEach(i => kids.append(fileRow(i, 1, fileName(i))));
-    grp.append(wrap);
-    pane.append(grp);
-  }
 }
 
 function renderLayers() {
@@ -94,8 +86,8 @@ function renderLayers() {
   for (const layer of D.layers) {
     const fs = D.order.filter(i => D.files[i].layer === layer);
     if (!fs.length) continue;
-    const key = 'l:' + layer, dflt = layer === 'Generated';
-    const g = el('div', 'lgroup' + (dflt ? ' gen' : '') + (isFolded(key, dflt) ? ' folded' : ''));
+    const key = 'l:' + layer, dflt = false;
+    const g = el('div', 'lgroup' + (isFolded(key, dflt) ? ' folded' : ''));
     const head = el('div', 'lhead');
     head.setAttribute('role', 'button');
     head.setAttribute('aria-expanded', String(!isFolded(key, dflt)));

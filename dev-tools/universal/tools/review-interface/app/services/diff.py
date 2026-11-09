@@ -272,7 +272,6 @@ def find_moves(files, colored=None):
 
 def layer_of(f):
     p, name = f["path"], f["path"].split("/")[-1]
-    if f["gen"]: return "Generated"
     if re.search(r"(\.|_)(test|spec)\.|/__tests__/|/tests?/", p): return "Tests"
     if re.search(r"/i18n/|/locales?/|\.po$", p): return "Copy"
     if re.match(r"use[A-Z]", name): return "Hooks"

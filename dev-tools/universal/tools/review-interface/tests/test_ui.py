@@ -248,7 +248,7 @@ class ReviewPageTests(unittest.TestCase):
         self.assertEqual(data["files"][0]["i"], 0)
         self.assertNotIn("rows", data["files"][0])
         self.assertEqual(data["notes"][0]["endRow"], "r0-4")
-        self.assertIn("Generated", data["layers"])
+        self.assertNotIn("Generated", data["layers"])
         self.assertEqual(data["severities"], ["block", "should", "nit", "question", "look"])
         self.assertEqual(data["severity_labels"]["should"], "Should fix")
 
@@ -351,6 +351,13 @@ class QueuePageTests(unittest.TestCase):
         self.assertEqual(page.count('<span class="chip approved">✓ Approved</span>'), 1)
         self.assertEqual(page.count('class="qitem approved"'), 1)
         self.assertLess(page.index("✓ Approved"), page.index("data-opened"))
+
+    def test_last_refreshed_stamp(self):
+        model = queue_model()
+        model["built_at"] = "2026-11-09T10:00:00.000Z"
+        page = queue_page.render(model)
+        self.assertIn('<time class="sub qlast" id="qlast" datetime="2026-11-09T10:00:00.000Z"></time>', page)
+        self.assertLess(page.index('id="qlast"'), page.index('id="qrefresh"'))
 
     def test_description_escaped(self):
         self.assertNotIn("<script>alert(1)</script>", self.page)

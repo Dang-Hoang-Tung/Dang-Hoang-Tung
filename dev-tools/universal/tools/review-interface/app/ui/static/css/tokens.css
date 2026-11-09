@@ -41,5 +41,5 @@
   --bg:#0b0e13;--surface:#11151c;--text:#e4e8ef;--accent:#7aa3ff;--accent-fg:#0b0e13;
   --add:#4cc77a;--del:#f26d68;--block:#ff6e62;--should:#f0a443;--nit:#a998ff;--look:#46d0bb;--question:#f383c6;
   --soft:16%;--shadow:rgba(0,0,0,.4);color-scheme:dark}
-:root.is-dark{--add-bg:rgba(46,160,67,.15);--add-num:rgba(63,185,80,.3);--add-hl:rgba(46,160,67,.4);
-  --del-bg:rgba(248,81,73,.1);--del-num:rgba(248,81,73,.3);--del-hl:rgba(248,81,73,.4)}
+:root.is-dark{--add-bg:rgba(46,160,67,.07);--add-num:rgba(63,185,80,.3);--add-hl:rgba(46,160,67,.4);
+  --del-bg:rgba(248,81,73,.05);--del-num:rgba(248,81,73,.3);--del-hl:rgba(248,81,73,.4)}

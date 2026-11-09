@@ -9,7 +9,6 @@
 .tgroup{padding:8px 0;border-bottom:1px dashed var(--line)}
 .tgroup+.tgroup{margin-top:6px}
 .tgroup:last-child{border-bottom:0}
-.tgroup.gen{opacity:.75}
 .trow{display:flex;align-items:center;gap:8px;padding:6px 8px 6px calc(8px + var(--d,0) * 12px);border-radius:8px;cursor:pointer;font:500 12px var(--mono);color:var(--text-2);min-width:0}
 .trow:hover{background:var(--surface-2);color:var(--text)}
 .trow.dir{color:var(--text-3);font-weight:500}
@@ -75,3 +74,5 @@
 #fvtitle{display:flex;align-items:center}
 .cpath .fstatus,#fvtitle .fstatus{flex:none}
 svg.fstat{overflow:visible}
+.trow .tgen{flex:none;margin-left:auto;font:600 9.5px var(--font);text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);background:var(--surface-3);padding:1px 6px;border-radius:5px}
+.tgen~.ring,.tgen~.chg{margin-left:0}

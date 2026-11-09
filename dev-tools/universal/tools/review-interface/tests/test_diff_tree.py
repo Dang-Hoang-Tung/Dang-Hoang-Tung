@@ -71,7 +71,7 @@ class ParseDiffTests(unittest.TestCase):
         self.assertEqual(layer("a/db/x.ts"), "Data")
         self.assertEqual(layer("a/i18n/en.json"), "Copy")
         self.assertEqual(layer("a/x.yaml"), "Config")
-        self.assertEqual(layer("a/x.ts", gen=True), "Generated")
+        self.assertEqual(layer("a/b/api/x.ts", gen=True), "API")
         self.assertEqual(layer("README.md"), "Other")
 
     def test_file_hash_changes_with_content(self):

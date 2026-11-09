@@ -70,3 +70,4 @@
 .qitem.approved{border-color:color-mix(in srgb,var(--add) 55%,var(--line));background:color-mix(in srgb,var(--add) 9%,var(--surface))}
 .qitem.approved .qrow .t{color:var(--add)}
 .qitem.approved .chip:not(.approved){background:color-mix(in srgb,var(--add) 6%,var(--surface-2))}
+.qhead .qlast{margin-left:-8px;white-space:nowrap}

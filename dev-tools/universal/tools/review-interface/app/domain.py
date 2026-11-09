@@ -2,7 +2,7 @@
 
 SEVERITIES = ("block", "should", "nit", "question", "look")
 SEVERITY_LABELS = {"block": "Blocking", "should": "Should fix", "nit": "Nit", "look": "Look here", "question": "Question"}
-LAYERS = ("UI", "Hooks", "API", "Domain", "Data", "Copy", "Config", "Tests", "Other", "Generated")
+LAYERS = ("UI", "Hooks", "API", "Domain", "Data", "Copy", "Config", "Tests", "Other")
 
 
 def worst(kinds):

@@ -1,3 +1,4 @@
+from app.config import now
 from app.ui.components import queue_bucket, queue_controls
 from app.ui.html import esc
 from app.ui.pages import document
@@ -15,6 +16,7 @@ def _heading(model):
     return (
         f'<div class="qhead"><h1>Hello {esc(model["user"])}. Let\'s review!</h1>'
         f'<div class="qhead-side"><span class="sub" id="qsum">{_count(model)} PRs · ~{model["total_minutes"]} min</span>'
+        f'<time class="sub qlast" id="qlast" datetime="{esc(model.get("built_at") or now())}"></time>'
         f'<button type="button" class="qrefresh" id="qrefresh" hidden title="Fetch the latest PRs, diffs and briefs">{REFRESH_ICON}<span>Refresh</span></button></div></div>'
     )
 

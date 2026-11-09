@@ -4,12 +4,20 @@ function setCollapsed(i, collapsed) {
   s.classList.toggle('collapsed', collapsed);
   $('.fold', s).setAttribute('aria-expanded', String(!collapsed));
 }
+// If the file's top has scrolled under the top bar, collapsing it would jump the page; keep its header just under the bar.
+function keepHeaderInView(i, change) {
+  const s = section(i), bar = $('header.appbar').getBoundingClientRect().bottom;
+  const above = s.getBoundingClientRect().top < bar;
+  change();
+  if (above && s.classList.contains('collapsed')) scrollTo({ top: scrollY + s.getBoundingClientRect().top - bar, behavior: 'instant' });
+}
 function initFileSections() {
   $$('section.file').forEach(s => {
     const i = +s.dataset.f;
-    $('.fold', s).onclick = () => setCollapsed(i, !s.classList.contains('collapsed'));
-    $('.path', s).onclick = () => setCollapsed(i, !s.classList.contains('collapsed'));
-    $('input[data-read]', s).onchange = e => setRead([i], e.target.checked);
+    const toggle = () => keepHeaderInView(i, () => setCollapsed(i, !s.classList.contains('collapsed')));
+    $('.fold', s).onclick = toggle;
+    $('.path', s).onclick = toggle;
+    $('input[data-read]', s).onchange = e => keepHeaderInView(i, () => setRead([i], e.target.checked));
   });
   $$('button.expand').forEach(b => b.onclick = () => {
     const t = b.previousElementSibling, s = b.closest('section.file');
