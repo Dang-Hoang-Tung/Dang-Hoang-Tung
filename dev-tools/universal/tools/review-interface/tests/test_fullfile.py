@@ -76,6 +76,14 @@ class CommentsAndToggleTests(unittest.TestCase):
         self.assertIn("<span>PR comments</span>", html)
         self.assertIn('id="commentsmodal"', html)
 
+    def test_overview_menu_holds_the_four_views(self):
+        html = self.page()
+        menu = html[html.index('id="fabmenu"'):html.index('id="fabtoggle"')]
+        for b in ("briefbtn", "commentsbtn", "treebtn", "mapbtn"):
+            self.assertIn(f'id="{b}"', menu)
+        self.assertIn('id="fabmenu" role="menu" hidden', html)
+        self.assertIn("<span>Overview</span>", html)
+
     def test_viewer_has_mode_toggle(self):
         html = self.page()
         self.assertIn('data-mode="preview"', html)

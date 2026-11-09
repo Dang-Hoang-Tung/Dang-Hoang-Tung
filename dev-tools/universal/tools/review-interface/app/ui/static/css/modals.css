@@ -1,6 +1,13 @@
 .fabs{position:fixed;right:22px;z-index:25;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
 .fab{display:inline-flex;align-items:center;gap:8px;font:600 13px var(--font);background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--line-strong);border-radius:999px;padding:9px 16px;box-shadow:var(--shadow-2)}
 .fab svg{width:16px;height:16px;color:var(--accent)}
+.fabtoggle{box-sizing:border-box;width:var(--fabw);height:var(--chatbar);justify-content:center;border-radius:18px;padding:0 14px}
+.fabtoggle .fabchev{display:inline-grid;margin-left:2px}.fabtoggle .fabchev svg{width:14px;height:14px;color:var(--text-3);transform:rotate(180deg);transition:transform .15s}
+.fabtoggle[aria-expanded="true"] .fabchev svg{transform:none}
+.fabmenu{position:absolute;right:0;bottom:calc(100% + 8px);min-width:var(--fabw);display:flex;flex-direction:column;gap:2px;padding:6px;background:var(--surface);border:1px solid var(--line-strong);border-radius:14px;box-shadow:var(--shadow-2)}
+.fabmenu[hidden]{display:none}
+.fabmenu .fab{width:100%;border:0;border-radius:9px;background:transparent;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;padding:9px 12px;white-space:nowrap}
+.fabmenu .fab:hover{background:var(--surface-2)}
 dialog.modal{border:1px solid var(--line);border-radius:18px;padding:0;background:var(--surface);color:var(--text);margin:var(--modal-top) auto 20px;max-height:var(--modal-h);box-shadow:var(--shadow-2)}
 dialog.modal[open]{animation:pop .16s ease-out}
 dialog.modal::backdrop{background:var(--shade);backdrop-filter:blur(3px)}
