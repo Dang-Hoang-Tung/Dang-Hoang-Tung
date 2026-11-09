@@ -69,5 +69,25 @@ class FileStatusTests(unittest.TestCase):
         self.assertIn('class="fstat modified"', file_section.render(f, []))
 
 
+class NoDiffTests(unittest.TestCase):
+    def section(self, **f):
+        base = {"idx": 3, "path": "a/b.ts", "kind": None, "gen": False, "a": 0, "d": 0, "rows": [], "status": "renamed", "old_path": "x/b.ts"}
+        return file_section.render({**base, **f}, [])
+
+    def test_moved_file_is_a_plain_row(self):
+        html = self.section()
+        self.assertIn('class="file nodiff"', html)
+        self.assertNotIn('class="fold"', html)
+        self.assertIn('class="fold-spacer"', html)
+        self.assertNotIn("<table", html)
+        self.assertIn('data-read="3"', html)
+        self.assertIn("moved, no changes", html)
+
+    def test_file_with_rows_keeps_its_fold(self):
+        html = self.section(rows=[("add", None, 1, "x")], a=1, status="modified")
+        self.assertIn('class="fold"', html)
+        self.assertNotIn("nodiff", html)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -65,3 +65,8 @@ tr.ws-only .sign{color:transparent}tr.ws-only .hl{background:none}
 .is-dark .tk{color:color-mix(in srgb,var(--shiki-dark) 70%,#fff)}
 tr.ws-only .tk{color:inherit}
 td.code :is(.ti,.mvlabel,.hl,.tk,.implink){text-indent:0}
+.fold-spacer{flex:none;width:26px;height:26px}
+section.nodiff .fh{border-bottom:0}
+section.nodiff .fbody{display:none}
+section.nodiff .path{cursor:default}
+.nodiff-note{font:500 11.5px var(--font);color:var(--text-3)}

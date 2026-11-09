@@ -40,14 +40,29 @@ def _status(f):
     return f'<span class="fstatus" title="{title}" aria-label="{title}">{icons.FILE_STATUS.get(status, icons.FILE_STATUS["modified"])}</span>'
 
 
+FOLD = '<button type="button" class="fold" aria-expanded="true" aria-label="Collapse file"></button>'
+SPACER = '<span class="fold-spacer"></span>'
+
+
+def _no_diff(f):
+    return not f["rows"]
+
+
+def _stat(f):
+    if _no_diff(f):
+        return f'<span class="stat nodiff-note">{"moved, no changes" if f.get("status") == "renamed" else "no changes"}</span>'
+    return f'<span class="stat"><span class="a">+{f["a"]}</span> <span class="d">−{f["d"]}</span></span>'
+
+
 def _header(f):
     directory, name = _path_parts(f["path"])
     tags = (f'<span class="tag {f["kind"]}">{SEVERITY_LABELS[f["kind"]]}</span>' if f["kind"] else "") + ('<span class="tag gen">Generated</span>' if f["gen"] else "")
     return (
-        '<div class="fh"><button type="button" class="fold" aria-expanded="true" aria-label="Collapse file"></button>'
+        '<div class="fh">'
+        f'{SPACER if _no_diff(f) else FOLD}'
         f'{_status(f)}'
         f'<span class="path" title="{esc(f["path"])}"><span class="dirpart">{esc(directory)}</span>{esc(name)}</span>{tags}'
-        f'<span class="stat"><span class="a">+{f["a"]}</span> <span class="d">−{f["d"]}</span></span>'
+        f'{_stat(f)}'
         f'<button type="button" class="iconbtn sm fullbtn" data-full="{f["idx"]}" aria-label="Show entire file" title="Show entire file">{icons.EYE}</button>'
         f'<label class="viewed"><input type="checkbox" data-read="{f["idx"]}"><span>Viewed</span></label></div><div class="fbody">'
     )
@@ -125,10 +140,12 @@ def lang(path):
 
 
 def render(f, notes):
-    classes = "file" + (" focused" if notes else "") + (" generated" if f["gen"] else "")
+    classes = "file" + (" focused" if notes else "") + (" generated" if f["gen"] else "") + (" nodiff" if _no_diff(f) else "")
     lang = _lang(f["path"])
     lang_attr = f' data-lang="{lang}"' if lang else ""
     parts = [f'<section class="{classes}" id="f-{f["idx"]}" data-f="{f["idx"]}"{lang_attr}>', _header(f)]
+    if _no_diff(f):
+        return "\n".join(parts) + "</div></section>"
     if f["gen"]:
         parts.append(f'<p class="gen-note">Generated file, {f["a"] + f["d"]} changed lines. Safe to skim.</p><template class="lazy">')
     parts.append(_table(f, notes))

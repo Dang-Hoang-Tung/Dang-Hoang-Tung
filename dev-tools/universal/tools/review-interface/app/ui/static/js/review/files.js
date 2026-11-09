@@ -2,7 +2,8 @@ const section = i => document.getElementById('f-' + i);
 function setCollapsed(i, collapsed) {
   const s = section(i); if (!s) return;
   s.classList.toggle('collapsed', collapsed);
-  $('.fold', s).setAttribute('aria-expanded', String(!collapsed));
+  const fold = $('.fold', s);
+  if (fold) fold.setAttribute('aria-expanded', String(!collapsed));
 }
 // If the file's top has scrolled under the top bar, collapsing it would jump the page; keep its header just under the bar.
 function keepHeaderInView(i, change) {
@@ -15,8 +16,7 @@ function initFileSections() {
   $$('section.file').forEach(s => {
     const i = +s.dataset.f;
     const toggle = () => keepHeaderInView(i, () => setCollapsed(i, !s.classList.contains('collapsed')));
-    $('.fold', s).onclick = toggle;
-    $('.path', s).onclick = toggle;
+    if ($('.fold', s)) { $('.fold', s).onclick = toggle; $('.path', s).onclick = toggle; }
     $('input[data-read]', s).onchange = e => keepHeaderInView(i, () => setRead([i], e.target.checked));
   });
   $$('button.expand').forEach(b => b.onclick = () => {
