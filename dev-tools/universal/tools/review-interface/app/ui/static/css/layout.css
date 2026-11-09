@@ -1,7 +1,7 @@
 .layout{display:grid;grid-template-columns:var(--left) minmax(0,1fr);align-items:start}
 aside.left{position:sticky;top:var(--bar);height:calc(100vh - var(--bar));display:flex;flex-direction:column;min-height:0}
 aside.left{border-right:1px solid var(--line);background:var(--surface)}
-main{min-width:0;padding:22px 26px 120px;display:flex;flex-direction:column;gap:16px}
+main{min-width:0;padding:22px 26px calc(var(--chatbar,56px) + var(--chatbox,0px) + 36px);display:flex;flex-direction:column;gap:16px}
 
 .resizer{position:absolute;top:0;bottom:0;width:9px;z-index:12;cursor:col-resize;touch-action:none}
 aside.left .resizer{right:-5px}

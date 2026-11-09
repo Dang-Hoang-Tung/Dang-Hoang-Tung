@@ -30,6 +30,8 @@
   --font:"Geist",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"Geist Mono",ui-monospace,"SF Mono",Menlo,monospace;
   --r:12px;--bar:56px;--left:284px;
+  --w-sm:640px;--w-md:960px;--w-lg:1200px;--w-xl:1400px;
+  --modal-top:calc(var(--bar) + 20px);--modal-h:calc(100vh - var(--bar) - 40px);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0b0e13;--surface:#11151c;--text:#e4e8ef;--accent:#7aa3ff;--accent-fg:#0b0e13;

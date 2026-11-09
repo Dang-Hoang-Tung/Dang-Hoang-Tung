@@ -28,7 +28,9 @@ class ChatTests(unittest.TestCase):
     def test_fabs_sit_above_bar(self):
         css = (ROOT / "app/ui/static/css/chat.css").read_text()
         self.assertRegex(css, r"\.chat\{position:fixed;left:calc\(var\(--left\)")
-        self.assertRegex(css, r"body\{padding-bottom:calc\(var\(--chatbar\)")
+        layout = (ROOT / "app/ui/static/css/layout.css").read_text()
+        self.assertRegex(layout, r"main\{[^}]*padding:[^;]*var\(--chatbar,56px\) \+ var\(--chatbox,0px\)")
+        self.assertNotIn("body{padding-bottom", css)
 
     @unittest.skipUnless(shutil.which("node"), "node not installed")
     def test_inline_scripts_parse(self):

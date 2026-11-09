@@ -105,11 +105,22 @@ function paintHead() {
     b.setAttribute('aria-pressed', String(!!fv && b.dataset.mode === fv.mode));
     if (b.dataset.mode === 'full') { b.disabled = !served; b.title = served ? '' : 'Needs the local helper (run review.py)'; }
   });
+  paintViewNav();
+}
+
+// One back/forward history across the AI Brief, PR comments and the 1-file viewer.
+// Entries: {kind: 'brief'} | {kind: 'comments'} | {kind: 'file', path, mode, line}.
+const NAV_DIALOGS = { brief: '#briefmodal', comments: '#commentsmodal' };
+const navLabel = e => (e.kind === 'brief' ? 'AI Brief' : e.kind === 'comments' ? 'PR comments' : `${e.path} (${MODE_LABEL[e.mode]})`);
+
+function paintViewNav() {
   const prev = fvNav.stack[fvNav.pos - 1], next = fvNav.stack[fvNav.pos + 1];
-  const tip = (dir, e) => (e ? `${dir}: ${e.path} (${MODE_LABEL[e.mode]})` : dir);
-  const back = $('#fvback'), fwd = $('#fvfwd');
-  back.disabled = !prev; back.title = tip('Back', prev); back.setAttribute('aria-label', back.title);
-  fwd.disabled = !next; fwd.title = tip('Forward', next); fwd.setAttribute('aria-label', fwd.title);
+  $$('.vnav [data-dir]').forEach(b => {
+    const back = b.dataset.dir === '-1', e = back ? prev : next, dir = back ? 'Back' : 'Forward';
+    b.disabled = !e;
+    b.title = e ? `${dir}: ${navLabel(e)}` : dir;
+    b.setAttribute('aria-label', b.title);
+  });
 }
 
 function dropModalDraft() {
@@ -152,17 +163,58 @@ async function show(entry, { side = 'R', line = null, flash = false } = {}) {
   }
 }
 
-function remember() {
-  const cur = fvNav.stack[fvNav.pos];
-  if (cur && fv) { cur.line = topLine(); cur.mode = fv.mode; }
+function hideOverlay() {
+  if (fvBox.hidden) return;
+  dropModalDraft();
+  fv = null; sel = null;
+  closeCard();
+  fvBox.hidden = true;
+  fvBody.replaceChildren();
+  document.body.classList.remove('fv-open');
+  paintSel();
+  renderThreads();
 }
 
-function go(path, mode) {
+function closeNavDialogs() {
+  Object.values(NAV_DIALOGS).forEach(sel => { const d = $(sel); if (d.open) d.close(); });
+}
+
+function remember() {
+  const cur = fvNav.stack[fvNav.pos];
+  if (!cur) return;
+  if (cur.kind === 'file') { if (fv) { cur.line = topLine(); cur.mode = fv.mode; } }
+  else cur.scroll = $(NAV_DIALOGS[cur.kind] + ' .modal-body').scrollTop;
+}
+
+function present(entry, opts = {}) {
+  if (entry.kind === 'file') {
+    closeNavDialogs();
+    fvBox.hidden = false;
+    document.body.classList.add('fv-open');
+    return show(entry, opts);
+  }
+  hideOverlay();
+  closeNavDialogs();
+  const d = $(NAV_DIALOGS[entry.kind]);
+  if (entry.kind === 'comments') renderComments();
+  d.showModal();
+  $('.modal-body', d).scrollTop = entry.scroll || 0;
+  paintViewNav();
+  return Promise.resolve();
+}
+
+function startNav(entry, opts) {
+  remember();
+  fvNav.stack = [entry]; fvNav.pos = 0;
+  return present(entry, opts);
+}
+
+function go(entry, opts) {
   remember();
   fvNav.stack = fvNav.stack.slice(0, fvNav.pos + 1);
-  fvNav.stack.push({ path, mode, line: null });
+  fvNav.stack.push(entry);
   fvNav.pos++;
-  show(fvNav.stack[fvNav.pos]);
+  return present(entry, opts);
 }
 
 function step(d) {
@@ -170,7 +222,12 @@ function step(d) {
   if (!e) return;
   remember();
   fvNav.pos += d;
-  show(e, { line: e.line });
+  present(e, { line: e.line });
+}
+
+function endNav() {
+  fvNav.stack = []; fvNav.pos = -1;
+  hideOverlay();
 }
 
 async function followImport(span) {
@@ -182,35 +239,63 @@ async function followImport(span) {
       path = (await fvApi(`/api/resolve/${D.slug}?from=${encodeURIComponent(fv.path)}&spec=${encodeURIComponent(span.dataset.spec)}`)).path;
       resolved.set(key, path);
     }
-    go(path, fileIndex(path) >= 0 ? 'full' : 'blob');
+    go({ kind: 'file', path, mode: fileIndex(path) >= 0 ? 'full' : 'blob', line: null });
   } catch (e) { note(e.message); }
 }
 
+const fileEntry = (i, mode) => ({ kind: 'file', path: D.files[i].path, mode: mode === 'full' && !served ? 'preview' : mode, line: null });
+
+// From another viewer (brief, comments): a step forward in the history. From the page: a fresh history.
 function openFile(i, { mode = 'full', side = 'R', line = null } = {}) {
-  const entry = { path: D.files[i].path, mode: mode === 'full' && !served ? 'preview' : mode, line: null };
-  fvNav.stack = [entry]; fvNav.pos = 0;
-  fvBox.hidden = false;
-  document.body.classList.add('fv-open');
-  show(entry, { side, line, flash: !!line });
+  const entry = fileEntry(i, mode), opts = { side, line, flash: !!line };
+  return fvNav.stack.length ? go(entry, opts) : startNav(entry, opts);
 }
 
-function closeFull() {
-  if (!fv) return;
-  dropModalDraft();
-  fv = null; sel = null;
-  fvNav.stack = []; fvNav.pos = -1;
-  closeCard();
-  fvBox.hidden = true;
-  fvBody.replaceChildren();
-  document.body.classList.remove('fv-open');
-  paintSel();
-  renderThreads();
+// Paths in the AI Brief: `path`, `path:12` or `path:12-14`, matched to a file in this PR (whole path, or a unique ending).
+const PATH_RE = /^([\w@.\-/]+\.[A-Za-z0-9]+)(?::(\d+)(?:[-–](\d+))?)?$/;
+function briefTarget(text) {
+  const m = PATH_RE.exec(text.trim());
+  if (!m) return null;
+  let i = fileIndex(m[1]);
+  if (i < 0) {
+    const hits = D.files.map((f, k) => (f.path.endsWith('/' + m[1]) ? k : -1)).filter(k => k >= 0);
+    if (hits.length !== 1) return null;
+    i = hits[0];
+  }
+  return { i, line: m[2] ? +m[2] : null };
 }
+
+async function openFromBrief(t) {
+  await openFile(t.i, { mode: 'preview', line: t.line });
+  if (t.line && served && fv && !fvRow('R', t.line)) {
+    const cur = fvNav.stack[fvNav.pos];
+    cur.mode = 'full';
+    await show(cur, { line: t.line, flash: true });
+  }
+  const n = t.line && D.notes.find(x => x.file === t.i && x.start != null && t.line >= x.start && t.line <= (x.end || x.start));
+  if (n && markerFor('n:' + n.key)) openCard('n:' + n.key, { pinned: true });
+}
+
+function initBriefLinks() {
+  $$('#briefmodal code').forEach(c => {
+    const t = briefTarget(c.textContent);
+    if (!t) return;
+    const b = el('button', 'codelink');
+    b.type = 'button';
+    b.title = 'Open ' + D.files[t.i].path + (t.line ? ' at line ' + t.line : '');
+    c.replaceWith(b);
+    b.append(c);
+    b.onclick = () => openFromBrief(t);
+  });
+}
+
+function closeFull() { endNav(); }
 
 function initFullView() {
+  initBriefLinks();
   $$('.fullbtn').forEach(b => {
     if (!served) { b.hidden = true; return; }
-    b.onclick = e => { e.stopPropagation(); openFile(+b.dataset.full); };
+    b.onclick = e => { e.stopPropagation(); startNav(fileEntry(+b.dataset.full, 'full')); };
   });
   $$('.fv-seg button', fvBox).forEach(b => {
     b.onclick = () => {
@@ -220,16 +305,20 @@ function initFullView() {
       show(cur, { line });
     };
   });
-  $('#fvback').onclick = () => step(-1);
-  $('#fvfwd').onclick = () => step(1);
+  $$('.vnav [data-dir]').forEach(b => { b.onclick = () => step(+b.dataset.dir); });
+  // A dialog closed by the reviewer (×, Esc, backdrop) ends the history; one closed because we moved on does not.
+  Object.entries(NAV_DIALOGS).forEach(([kind, sel]) => $(sel).addEventListener('close', () => {
+    const cur = fvNav.stack[fvNav.pos];
+    if (cur && cur.kind === kind) endNav();
+  }));
   fvBody.addEventListener('click', e => { const s = e.target.closest('.implink'); if (s) followImport(s); });
   $('[data-close]', fvBox).onclick = closeFull;
   fvBox.addEventListener('click', e => { if (e.target === fvBox) closeFull(); });
   fvBody.addEventListener('scroll', () => { placeCard(); if (sel) paintSel(); }, { passive: true });
   addEventListener('keydown', e => {
-    if (!fv || $('dialog[open]')) return;
+    if (!fvNav.stack.length) return;
     if (e.altKey && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) { e.preventDefault(); step(e.key === 'ArrowLeft' ? -1 : 1); return; }
-    if (e.key !== 'Escape' || cs.id || sel) return;
+    if (!fv || $('dialog[open]') || e.key !== 'Escape' || cs.id || sel) return;
     e.stopPropagation();
     closeFull();
   }, true);

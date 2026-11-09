@@ -1,9 +1,9 @@
 .fullbtn{color:var(--text-3)}
 .fullbtn:hover{color:var(--text)}
 .fullbtn[hidden]{display:none}
-.fullview{position:fixed;inset:0;z-index:30;display:grid;place-items:center;background:var(--shade);padding:4vh 16px}
+.fullview{position:fixed;inset:0;z-index:30;display:grid;place-items:start center;background:var(--shade);padding:var(--modal-top) 16px 20px}
 .fullview[hidden]{display:none}
-.fv-card{display:flex;flex-direction:column;width:min(1200px,100%);height:92vh;background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--r);box-shadow:var(--shadow-2);overflow:hidden}
+.fv-card{display:flex;flex-direction:column;height:var(--modal-h);background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--r);box-shadow:var(--shadow-2);overflow:hidden}
 .fv-card .modal-head h2{font:500 13px var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .fv-body{flex:1;overflow:auto;position:relative}
 .fv-body table.diff{width:100%}
@@ -21,11 +21,13 @@ body.fv-open #cbtn{z-index:51}
 .fv-seg button:disabled{opacity:.45;cursor:default}
 .fv-card .modal-head{gap:16px}
 .fv-card .modal-head h2{min-width:0}
-dialog.modal#commentsmodal{width:min(780px,94vw)}
-.clist{display:flex;flex-direction:column;gap:12px}
-.cgroup{border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
-.chead{position:sticky;top:-18px;z-index:1;display:flex;align-items:center;gap:6px;padding:6px 12px 6px 6px;background:var(--surface-2);border-bottom:1px solid var(--line);border-radius:var(--r) var(--r) 0 0;cursor:pointer}
-.cgroup.folded .chead{border-bottom:0;border-radius:var(--r)}
+#commentsmodal .modal-body{padding:0}
+.clist{display:flex;flex-direction:column}
+.clist .cempty{padding:18px}
+.cgroup{border-bottom:1px solid var(--line)}
+.cgroup:last-child{border-bottom:0}
+.chead{position:sticky;top:0;z-index:1;display:flex;align-items:center;gap:6px;padding:8px 18px 8px 12px;background:var(--surface-2);border-bottom:1px solid var(--line);cursor:pointer}
+.cgroup.folded .chead{border-bottom:0}
 .cfold{flex:none;width:26px;height:26px;padding:0;border:0;background:transparent;display:grid;place-items:center;border-radius:7px}
 .cfold:hover{background:var(--surface-3)}
 .cfold::before{content:"";width:6px;height:6px;border-right:1.6px solid var(--text-3);border-bottom:1.6px solid var(--text-3);transform:rotate(45deg) translate(-1px,-1px);transition:transform .15s}
@@ -35,7 +37,7 @@ dialog.modal#commentsmodal{width:min(780px,94vw)}
 button.cpath:hover{color:var(--accent);background:var(--accent-soft)}
 button.cpath:hover .cname{text-decoration:underline}
 .ccount{margin-left:auto;flex:none;font:500 11.5px var(--font);color:var(--text-3)}
-.cbody{display:flex;flex-direction:column;gap:10px;padding:12px}
+.cbody{display:flex;flex-direction:column;gap:10px;padding:14px 18px 18px}
 .cgroup.folded .cbody{display:none}
 .cthread{border:1px solid var(--line);border-radius:var(--r)}
 .cloc{border:0;background:transparent;padding:0;font:inherit;color:var(--accent);cursor:pointer}
@@ -51,3 +53,6 @@ button.cpath:hover .cname{text-decoration:underline}
 .fv-note{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:500 12px var(--font);color:var(--should)}
 .implink{cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-decoration-color:color-mix(in srgb,var(--accent) 60%,transparent);text-underline-offset:3px;border-radius:3px}
 .implink:hover{text-decoration-style:solid;text-decoration-color:var(--accent);background:var(--accent-soft)}
+.codelink{display:inline;padding:0;margin:0;border:0;background:transparent;font:inherit;color:inherit;cursor:pointer;border-radius:6px}
+.codelink code{color:var(--accent);text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px}
+.codelink:hover code{text-decoration-style:solid;background:var(--accent-soft)}

@@ -7,5 +7,5 @@ function initModals() {
   });
   $('#treebtn').onclick = () => { treeModal.showModal(); tree.start(); };
   $('#mapbtn').onclick = () => { mapModal.showModal(); requestAnimationFrame(drawTreemap); };
-  $('#briefbtn').onclick = () => briefModal.showModal();
+  $('#briefbtn').onclick = () => startNav({ kind: 'brief' });
 }

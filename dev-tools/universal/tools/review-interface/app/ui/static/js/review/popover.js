@@ -10,14 +10,24 @@ function buildCard(id) {
 }
 const markerFor = id => $$('.ti').find(b => b.dataset.card === id);
 function paintOpen() { $$('.ti').forEach(b => b.classList.toggle('open', b.dataset.card === cs.id)); }
+// The card stays between the top bar and the chat bar, 8px clear of each.
+function cardBounds() {
+  const bar = $('header.appbar'), chat = $('#chat');
+  const lo = (bar ? bar.getBoundingClientRect().bottom : 0) + 8;
+  const hi = (chat && chat.getClientRects().length ? chat.getBoundingClientRect().top : innerHeight) - 8;
+  return [lo, hi];
+}
 function placeCard() {
   if (!cs.id || cs.centred) return;
   const m = markerFor(cs.id);
   if (!m) { closeCard(); return; }
+  const [lo, hi] = cardBounds();
+  pcard.style.maxHeight = Math.max(160, hi - lo) + 'px';
   const r = m.getBoundingClientRect(), w = pcard.offsetWidth, h = pcard.offsetHeight;
   const left = Math.min(Math.max(8, r.right - w), innerWidth - w - 8);
   let top = r.bottom + 6;
-  if (top + h > innerHeight - 8 && r.top - h - 6 > 8) top = r.top - h - 6;
+  if (top + h > hi) top = r.top - h - 6 >= lo ? r.top - h - 6 : hi - h;
+  top = Math.max(lo, Math.min(top, hi - h));
   pcard.style.left = left + scrollX + 'px';
   pcard.style.top = top + scrollY + 'px';
 }

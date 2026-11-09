@@ -28,10 +28,11 @@ body.focus-only section.file:not(.focused){display:none}
 
 /* ---------- diff ---------- */
 .diffwrap{overflow-x:auto}
-table.diff{border-collapse:collapse;min-width:100%;font:12px/20px ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;font-variant-numeric:tabular-nums}
+table.diff{border-collapse:collapse;width:100%;font:12px/20px ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;font-variant-numeric:tabular-nums}
 table.diff td{padding:0 12px;vertical-align:top}
 td.num{touch-action:pan-y;width:1%;min-width:50px;text-align:right;color:var(--text-3);user-select:none;cursor:pointer;position:relative;padding:0 10px;border-right:1px solid var(--line)}
-td.code{white-space:pre;width:100%;position:relative}
+td.code{color:var(--text);white-space:pre-wrap;overflow-wrap:anywhere;width:100%;position:relative}
+table.diff td.code{padding-left:calc(12px + 1ch + 8px);text-indent:calc(-1ch - 8px)}
 .sign{color:var(--text-3);user-select:none;margin-right:8px}
 tr.add td{background:var(--add-bg)}tr.add td.num{background:var(--add-num);color:var(--add-fg)}tr.add .sign{color:var(--add-fg)}
 tr.del td{background:var(--del-bg)}tr.del td.num{background:var(--del-num);color:var(--del-fg)}tr.del .sign{color:var(--del-fg)}
@@ -60,6 +61,7 @@ tr.ws-only td{background:transparent}tr.ws-only td.num{background:transparent;co
 tr.ws-only .sign{color:transparent}tr.ws-only .hl{background:none}
 .mvlabel.plain{cursor:default}
 /* Shiki tokens */
-.tk{color:var(--shiki-light)}
-.is-dark .tk{color:var(--shiki-dark)}
+.tk{color:color-mix(in srgb,var(--shiki-light) 85%,#000)}
+.is-dark .tk{color:color-mix(in srgb,var(--shiki-dark) 78%,#fff)}
 tr.ws-only .tk{color:inherit}
+td.code :is(.ti,.mvlabel,.hl,.tk,.implink){text-indent:0}

@@ -15,7 +15,7 @@ header.appbar .timerchip{gap:6px;font:600 13px var(--mono);color:var(--text);cur
 .timerpop input{width:100%;box-sizing:border-box;font:600 16px var(--mono);background:var(--surface-2);color:var(--text);border:1px solid var(--line);border-radius:9px;padding:6px 8px}
 .timerpop input:focus{background:var(--surface);border-color:var(--accent);outline:0}
 .timerpop .solid{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
-.timeup{position:fixed;top:calc(var(--bar) + 18px);left:50%;transform:translateX(-50%);z-index:60;width:min(420px,calc(100vw - 32px));box-sizing:border-box;padding:18px 18px 16px;background:var(--surface);border:1px solid var(--del);border-radius:16px;box-shadow:var(--shadow-2),0 0 0 4px color-mix(in srgb,var(--del) 18%,transparent);animation:tpop .35s cubic-bezier(.2,1.4,.4,1)}
+.timeup{position:fixed;top:calc(var(--bar) + 18px);left:calc(var(--left) + (100% - var(--left)) / 2);transform:translateX(-50%);z-index:60;width:min(420px,calc(100vw - 32px));box-sizing:border-box;padding:18px 18px 16px;background:var(--surface);border:1px solid var(--del);border-radius:16px;box-shadow:var(--shadow-2),0 0 0 4px color-mix(in srgb,var(--del) 18%,transparent);animation:tpop .35s cubic-bezier(.2,1.4,.4,1)}
 .timeup[hidden]{display:none}
 .timeup p{margin:0 24px 14px 0;font-size:14px;font-weight:600;line-height:1.45;color:var(--text)}
 .timeupx{position:absolute;top:8px;right:8px;width:28px;height:28px;border:0;border-radius:8px;background:transparent;color:var(--text-3);font-size:18px;line-height:1;cursor:pointer}
@@ -25,3 +25,8 @@ header.appbar .timerchip{gap:6px;font:600 13px var(--mono);color:var(--text);cur
 .timeupbtns button:hover{background:var(--accent-soft);border-color:var(--accent)}
 @keyframes tpop{from{opacity:0;transform:translate(-50%,-10px) scale(.96)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
 @media (prefers-reduced-motion:reduce){.timer.over .timerchip,.timeup{animation:none}}
+.tdots{position:absolute;inset:-1px;pointer-events:none;border-radius:16px}
+.tdot{position:absolute;top:0;left:0;width:6px;height:6px;border-radius:50%;background:var(--del);box-shadow:0 0 6px 2px color-mix(in srgb,var(--del) 70%,transparent);offset-anchor:center;offset-rotate:0deg;animation:tdot 4s linear infinite}
+@keyframes tdot{from{offset-distance:0%}to{offset-distance:100%}}
+@media (prefers-reduced-motion:reduce){.tdots{display:none}}
+@media (max-width:1100px){.timeup{left:50%}}

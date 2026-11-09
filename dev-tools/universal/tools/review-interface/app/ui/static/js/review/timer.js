@@ -43,7 +43,22 @@ function finishTimer() {
   const show = !timer.fired;
   timer.fired = true;
   saveTimer(); renderTimer(); armTimer();
-  if (show) { $('#timeup').hidden = false; $('#timeup [data-add]').focus(); }
+  if (show) { $('#timeup').hidden = false; runDots(); $('#timeup [data-add]').focus(); }
+}
+
+// Five dots that run clockwise around the "Time's up" pop-up's rounded border.
+const DOTS = 5, DOT_LOOP = 4, DOT_RADIUS = 16;
+function runDots() {
+  const box = $('#timeup');
+  let ring = $('.tdots', box);
+  if (!ring) {
+    ring = el('span', 'tdots'); ring.setAttribute('aria-hidden', 'true');
+    for (let i = 0; i < DOTS; i++) { const d = el('span', 'tdot'); d.style.animationDelay = (-i * DOT_LOOP / DOTS) + 's'; ring.append(d); }
+    box.append(ring);
+  }
+  const w = box.offsetWidth, h = box.offsetHeight, r = DOT_RADIUS;
+  const path = `path("M ${r} 0 H ${w - r} A ${r} ${r} 0 0 1 ${w} ${r} V ${h - r} A ${r} ${r} 0 0 1 ${w - r} ${h} H ${r} A ${r} ${r} 0 0 1 0 ${h - r} V ${r} A ${r} ${r} 0 0 1 ${r} 0 Z")`;
+  $$('.tdot', ring).forEach(d => { d.style.offsetPath = path; });
 }
 
 function armTimer() {

@@ -16,7 +16,6 @@ function commentGroups() {
 function openFromComments(path, t) {
   const i = D.files.findIndex(f => f.path === path);
   if (i < 0) return;
-  commentsModal.close();
   openFile(i, { mode: 'preview', side: t && t.side === 'LEFT' ? 'L' : 'R', line: t ? t.line : null });
 }
 
@@ -68,5 +67,5 @@ function renderComments() {
 }
 
 function initComments() {
-  $('#commentsbtn').onclick = () => { renderComments(); commentsModal.showModal(); };
+  $('#commentsbtn').onclick = () => startNav({ kind: 'comments' });
 }
