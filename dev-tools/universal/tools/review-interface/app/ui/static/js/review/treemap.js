@@ -31,7 +31,8 @@ function drawTreemap() {
     if (r.w > 70 && r.h > 36) {
       const ns = f.notes.map(k => noteByKey.get(k)).filter(Boolean);
       const counts = RANK.filter(k => ns.some(n => n.kind === k)).map(k => `${ns.filter(n => n.kind === k).length} ${LABEL[k].toLowerCase()}`);
-      b.append(el('span', 'tmn', f.path.split('/').pop()), el('span', 'tms', `+${f.a} −${f.d}${f.gen ? ' · generated' : ''}${counts.length ? ' · ' + counts.join(' · ') : ''}${isRead(r.i) ? ' · viewed' : ''}`));
+      const name = el('span', 'tmn'); name.append(statusIcon(r.i), f.path.split('/').pop());
+      b.append(name, el('span', 'tms', `+${f.a} −${f.d}${f.gen ? ' · generated' : ''}${counts.length ? ' · ' + counts.join(' · ') : ''}${isRead(r.i) ? ' · viewed' : ''}`));
     }
     b.onclick = () => { mapModal.close(); goToFile(r.i); };
     box.append(b);

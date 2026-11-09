@@ -1,3 +1,4 @@
+from app.ui.components import icons
 from app.ui.html import esc
 
 
@@ -19,6 +20,13 @@ def _node_classes(node):
     return f'node {node["role"]} {kind}{" gen" if node["gen"] else ""}'
 
 
+def _status_mark(node, x, y):
+    if node.get("file") is None:
+        return ""
+    icon = icons.FILE_STATUS.get(node.get("status") or "modified", icons.FILE_STATUS["modified"])
+    return icon.replace("<svg ", f'<svg x="{_n(x + 6)}" y="{_n(y + 6)}" width="12" height="12" ', 1)
+
+
 def _node_body(node):
     x, y, cx = node["x"], node["y"], node["cx"]
     return (
@@ -26,7 +34,7 @@ def _node_body(node):
         f'<text class="nlabel" x="{_n(cx)}" y="{_n(y + 18)}">{esc(node["label"])}</text>'
         f'<text class="nstat" x="{_n(cx)}" y="{_n(y + 33)}"><tspan class="a">+{node["a"]}</tspan> <tspan class="d">−{node["d"]}</tspan>'
         f'{_notes_text(node["notes"])}{" · generated" if node["gen"] else ""}</text>'
-        f'<title>{esc(node["title"])}</title>'
+        f'{_status_mark(node, x, y)}<title>{esc(node["title"])}</title>'
     )
 
 

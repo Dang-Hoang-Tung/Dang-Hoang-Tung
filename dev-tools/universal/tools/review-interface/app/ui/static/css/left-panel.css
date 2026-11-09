@@ -62,3 +62,14 @@
 .lchip.isread{background:transparent;border-color:var(--line);color:var(--text-3)}
 .lchip.isread .tick{display:inline;width:auto}.lchip.isread .tick::before{content:"✓";color:var(--read);font-weight:700}
 .lchip.current{box-shadow:0 0 0 2px var(--accent)}
+.fstatus{flex:none;display:inline-grid;place-items:center;width:16px;height:16px}
+.fstat{width:16px;height:16px;display:block}
+.fstat.added{color:var(--add)}
+.fstat.deleted{color:var(--del)}
+.fstat.modified{color:var(--text-3)}
+.fstat.renamed{color:var(--accent)}
+:is(.rec-loc,.where,.tmn,.cpath,#fvtitle) .fstatus{display:inline-grid;vertical-align:-3px;margin-right:6px;width:14px;height:14px}
+:is(.rec-loc,.where,.tmn,.cpath,#fvtitle) .fstat{width:14px;height:14px}
+.cpath,#fvtitle{display:flex;align-items:center}
+.cpath .fstatus,#fvtitle .fstatus{flex:none}
+svg.fstat{overflow:visible}

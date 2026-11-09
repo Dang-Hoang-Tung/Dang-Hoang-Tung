@@ -19,7 +19,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
 from app.config import ROOT, dirs, load_config
-from app.services import approval, events, gh_sync, inbox, manifest, posting, state
+from app.ui.components import file_section
+from app.services import approval, events, fullfile, resolve, gh_sync, inbox, manifest, posting, state
 
 MAX_BODY = 2 * 1024 * 1024
 LOCAL_HOSTS = ("127.0.0.1", "localhost")
@@ -157,6 +158,53 @@ def make_handler(cfg, token, touch):
             except ValueError:
                 return self._send(400, "bad slug")
 
+        def _repo_call(self, s, fn):
+            meta = manifest.manifest_entry(cfg, s)
+            if not meta:
+                return self._json(404, {"error": "This PR is not in the current build. Run review.py again."})
+            try:
+                return self._json(200, fn(resolve.clone_for(cfg, meta["repo"]), meta["head_sha"]))
+            except resolve.NotFound as e:
+                return self._json(404, {"error": str(e)})
+            except subprocess.SubprocessError as e:
+                return self._json(502, {"error": (getattr(e, "stderr", "") or str(e)).strip()[:300]})
+
+        def _resolve(self, s, q):
+            frm, spec = q.get("from", [""])[0], q.get("spec", [""])[0]
+            if not frm or not spec:
+                return self._json(400, {"error": "from and spec are required"})
+
+            def go(clone, sha):
+                hit = resolve.resolve(clone, sha, frm, spec)
+                if not hit:
+                    raise resolve.NotFound(f"Can't find {spec} in the repo")
+                return {"path": hit}
+            return self._repo_call(s, go)
+
+        def _blob(self, s, q):
+            path = q.get("path", [""])[0]
+            if not path:
+                return self._json(400, {"error": "path is required"})
+
+            def go(clone, sha):
+                html, lines = file_section.blob_table(resolve.read(clone, sha, path))
+                return {"html": html, "lines": lines, "lang": file_section.lang(path)}
+            return self._repo_call(s, go)
+
+        def _get_file(self, s, q):
+            meta = manifest.manifest_entry(cfg, s)
+            if not meta:
+                return self._json(404, {"error": "This PR is not in the current build. Run review.py again."})
+            path, idx = q.get("path", [""])[0], q.get("i", [""])[0]
+            if not path or not idx.isdigit():
+                return self._json(400, {"error": "path and i are required"})
+            try:
+                return self._json(200, fullfile.render(cfg, meta, path, int(idx)))
+            except fullfile.NoClone as e:
+                return self._json(409, {"error": str(e)})
+            except subprocess.SubprocessError as e:
+                return self._json(502, {"error": (getattr(e, "stderr", "") or str(e)).strip()[:300]})
+
         def _get_page(self, path):
             f = (pages / (path.lstrip("/") or "index.html")).resolve()
             if pages not in f.parents or not f.is_file():
@@ -180,6 +228,12 @@ def make_handler(cfg, token, touch):
                 return self._get_state(url.path)
             if url.path == "/api/refresh":
                 return self._json(200, refresh)
+            if url.path.startswith("/api/resolve/"):
+                return self._resolve(url.path.rsplit("/", 1)[1], q)
+            if url.path.startswith("/api/blob/"):
+                return self._blob(url.path.rsplit("/", 1)[1], q)
+            if url.path.startswith("/api/file/"):
+                return self._get_file(url.path.rsplit("/", 1)[1], q)
             return self._get_page(url.path)
 
         def do_PUT(self):

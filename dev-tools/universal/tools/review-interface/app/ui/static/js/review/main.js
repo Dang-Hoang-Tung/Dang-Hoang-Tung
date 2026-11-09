@@ -15,6 +15,8 @@ initPopover();
 initNav();
 initApprove();
 initTimer();
+initFullView();
+initComments();
 initChat();
 addEventListener('focus', reload);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) reload();

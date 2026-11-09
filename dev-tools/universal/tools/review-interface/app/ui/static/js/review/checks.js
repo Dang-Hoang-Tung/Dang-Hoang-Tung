@@ -35,7 +35,9 @@ function noteCard(n) {
   const c = el('article', 'rec ' + n.kind);
   const head = el('div', 'rec-head');
   head.append(el('span', 'tag ' + n.kind, LABEL[n.kind]));
-  const loc = el('button', 'rec-loc', noteLoc(n)); loc.type = 'button';
+  const loc = el('button', 'rec-loc'); loc.type = 'button';
+  if (n.file != null) loc.append(statusIcon(n.file));
+  loc.append(noteLoc(n));
   loc.onclick = () => { if (n.rows.length) goToRows(n.rows, true); else if (n.file != null) goToFile(n.file); placeCard(); };
   head.append(loc);
   c.append(head, el('div', 'rec-title', n.title));

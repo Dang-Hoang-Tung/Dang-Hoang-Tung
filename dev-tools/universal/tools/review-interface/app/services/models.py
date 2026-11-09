@@ -123,7 +123,8 @@ def build_totals(files):
 def file_model(f, by_file, moved):
     ns = by_file.get(f["path"], [])
     return {"idx": f["idx"], "path": f["path"], "a": f["a"], "d": f["d"], "gen": f["gen"], "layer": diffs.layer_of(f),
-            "hash": diffs.file_hash(f["rows"]), "binary": f["binary"], "kind": worst(x["kind"] for x in ns), "notes": [x["key"] for x in ns],
+            "hash": diffs.file_hash(f["rows"]), "binary": f["binary"],
+            "status": f.get("status", "modified"), "old_path": f.get("old_path"), "kind": worst(x["kind"] for x in ns), "notes": [x["key"] for x in ns],
             "rows": [list(r) for r in f["rows"]], "moved": moved, "spans": {}}
 
 
@@ -138,7 +139,7 @@ def review_model(cfg, pr, diff_text, ins, ins_status, user_name):
     by_file = group_by_file(notes)
     root = tree.build_tree(paths, repo.split("/")[1])
     top_nodes = [nest_tree(k, idx) for k in root["kids"]]
-    file_stats = {f["path"]: {"idx": f["idx"], "a": f["a"], "d": f["d"], "gen": f["gen"], "notes": by_file.get(f["path"], [])} for f in files}
+    file_stats = {f["path"]: {"idx": f["idx"], "a": f["a"], "d": f["d"], "gen": f["gen"], "status": f.get("status", "modified"), "notes": by_file.get(f["path"], [])} for f in files}
     totals = build_totals(files)
     return {
         "pr": {"repo": repo, "number": n, "slug": slug(repo, n), "title": pr["title"], "url": pr["url"],

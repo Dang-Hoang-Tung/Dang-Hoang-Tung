@@ -73,6 +73,7 @@ def node_geometry(n, file_stats, role):
         "x": n["x"], "y": n["y"], "w": n["w"], "h": NODE_H, "cx": n["x"] + n["w"] / 2,
         "label": label_of(n), "title": n["file"] or n["name"],
         "file": file_stats[n["file"]]["idx"] if n["file"] else None, "role": role,
+        "status": file_stats[n["file"]].get("status", "modified") if n["file"] else None,
         "kind": worst(n["kind"] for n in st["notes"]), "gen": st["gen"], "a": st["a"], "d": st["d"], "notes": len(st["notes"]),
     }
 

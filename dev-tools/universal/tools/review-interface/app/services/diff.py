@@ -82,6 +82,21 @@ def header_info(first, lines):
     return path, binary
 
 
+def file_status(lines):
+    """added, deleted, renamed or modified, plus the old path for a rename, from the lines before the first hunk."""
+    status, old = "modified", None
+    for ln in lines:
+        if ln.startswith("@@"):
+            break
+        if ln.startswith("new file mode") or ln.startswith("copy to "):
+            status = "added"
+        elif ln.startswith("deleted file mode"):
+            status = "deleted"
+        elif ln.startswith("rename from "):
+            status, old = "renamed", unquote(ln[12:])
+    return status, old
+
+
 def _char_col(text, byte_col):
     return len(text.encode()[:byte_col].decode(errors="ignore"))
 
@@ -152,7 +167,9 @@ def parse_diff(diff, generated):
         if lines and lines[-1] == "":
             lines.pop()
         rows, a, d = ([], 0, 0) if binary else parse_file_rows(lines)
+        status, old_path = file_status(lines)
         files.append({"idx": len(files), "path": path, "rows": rows, "a": a, "d": d, "binary": binary,
+                      "status": status, "old_path": old_path,
                       "gen": any(r.search(path) for r in gen_re)})
     return files
 

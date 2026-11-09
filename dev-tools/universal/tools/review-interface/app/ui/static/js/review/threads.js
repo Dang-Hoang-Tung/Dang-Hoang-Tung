@@ -56,6 +56,13 @@ function addNoteReply(n, text, post) {
 }
 function toggleResolved(t) { t = liveThread(t); t.resolved = !t.resolved; t.resolvedAt = now(); renderThreads(); persist(); }
 const where = t => (t.path ? t.path.split('/').pop() : 'General') + (t.line ? ' ' + span(t) : '');
+function whereEl(t) {
+  const w = el('span', 'where');
+  const i = t.path ? D.files.findIndex(f => f.path === t.path) : -1;
+  if (i >= 0) w.append(statusIcon(i));
+  w.append(where(t));
+  return w;
+}
 function composer(key, placeholder, value, onSave, onCancel, saveLabel, blocked, fixed = null) {
   const c = el('div', 'compose');
   const ta = el('textarea'); ta.placeholder = placeholder; ta.value = key in drafts ? drafts[key].value : value || ''; ta.dataset.draft = key;
@@ -127,7 +134,7 @@ function resolveButton(t) {
 function threadCard(t) {
   const box = el('div', 'thread' + (t.resolved ? ' resolved' : ''));
   const head = el('div', 'thread-head');
-  head.append(el('span', 'where', where(t)));
+  head.append(whereEl(t));
   if (stale(t)) { const o = el('span', 'old-commit', 'on an older commit'); o.title = STALE_TIP; head.append(o); }
   head.append(...syncPills(t), threadState(t));
   head.title = t.path || '';
@@ -141,7 +148,7 @@ function threadCard(t) {
 }
 function draftCard() {
   const box = el('div', 'thread new');
-  const head = el('div', 'thread-head'); head.append(el('span', 'where', where(draftFor)), el('span', 'state', 'New'));
+  const head = el('div', 'thread-head'); head.append(whereEl(draftFor), el('span', 'state', 'New'));
   const cancel = () => { draftFor = null; delete drafts.new; closeCard(); renderThreads(); paintSel(); };
   box.append(head, composer('new', 'Leave a comment…', '', addThread, cancel, 'Comment'));
   return box;
@@ -159,7 +166,7 @@ function drawMarkers() {
   const add = (rowId, b) => { if (rowId) byRow.set(rowId, [...(byRow.get(rowId) || []), b]); };
   for (const n of D.notes) {
     const count = threadsFor(n.key).reduce((s, t) => s + t.messages.length, 0);
-    add(n.endRow, marker('n:' + n.key, n.kind + (isChecked(n.key) ? ' done' : ''), count, LABEL[n.kind] + ': ' + n.title));
+    add(noteRow(n), marker('n:' + n.key, n.kind + (isChecked(n.key) ? ' done' : ''), count, LABEL[n.kind] + ': ' + n.title));
   }
   for (const t of state.threads) {
     const a = anchors.get(t.id);

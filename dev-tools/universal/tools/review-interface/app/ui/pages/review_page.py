@@ -1,22 +1,23 @@
 import json
 
 from app.domain import SEVERITIES, SEVERITY_LABELS
-from app.ui.components import appbar, banner, chatbar, fabs, file_section, left_panel, modals, popover, summary_card
+from app.ui.components import appbar, banner, chatbar, fabs, file_section, icons, left_panel, modals, popover, summary_card
 from app.ui.pages import document
 
 CSS = ["tokens.css", "base.css", "appbar.css", "left-panel.css", "canvas.css", "cards.css", "diff.css",
-       "threads.css", "popover.css", "modals.css", "timer.css", "chat.css", "layout.css"]
+       "threads.css", "popover.css", "modals.css", "fullview.css", "timer.css", "chat.css", "layout.css"]
 JSDIFF = ('<script src="https://cdn.jsdelivr.net/npm/diff@5.2.0/dist/diff.min.js" '
           'integrity="sha384-lJJVaUgxmk/PVfQnAsGN1QuJZrE+n6bg2EMu33yVZOJ2av/3UzTHbmnPCI7ENJYa" crossorigin="anonymous"></script>\n')
 JS = ["shared/dom.js", "shared/markdown.js", "shared/time.js", "shared/theme.js",
       "review/data.js", "review/store.js", "review/read-state.js", "review/files.js", "review/left-panel.js",
       "review/scroll-spy.js", "review/tree-canvas.js", "review/modals.js", "review/treemap.js",
       "review/highlight.js", "review/titletip.js", "review/selection.js", "review/checks.js", "review/threads.js", "review/chat.js", "review/popover.js", "review/nav.js",
-      "review/approve.js", "review/timer.js", "review/resizers.js", "review/intraline.js", "review/whitespace.js", "review/main.js"]
+      "review/approve.js", "review/timer.js", "review/fullview.js", "review/comments.js", "review/resizers.js", "review/intraline.js", "review/whitespace.js", "review/main.js"]
 
 
 def _file_data(f):
     return {"i": f["idx"], "path": f["path"], "a": f["a"], "d": f["d"], "gen": f["gen"], "layer": f["layer"],
+            "st": f.get("status", "modified"), "old": f.get("old_path"),
             "hash": f["hash"], "kind": f["kind"], "notes": list(f["notes"])}
 
 
@@ -31,6 +32,7 @@ def browser_data(model):
         "pr": pr["number"], "repo": pr["repo"], "slug": pr["slug"], "sha": pr["head_sha"],
         "ai_name": model["ai_name"], "user": model["user"], "has_insights": model["summary"]["has_insights"],
         "layers": model["layers"], "severities": list(SEVERITIES), "severity_labels": dict(SEVERITY_LABELS), "order": model["order"], "tree": model["tree"],
+        "status_icons": icons.FILE_STATUS, "status_labels": icons.STATUS_LABELS,
         "files": [_file_data(f) for f in model["files"]],
         "notes": [_note_data(n) for n in sorted(model["notes"], key=lambda n: SEVERITIES.index(n["kind"]))],
     }

@@ -28,4 +28,15 @@ def render(layout, summary):
     tree = _tree_modal(layout)
     treemap = _modal("mapmodal", "Treemap · size is lines changed, colour is the top finding", '<div class="treemap" id="treemap"></div>')
     brief = _modal("briefmodal", "AI Brief", summary_card.brief_html(summary))
-    return f"{tree}\n{treemap}\n{brief}"
+    comments = _modal("commentsmodal", "PR comments", '<div class="clist" id="clist"></div>')
+    full = ('<div class="fullview" id="fullview" role="dialog" aria-modal="true" aria-labelledby="fvtitle" hidden>'
+            '<div class="fv-card"><div class="modal-head"><div class="fv-nav">'
+            '<button type="button" class="iconbtn sm" id="fvback" aria-label="Back" disabled>←</button>'
+            '<button type="button" class="iconbtn sm" id="fvfwd" aria-label="Forward" disabled>→</button></div>'
+            '<h2 id="fvtitle"></h2><span class="fv-tag" id="fvtag" hidden>Not changed in this PR</span>'
+            '<span class="fv-note" id="fvnote" role="status" hidden></span><div class="head-tools">'
+            '<div class="fv-seg" role="group" aria-label="View"><button type="button" data-mode="preview" aria-pressed="false">Changes</button>'
+            '<button type="button" data-mode="full" aria-pressed="false">Full file</button></div>'
+            f'{_close_button()}</div></div>'
+            '<div class="fv-body" id="fvbody"></div></div></div>')
+    return f"{tree}\n{treemap}\n{brief}\n{comments}\n{full}"

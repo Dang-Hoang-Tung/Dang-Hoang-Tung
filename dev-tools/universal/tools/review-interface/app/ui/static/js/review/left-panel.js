@@ -18,6 +18,14 @@ const FOLDER = '<svg class="fi closed" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0
   + '<svg class="fi open" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v1"/><path d="M3 7v10a2 2 0 0 0 2 2h12.5a2 2 0 0 0 1.9-1.4l1.8-5.6a1.5 1.5 0 0 0-1.4-2H8.3a2 2 0 0 0-1.9 1.4L3 17"/></svg>';
 const CHEVRON = '<svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>';
 
+function statusIcon(i) {
+  const f = D.files[i], st = (f && f.st) || 'modified';
+  const s = el('span', 'fstatus');
+  s.innerHTML = D.status_icons[st] || D.status_icons.modified;
+  s.title = (D.status_labels[st] || 'Modified') + (st === 'renamed' && f.old ? ' from ' + f.old : '');
+  return s;
+}
+
 function fileRow(i, depth, name) {
   const row = el('div', 'trow leaf' + (isRead(i) ? ' isread' : ''));
   row.style.setProperty('--d', depth);
@@ -25,7 +33,7 @@ function fileRow(i, depth, name) {
   row.title = D.files[i].path;
   const lead = el('span', 'lead');
   lead.append(checkbox(isRead(i), false, on => setRead([i], on), 'Mark as viewed'), el('span', 'vmark', '✓'));
-  row.append(lead, el('span', 'nm', name));
+  row.append(lead, statusIcon(i), el('span', 'nm', name));
   if (D.files[i].kind) row.append(el('span', 'ring ' + ringOf(i)));
   if (changedSinceRead(i)) row.append(el('span', 'chg', 'changed'));
   row.onclick = () => goToFile(i);
