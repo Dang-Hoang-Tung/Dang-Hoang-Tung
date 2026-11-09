@@ -9,8 +9,8 @@
   --surface-3:color-mix(in srgb,var(--text) 7%,var(--surface));
   --line:color-mix(in srgb,var(--text) 8%,var(--surface));
   --line-strong:color-mix(in srgb,var(--text) 15%,var(--surface));
-  --text-2:color-mix(in srgb,var(--text) 74%,var(--surface));
-  --text-3:color-mix(in srgb,var(--text) 50%,var(--surface));
+  --text-2:color-mix(in srgb,var(--text) 93%,var(--surface));
+  --text-3:color-mix(in srgb,var(--text) 70%,var(--surface));
   --accent-soft:color-mix(in srgb,var(--accent) var(--soft),var(--surface));
   --block-soft:color-mix(in srgb,var(--block) var(--soft),var(--surface));
   --should-soft:color-mix(in srgb,var(--should) var(--soft),var(--surface));
