@@ -113,6 +113,16 @@ def _merged(ranges):
     return out
 
 
+def _bridged(ranges, text):
+    out = []
+    for start, end in ranges:
+        if out and not text[out[-1][1]:start].strip():
+            out[-1][1] = end
+        else:
+            out.append([start, end])
+    return out
+
+
 def difft_spans(rows, data):
     """{row index: [[start, end], ...]} for removed/added lines, from difftastic's JSON. None when difftastic fell back to plain text."""
     if str(data.get("language", "Text")).startswith("Text"):
@@ -130,11 +140,8 @@ def difft_spans(rows, data):
             found = changes["rhs"].get(new - 1)
         else:
             continue
-        ranges = _merged([_char_col(text, c["start"]), _char_col(text, c["end"])] for c in found or [])
-        unchanged = list(text)
-        for start, end in ranges:
-            unchanged[start:end] = " " * (end - start)
-        if ranges and "".join(unchanged).strip():
+        ranges = _bridged(_merged([_char_col(text, c["start"]), _char_col(text, c["end"])] for c in found or []), text)
+        if ranges:
             spans[i] = ranges
     return spans
 

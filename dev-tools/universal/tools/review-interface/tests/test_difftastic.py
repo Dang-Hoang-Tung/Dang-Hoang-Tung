@@ -37,16 +37,16 @@ class MappingTests(unittest.TestCase):
         spans = diffmod.difft_spans(ROWS, RECORDED)
         self.assertEqual(spans[1], [[10, 23], [29, 30]])
         self.assertEqual(spans[3], [[10, 24], [30, 31]])
-        self.assertEqual(spans[4], [[5, 6], [7, 8]])
+        self.assertEqual(spans[4], [[5, 8]])
 
     def test_del_rows_use_lhs_and_add_rows_use_rhs(self):
         spans = diffmod.difft_spans(ROWS, RECORDED)
         self.assertNotIn(2, spans)
-        self.assertEqual(sorted(spans), [1, 3, 4])
+        self.assertEqual(sorted(spans), [1, 3, 4, 6])
 
-    def test_fully_new_lines_and_context_get_no_spans(self):
+    def test_fully_new_lines_are_highlighted_and_context_is_not(self):
         spans = diffmod.difft_spans(ROWS, RECORDED)
-        self.assertNotIn(6, spans)
+        self.assertEqual(spans[6], [[0, 12]])
         self.assertNotIn(5, spans)
 
     def test_text_fallback_returns_none(self):
@@ -88,7 +88,7 @@ class FallbackTests(unittest.TestCase):
                 mock.patch.object(git, "merge_base", return_value="abc"), mock.patch.object(git, "file_pair", return_value=(OLD, NEW)), \
                 mock.patch.object(diffmod, "run_difft", return_value=RECORDED):
             builder.refine_spans(self.pr(), m)
-        self.assertEqual(sorted(m["files"][0]["spans"]), [1, 4])
+        self.assertEqual(sorted(m["files"][0]["spans"]), [1, 4, 6])
 
 
 @unittest.skipUnless(shutil.which("difft"), "difft not installed")
@@ -99,7 +99,7 @@ class RealRunTests(unittest.TestCase):
         spans = diffmod.difft_spans(ROWS, data)
         self.assertEqual(spans[1], [[10, 23], [29, 30]])
         self.assertEqual(spans[3], [[10, 24], [30, 31]])
-        self.assertEqual(spans[4], [[5, 6], [7, 8]])
+        self.assertEqual(spans[4], [[5, 8]])
 
     def test_missing_binary_returns_none(self):
         with mock.patch.object(diffmod, "run", side_effect=FileNotFoundError):
