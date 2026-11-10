@@ -25,6 +25,6 @@ Keep all of this short.
 
 ## Efficiency
 
-- Don't waste tokens or context. Spend them on the work, not on waiting.
-- Waiting idle for a message is fine. Don't poll, re-prompt yourself, or run monitor or watch loops while you wait.
+- Always parallelise the work to the best of your ability
+- Waiting (monitoring) idle for a message is fine. Don't poll, re-prompt yourself, or watch loops while you wait.
 - Don't keep tasks running with no clear end. You can schedule a check-in instead.
