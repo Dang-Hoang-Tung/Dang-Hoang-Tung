@@ -12,11 +12,11 @@ class NoClone(Exception):
 
 
 def rows(cfg, meta, path):
-    src = next((s for s in cfg["sources"] if s.get("repo") == meta["repo"] and git.has_clone(s)), None)
-    if not src:
+    clone = git.clone_for(cfg, meta["repo"])
+    if not clone:
         raise NoClone("Showing a whole file needs a local clone of " + meta["repo"])
     rng = f"refs/review/base-{meta['pr']}...{meta['head_sha']}"
-    text = run("git", "--literal-pathspecs", "-C", src["clone"], "diff", "--histogram", CONTEXT, rng, "--", path, timeout=60)
+    text = run("git", "--literal-pathspecs", "-C", clone, "diff", "--histogram", CONTEXT, rng, "--", path, timeout=60)
     found, _, _ = parse_file_rows(text.splitlines())
     return [r for r in found if r[0] != "hunk"]
 

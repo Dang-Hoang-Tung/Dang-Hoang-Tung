@@ -29,6 +29,7 @@ class BuildHelper(TmpCase):
         with mock.patch.object(builder, "review_page", review), mock.patch.object(builder, "queue_page", queue), \
                 mock.patch("sys.stdout"), mock.patch("app.services.gh_sync.sync", return_value=0), \
                 mock.patch.object(github, "list_pending", return_value=[pr]), \
+                mock.patch.object(git, "ensure_clone", side_effect=lambda cfg, src: src), \
                 mock.patch.object(github, "fetch_api_diff", return_value=diff_text), \
                 mock.patch.object(github, "requested_at", return_value="2026-11-02T00:00:00Z"):
             return builder.build(self.cfg, only), review, queue
@@ -55,6 +56,14 @@ class BuildTests(BuildHelper):
         with mock.patch.object(git, "has_clone", return_value=True), mock.patch.object(git, "fetch_diff", return_value="diff --git a/a b/a\n") as g:
             self.assertEqual(builder.fetch_diff(pr), "diff --git a/a b/a\n")
         g.assert_called_once_with(pr)
+
+    def test_git_failure_falls_back_to_the_api_diff(self):
+        pr = make_pr(source={"repo": REPO, "clone": "/x"})
+        err = subprocess.TimeoutExpired("git", 300)
+        with mock.patch.object(git, "has_clone", return_value=True), mock.patch.object(git, "fetch_diff", side_effect=err), \
+                mock.patch.object(github, "fetch_api_diff", return_value="api") as api, mock.patch("sys.stderr"):
+            self.assertEqual(builder.fetch_diffs([pr]), {(REPO, 7): "api"})
+        api.assert_called_once_with(pr)
 
     def test_fetch_failure_skips_pr(self):
         err = subprocess.CalledProcessError(1, "gh", stderr="boom")

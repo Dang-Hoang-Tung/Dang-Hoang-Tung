@@ -56,7 +56,7 @@ class FullFileTests(unittest.TestCase):
 
     def test_no_clone(self):
         with self.assertRaises(fullfile.NoClone):
-            fullfile.rows({"sources": [{"repo": "acme/w"}]}, self.meta, "a.py")
+            fullfile.rows({"sources": [{"repo": "acme/w"}], "data_dir": "/nonexistent"}, self.meta, "a.py")
 
     def test_pathspec_magic_is_literal(self):
         self.assertEqual(fullfile.rows(self.cfg, self.meta, ":(glob)*"), [])

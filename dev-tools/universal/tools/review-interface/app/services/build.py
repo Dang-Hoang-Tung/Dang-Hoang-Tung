@@ -7,7 +7,7 @@ from app.services import events
 from app.services import gh_sync, git, github, manifest, models
 from app.services.adapters import team_reviewer
 from app.services.insights import load as load_insights
-from app.services.shell import run, why
+from app.services.shell import FAILURES, run, why
 from app.services.state import load_state
 from app.ui.pages import queue_page, review_page
 
@@ -27,7 +27,10 @@ def user_name(cfg):
 
 def fetch_diff(pr):
     if git.has_clone(pr["source"]):
-        return git.fetch_diff(pr)
+        try:
+            return git.fetch_diff(pr)
+        except FAILURES as e:
+            print(f"  {pr['repo']}#{pr['number']}: git diff failed, using the API diff: {why(e)}", file=sys.stderr)
     return github.fetch_api_diff(pr)
 
 
@@ -36,8 +39,8 @@ def fetch_diffs(prs):
     for pr in prs:
         try:
             diffs[pr["repo"], pr["number"]] = fetch_diff(pr)
-        except subprocess.CalledProcessError as e:
-            print(f"  {pr['repo']}#{pr['number']}: failed: {(e.stderr or str(e)).strip()[:300]}", file=sys.stderr)
+        except FAILURES as e:
+            print(f"  {pr['repo']}#{pr['number']}: failed: {why(e)}", file=sys.stderr)
     return diffs
 
 
@@ -68,7 +71,7 @@ def queue_items(cfg, entries):
 
 def build(cfg, only=None, source="cli"):
     d = dirs(cfg)
-    prs = github.list_pending(cfg, only)
+    prs = [dict(pr, source=git.ensure_clone(cfg, pr["source"])) for pr in github.list_pending(cfg, only)]
     name = user_name(cfg)
     diffs = fetch_diffs(prs)
     previous = {e["slug"]: e for e in manifest.read_manifest(cfg)["prs"] if "slug" in e}

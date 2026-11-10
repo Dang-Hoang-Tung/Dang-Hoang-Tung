@@ -16,10 +16,10 @@ class NotFound(Exception):
 
 
 def clone_for(cfg, repo):
-    src = next((s for s in cfg["sources"] if s.get("repo") == repo and git.has_clone(s)), None)
-    if not src:
+    clone = git.clone_for(cfg, repo)
+    if not clone:
         raise NotFound("This needs a local clone of " + repo)
-    return src["clone"]
+    return clone
 
 
 def _stem(p):

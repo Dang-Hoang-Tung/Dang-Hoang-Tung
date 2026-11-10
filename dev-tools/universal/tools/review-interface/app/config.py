@@ -3,6 +3,8 @@ import os
 from datetime import datetime, timezone
 from pathlib import Path
 
+from app.services import sources
+
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_CONFIG = ROOT / "config.json"
 DEFAULTS = {
@@ -10,6 +12,7 @@ DEFAULTS = {
     "port": 47615,
     "idle_hours": 2,
     "refresh_minutes": 15,
+    "auto_clone": True,
     "keep_days": 14,
     "ai_name": "AI",
     "user_name": "",
@@ -35,6 +38,7 @@ def load_config(path=None):
     cfg = {**DEFAULTS, **json.loads(path.read_text())}
     cfg["config_path"] = str(path)
     cfg["data_dir"] = Path(cfg["data_dir"]).expanduser()
+    sources.validate(cfg["sources"])
     for s in cfg["sources"]:
         if s.get("clone"):
             s["clone"] = str(Path(s["clone"]).expanduser())

@@ -3,6 +3,7 @@ import os
 import sys
 
 from app.config import now
+from app.services import sources
 from app.services.shell import FAILURES, run, why
 
 PR_FIELDS = "number,title,url,author,headRefOid,baseRefName,isDraft,additions,deletions,changedFiles,body,createdAt,labels,statusCheckRollup"
@@ -12,25 +13,60 @@ REQUESTS_Q = ("query($o:String!,$n:String!,$p:Int!){repository(owner:$o,name:$n)
 FAILING = ("FAILURE", "ERROR", "TIMED_OUT", "CANCELLED", "ACTION_REQUIRED")
 PENDING = ("PENDING", "IN_PROGRESS", "QUEUED", "EXPECTED", "WAITING")
 _viewer = []
+DEFAULT_SEARCH = "review-requested:@me -author:@me"
+
+
+def _search_owner(src):
+    """(repo, number) of the open PRs under an owner (user or org) matching the source's search, newest first.
+    One search page, so `limit` is capped at 100."""
+    q = f'is:pr is:open user:{src["owner"]} {src.get("search", DEFAULT_SEARCH)}'
+    per_page = min(src.get("limit", 50), 100)
+    found = json.loads(run("gh", "api", "-X", "GET", "search/issues", "-f", f"q={q}", "-f", "sort=created", "-f", "order=desc",
+                           "-f", f"per_page={per_page}",
+                           "--jq", "[.items[] | [(.repository_url | split(\"/\")[-2:] | join(\"/\")), .number]]"))
+    return [(r, n) for r, n in found if sources.covers(src, r)]
+
+
+def _view_all(pairs):
+    prs = []
+    for repo, n in pairs:
+        pr = view_pr(repo, n)
+        if pr:
+            prs.append(dict(pr, repo=repo))
+    return prs
+
+
+def _hits(src, earlier, only, first):
+    """The PRs `src` finds, as dicts with `repo` set. A repo an earlier source covers is left to that source."""
+    def mine(repo):
+        return sources.covers(src, repo) and not any(sources.covers(s, repo) for s in earlier)
+
+    if only:
+        pairs = [(r or src.get("repo"), n) for r, n in only if (r is None and first and "repo" in src) or (r and mine(r))]
+        return _view_all(pairs)
+    if "repo" in src:
+        if not mine(src["repo"]):
+            return []
+        listed = json.loads(run("gh", "pr", "list", "-R", src["repo"], "--search", src.get("search", DEFAULT_SEARCH),
+                                "--limit", str(src.get("limit", 50)), "--json", PR_FIELDS))
+        return [dict(pr, repo=src["repo"]) for pr in listed]
+    return _view_all([(r, n) for r, n in _search_owner(src) if mine(r)])
 
 
 def list_pending(cfg, only=None):
-    out = []
-    for i, src in enumerate(cfg["sources"]):
-        repo = src["repo"]
+    out, seen = [], set()
+    configured = cfg["sources"]
+    for i, src in enumerate(configured):
         try:
-            if only:
-                nums = [n for r, n in only if r == repo or (r is None and i == 0)]
-                items = [pr for pr in (view_pr(repo, n) for n in nums) if pr]
-            else:
-                items = json.loads(run("gh", "pr", "list", "-R", repo, "--search", src.get("search", "review-requested:@me -author:@me"),
-                                       "--limit", str(src.get("limit", 50)), "--json", PR_FIELDS))
+            prs = _hits(src, configured[:i], only, i == 0)
         except FAILURES + (ValueError,) as e:
-            print(f"  {repo}: could not list PRs: {why(e)}", file=sys.stderr)
+            print(f"  {src.get('repo') or src['owner']}: could not list PRs: {why(e)}", file=sys.stderr)
             continue
-        for it in items:
-            it["repo"], it["source"] = repo, src
-            out.append(it)
+        for pr in prs:
+            if (pr["repo"], pr["number"]) in seen:
+                continue
+            seen.add((pr["repo"], pr["number"]))
+            out.append(dict(pr, source=sources.for_repo(cfg, pr["repo"])))
     return out
 
 

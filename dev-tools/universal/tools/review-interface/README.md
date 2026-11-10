@@ -21,14 +21,20 @@ Needs `gh` (signed in) and Python 3.9+. Changed lines keep git's red, green or p
   "port": 47615,
   "ai_name": "Claude",
   "sources": [
-    {"repo": "owner/repo", "clone": "~/code/repo", "search": "review-requested:@me -author:@me"}
+    {"repo": "owner/repo", "clone": "~/code/repo", "search": "review-requested:@me -author:@me"},
+    {"owner": "owner", "clone": "~/code/{name}", "search": "review-requested:@me -author:@me", "exclude": ["owner/archived-*"]}
   ],
   "teams_file": "~/.claude/skills/workspace/review-teams.txt",
   "adapters": {"team_reviewer_briefs": "~/.claude/agent-files/shared/team-reviewer/briefs"}
 }
 ```
 
-- `sources`: one entry per repo. `search` is a GitHub PR search. `limit` caps how many PRs the search returns (default 50). `clone` is optional; with it, diffs come from git (fetched into `refs/review/*`, your branches are never touched), otherwise from the GitHub API.
+- `sources`: where to look for PRs. Each entry is either one repo (`repo`) or every repo under a user or org (`owner`), searched in one GitHub query.
+  - `search` is a GitHub PR search (default `review-requested:@me -author:@me`). `limit` caps how many PRs it returns (default 50; at most 100 for an `owner` source).
+  - `clone` is optional; with it, diffs come from git (fetched into `refs/review/*`, your branches are never touched), otherwise from a cache clone (see `auto_clone`). For an `owner` source it is a template: `{name}` is the repo name, `{owner}` the owner.
+  - `exclude` (owner sources): repo globs to skip, e.g. `owner/archived-*`.
+  - The first source that covers a repo wins, for listing and for lookups, so list a repo on its own before its owner to give it its own clone or search.
+- `auto_clone` (default true): a repo with no clone at its `clone` path gets a cache clone under `<data_dir>/clones/<owner>/<repo>` on first build (blobless, no checkout, so small and quick). Every repo with a review request gets one, even if you never open it. Every repo then gets the same git-based diff, moved-code marks, whole-file view and import links. The GitHub API diff is only the fallback when cloning fails or `auto_clone` is false. The clones dir is never pruned; `rm -rf <data_dir>/clones` is always safe (the clones are rebuilt).
 - `teams` or `teams_file`: teams whose review requests count as yours, for the "requested" time.
 - `generated`: regexes for generated files (folded and greyed out). Has sensible defaults.
 - `adapters.team_reviewer_briefs`: optional. Turns team-reviewer markdown briefs into insights files.

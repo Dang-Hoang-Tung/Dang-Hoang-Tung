@@ -93,6 +93,23 @@ class GeneratedAttrTests(unittest.TestCase):
             pr = {"number": 1, "source": {"clone": repo}}
             self.assertEqual(git.generated_paths(pr, ["out/a.ts", "keep.ts", "src/b.ts"]), {"out/a.ts"})
 
+    def test_cache_clone_without_checkout_is_read_through_its_index(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            origin = str(Path(tmp, "origin"))
+            sh(tmp, "init", "-q", "-b", "main", origin)
+            sh(origin, "config", "user.email", "t@t")
+            sh(origin, "config", "user.name", "t")
+            Path(origin, ".gitattributes").write_text("gen/* linguist-generated\n")
+            sh(origin, "add", "-A")
+            sh(origin, "commit", "-qm", "base")
+            cfg = {"data_dir": tmp}
+            clone = Path(tmp, "clones", "acme", "x")
+            clone.parent.mkdir(parents=True)
+            sh(tmp, "clone", "-q", "--no-checkout", origin, str(clone))
+            sh(clone, "update-ref", "refs/review/pr-1", "HEAD")
+            pr = {"number": 1, "source": git.cached_clone(cfg, {"repo": "acme/x"})}
+            self.assertEqual(git.generated_paths(pr, ["gen/a.ts", "src/b.ts"]), {"gen/a.ts"})
+
     def test_no_clone_or_failure_is_empty(self):
         self.assertEqual(git.generated_paths({"number": 1, "source": {}}, ["a"]), set())
         with mock.patch.object(git, "has_clone", return_value=True), mock.patch.object(git, "run", side_effect=OSError):

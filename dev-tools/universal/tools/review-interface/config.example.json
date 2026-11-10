@@ -9,6 +9,14 @@
       "repo": "owner/repo",
       "clone": "~/code/repo",
       "search": "review-requested:@me -author:@me"
+    },
+    {
+      "owner": "owner",
+      "clone": "~/code/{name}",
+      "search": "review-requested:@me -author:@me",
+      "exclude": [
+        "owner/archived-*"
+      ]
     }
   ],
   "teams": ["owner/team-slug"],

@@ -9,5 +9,6 @@ def run(*args, timeout=60, errors="replace", **kw):
 
 
 def why(e):
-    text = (getattr(e, "stderr", "") or str(e)).strip()
+    text = getattr(e, "stderr", None) or str(e)
+    text = (text.decode("utf-8", "replace") if isinstance(text, bytes) else text).strip()
     return text.splitlines()[-1][:300] if text else type(e).__name__
