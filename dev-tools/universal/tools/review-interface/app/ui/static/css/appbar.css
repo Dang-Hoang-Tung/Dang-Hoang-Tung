@@ -12,8 +12,8 @@ header.appbar{position:sticky;top:0;z-index:34;height:var(--bar);display:flex;al
 .meta .dotc{width:7px;height:7px;border-radius:50%;background:var(--text-3)}
 .meta .ci.ok .dotc{background:var(--add-fg);box-shadow:0 0 0 3px var(--add-num)}.meta .ci.bad .dotc{background:var(--del-fg);box-shadow:0 0 0 3px var(--del-num)}
 .topleft{display:flex;align-items:center;flex:0 0 30%;min-width:0}
-.progtop{display:flex;align-items:center;gap:12px;width:100%;min-width:0;height:32px;font-size:12px;color:var(--text-2);white-space:nowrap;font-variant-numeric:tabular-nums}
-.pwrap{position:relative;flex:1 1 auto;min-width:60px;height:10px}
+.progtop{display:flex;align-items:center;gap:14px;width:100%;min-width:0;height:34px;font-size:14px;color:var(--text-2);white-space:nowrap;font-variant-numeric:tabular-nums}
+.pwrap{position:relative;flex:1 1 auto;min-width:60px;height:14px}
 .ptrack{position:absolute;inset:0;border-radius:999px;background:var(--surface-3);box-shadow:inset 0 0 0 1px var(--line);overflow:hidden}
 .ptrack b{position:relative;display:block;height:100%;width:0;border-radius:999px;overflow:hidden;background:linear-gradient(90deg,color-mix(in srgb,var(--add) 70%,var(--surface)),var(--add));transition:width 1.4s cubic-bezier(.16,.9,.25,1)}
 .ptrack b.bump::after{content:"";position:absolute;top:0;bottom:0;left:0;width:55%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.95),transparent);transform:translateX(-120%);animation:pflash 1.3s cubic-bezier(.3,.6,.3,1) .15s}
@@ -24,10 +24,10 @@ header.appbar{position:sticky;top:0;z-index:34;height:var(--bar);display:flex;al
 .pfx{z-index:5}
 .pfx i{position:absolute;top:50%;font:normal var(--sz,12px)/1 var(--font);color:var(--c,var(--add));text-shadow:0 0 6px var(--c,var(--add)),0 0 12px var(--c,var(--add));opacity:0;transform:translate(-50%,-50%);animation:pspark var(--t,1.3s) cubic-bezier(.15,.7,.3,1) var(--delay,0s) forwards}
 @keyframes pspark{0%{opacity:0;transform:translate(-50%,-50%) scale(.2) rotate(0)}12%{opacity:1;transform:translate(-50%,-50%) scale(1.3) rotate(40deg)}100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.4) rotate(var(--rot,180deg))}}
-.plabel{display:flex;align-items:baseline;gap:8px;flex:none}
+.plabel{display:flex;align-items:baseline;gap:10px;flex:none}
 .left-files{font-weight:600;color:var(--text)}
-.plines{display:inline-flex;gap:4px;font-size:11px;color:var(--text-3)}
-.plines .a,.plines .d{color:var(--text-3)}
+.plines{display:inline-flex;gap:6px;font-size:13px;font-weight:500;color:var(--text-3)}
+.plines .a{color:var(--add-fg)}.plines .d{color:var(--del-fg)}
 .progtop.done .left-files{color:var(--add)}
 .progtop.done .plines{display:none}
 @media (prefers-reduced-motion:reduce){.ptrack b{transition:none}.ptrack b.bump::after{display:none}.pfx{display:none}.pwrap.glow .ptrack{animation:none}}
