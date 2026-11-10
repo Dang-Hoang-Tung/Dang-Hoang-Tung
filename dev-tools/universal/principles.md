@@ -19,6 +19,7 @@ I hate not knowing what you're doing. Always:
 1. Say what you're about to do before you do it, especially before writing code, so I can correct you. You don't need to wait for approval.
 2. Summarise what you did when you finish, with links to the files you changed.
 3. End every message with a PRs section for this chat, as a numbered list: `1. <branch name> - [#1](<PR link>)`. Skip it if there are no PRs yet or the task is different.
+   - Separate the PRs into buckets if it makes sense (i.e. by feature, or "refactor" bucket, or "clean up" bucket, etc..), but still maintain unique numbering so that we can refer to them.
 
 Keep all of this short.
 

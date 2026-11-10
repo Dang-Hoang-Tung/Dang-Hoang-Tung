@@ -32,8 +32,8 @@ Keep everything in `~/.claude/agent-files/shared/team-pe/state.md`. Read it when
 ## Sandbox: <name>, reserved until <time>
 
 ## Rounds
-| Env | Morph branch | SHA | Status | Check-ins |
-(status: building | deploying | deployed | failed · check-ins: n/5)
+| Env | Morph branch | SHA | Status | Monitor |
+(status: building | deploying | deployed | failed · monitor: task ID while watching)
 
 ## Leads
 | Lead | Project | Branches | Env | State | Since | Pings |
@@ -57,7 +57,22 @@ Keep everything in `~/.claude/agent-files/shared/team-pe/state.md`. Read it when
 5. **Deploy** (see the stack file). For sandbox, push the morph branch first (the stack file says how deploys pick the branch).
 6. **Wait:**
    - **Local**: you know when it's up. Go to step 7.
-   - **Sandbox**: schedule a one-off check-in for yourself in 2 minutes (`CronCreate`, `recurring: false`, pinned to that minute). Each check-in, run `python3 ~/.claude/skills/team-pe/deploy-status.py <morph-branch> --stage <sandbox>`. If it hasn't finished, schedule another. Stop after 5 check-ins, mark the round `failed`, and send `failed` to the leads and buddy.
+   - **Sandbox**: start one `Monitor` job (`timeout_ms: 1800000`) that polls the deploy and exits when it ends. It emits one line per job that finishes, then a final line on any end state:
+
+     ```bash
+     run=<run-id>; prev=""
+     while true; do
+       s=$(python3 ~/.claude/skills/team-pe/deploy-status.py <morph-branch> --stage <sandbox> 2>&1) || true
+       jobs=$(gh run view $run -R <owner/repo> --json jobs --jq '.jobs[] | select(.status=="completed") | "\(.name): \(.conclusion)"' 2>/dev/null | sort) || true
+       comm -13 <(echo "$prev") <(echo "$jobs"); prev=$jobs
+       echo "$s" | grep -qE '"state": ?"(completed|success|failed|cancelled)"' && { echo "END $s"; exit 0; }
+       sleep 60
+     done
+     ```
+
+     - On `END` with success: go to step 7. On a failure or cancel: read `gh run view <run-id> --log-failed`, then send `failed` to the leads and buddy.
+     - The monitor expires at 30 minutes with no `END`: mark the round `failed`, and send `failed` to the leads and buddy.
+     - Don't add cron check-ins on top. Wait for the monitor's events.
 7. **Send `deployed`** to each lead included, with the URLs. Leads reply `testing`, then `tested`.
 8. **No reply?** 15 minutes after `deployed` or `testing` with nothing back, ping the lead. 15 more minutes with nothing: send buddy `blocked`, drop that lead from the round, and carry on.
 9. **When every lead has sent `tested`** (or been dropped), delete the previous morph branch (`python3 ~/.claude/skills/team-pe/cleanup-morph-branches.py --keep <current> --apply`), then start the next round from the backlog.
