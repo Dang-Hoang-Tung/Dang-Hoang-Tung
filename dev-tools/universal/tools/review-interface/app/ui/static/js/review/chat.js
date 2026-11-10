@@ -62,6 +62,13 @@ function renderChat(force) {
   if (grew || atEnd) log.scrollTop = log.scrollHeight;
   fitFabs();
 }
+const CHAT_INPUT_MAX = 160;
+function fitChatInput(input) {
+  input.style.height = 'auto';
+  const h = input.scrollHeight + input.offsetHeight - input.clientHeight;
+  input.style.height = Math.min(h, CHAT_INPUT_MAX) + 'px';
+  input.style.overflowY = h > CHAT_INPUT_MAX ? 'auto' : 'hidden';
+}
 function sendChat() {
   const input = $('#chatinput'), text = input.value.trim();
   if (!text) return;
@@ -70,6 +77,7 @@ function sendChat() {
   if (t) t.messages.push(msg);
   else state.threads.push({ id: CHAT_ID, noteKey: null, created: now(), resolved: false, resolvedAt: null, posted: null, messages: [msg] });
   input.value = '';
+  fitChatInput(input);
   if ($('#chatbox').hidden) setChatOpen(true);
   renderThreads();
   persist();
@@ -101,7 +109,7 @@ function initChat() {
   input.addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); sendChat(); }
   });
-  input.addEventListener('input', () => { input.style.height = '34px'; input.style.height = Math.min(input.scrollHeight, 120) + 'px'; });
+  input.addEventListener('input', () => fitChatInput(input));
   setChatOpen(chatOpen());
   document.addEventListener('visibilitychange', () => { if (!document.hidden) watchReplies(true); });
 }
