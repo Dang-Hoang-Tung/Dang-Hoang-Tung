@@ -1,0 +1,41 @@
+{
+  "name": "Trailing commas added, nothing else",
+  "source": "synthetic edge case written for this corpus (original neutral code, no external source); modelled on common review-diff shapes",
+  "strong_must": [],
+  "strong_must_not": [
+    {
+      "side": "old",
+      "line": 3
+    },
+    {
+      "side": "new",
+      "line": 3
+    },
+    {
+      "side": "old",
+      "line": 7
+    },
+    {
+      "side": "new",
+      "line": 7
+    }
+  ],
+  "quiet": [
+    {
+      "side": "old",
+      "line": 3
+    },
+    {
+      "side": "new",
+      "line": 3
+    },
+    {
+      "side": "old",
+      "line": 7
+    },
+    {
+      "side": "new",
+      "line": 7
+    }
+  ]
+}

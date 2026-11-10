@@ -1,0 +1,17 @@
+{
+  "name": "Only a blank line added between statements",
+  "source": "difftastic manual, Tricky Cases (adapted, own words and code): https://difftastic.wilfred.me.uk/tricky_cases.html #Novel Blank Lines",
+  "strong_must": [],
+  "strong_must_not": [
+    {
+      "side": "new",
+      "line": 2
+    }
+  ],
+  "quiet": [
+    {
+      "side": "new",
+      "line": 2
+    }
+  ]
+}

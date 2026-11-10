@@ -1,0 +1,41 @@
+{
+  "name": "If condition split over lines with a clause added and a callee changed",
+  "source": "OSS (MIT) https://github.com/TanStack/query/pull/12542, excerpt adapted and renamed",
+  "strong_must": [
+    {
+      "side": "new",
+      "line": 3,
+      "text": "length === 0"
+    },
+    {
+      "side": "old",
+      "line": 2,
+      "text": "original"
+    },
+    {
+      "side": "new",
+      "line": 5,
+      "text": "cloned"
+    }
+  ],
+  "strong_must_not": [
+    {
+      "side": "new",
+      "line": 1
+    },
+    {
+      "side": "new",
+      "line": 4
+    }
+  ],
+  "quiet": [
+    {
+      "side": "new",
+      "line": 1
+    },
+    {
+      "side": "new",
+      "line": 4
+    }
+  ]
+}

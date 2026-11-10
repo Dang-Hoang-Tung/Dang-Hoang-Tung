@@ -1,0 +1,63 @@
+{
+  "name": "Block comment re-indented into a new if",
+  "source": "difftastic manual, Tricky Cases (adapted, own words and code): https://difftastic.wilfred.me.uk/tricky_cases.html #Multiline Comments",
+  "strong_must": [
+    {
+      "side": "new",
+      "line": 1,
+      "text": "if (ready)"
+    }
+  ],
+  "strong_must_not": [
+    {
+      "side": "old",
+      "line": 1
+    },
+    {
+      "side": "old",
+      "line": 2
+    },
+    {
+      "side": "new",
+      "line": 2
+    },
+    {
+      "side": "new",
+      "line": 3
+    },
+    {
+      "side": "old",
+      "line": 3
+    },
+    {
+      "side": "new",
+      "line": 4
+    }
+  ],
+  "quiet": [
+    {
+      "side": "old",
+      "line": 1
+    },
+    {
+      "side": "old",
+      "line": 2
+    },
+    {
+      "side": "new",
+      "line": 2
+    },
+    {
+      "side": "new",
+      "line": 3
+    },
+    {
+      "side": "old",
+      "line": 3
+    },
+    {
+      "side": "new",
+      "line": 4
+    }
+  ]
+}

@@ -52,13 +52,14 @@ function renderChat(force) {
   const t = chatThread(), msgs = t ? t.messages : [];
   const wait = !!t && lastFromMe(t);
   $('#chatwait').hidden = !wait;
-  if (!force && msgs.length === chatShown) return;
-  const grew = msgs.length !== chatShown || force;
+  const shown = msgs.length + ':' + (t && t.thinking ? t.thinking.length : 0);
+  if (!force && shown === chatShown) return;
+  const grew = shown !== chatShown || force;
   const atEnd = log.scrollHeight - log.scrollTop - log.clientHeight < 40;
   log.textContent = '';
   if (!msgs.length) log.append(el('div', 'empty', 'Ask ' + AI_NAME + ' anything about this PR.'));
   else messageList(t, log);
-  chatShown = msgs.length;
+  chatShown = shown;
   if (grew || atEnd) log.scrollTop = log.scrollHeight;
   fitFabs();
 }

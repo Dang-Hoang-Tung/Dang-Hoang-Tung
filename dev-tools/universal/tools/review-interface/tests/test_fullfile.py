@@ -49,6 +49,11 @@ class FullFileTests(unittest.TestCase):
         self.assertNotIn('id="r3-', out["html"])
         self.assertEqual(out["lines"], 61)
 
+    def test_render_marks_changed_tokens(self):
+        html = fullfile.render(self.cfg, self.meta, "a.py", 3)["html"]
+        self.assertIn('<span class="hl">line</span> 30', html)
+        self.assertIn('<span class="hl">changed</span> 30', html)
+
     def test_no_clone(self):
         with self.assertRaises(fullfile.NoClone):
             fullfile.rows({"sources": [{"repo": "acme/w"}]}, self.meta, "a.py")

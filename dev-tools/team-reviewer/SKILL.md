@@ -25,7 +25,8 @@ python3 ~/.claude/skills/universal/tools/review-interface/review.py
 - It finds the PRs waiting on me, builds a page for each, starts a small local helper and opens the queue in my browser.
 - The helper stops by itself when idle. Run the command again to bring it back.
 - After you write or update briefs, rebuild so they show: `review.py build --no-open` (add a PR number for just one).
-- The queue refreshes itself every 15 min while it's open, and when I hit **Refresh**. Each refresh adds a line to `events.jsonl`.
+- When answering a chat or comment in the app, post a short `review.py ai thinking <slug> <thread> "…"` note at each real step (what you're checking), then `ai reply`. I see them live while I wait.
+- The helper refreshes the queue every 15 min while it's running (whatever page I'm on, even when I'm away), and when I hit **Refresh**. Each refresh adds a line to `events.jsonl`.
 - Watch both files with one Monitor: `tail -n0 -F <data dir>/inbox.jsonl <data dir>/events.jsonl` (paths from `review.py paths`), 30 min timeout, and re-arm it when it expires. `tail` prints a `==> file <==` header when the source switches.
 - An `inbox.jsonl` line is a comment or chat message from me. Answer it with `review.py ai reply <slug> <thread> "<text>"`. The chat bar is thread `chat`. Keep replies short, in my language style.
 - An `events.jsonl` line is a refresh. If its `check` list is empty, do nothing. Otherwise run `/dev-review` on just those PRs (new, or new commits), update their briefs and rebuild. How the files work: `CONTRACT.md` in the app folder.

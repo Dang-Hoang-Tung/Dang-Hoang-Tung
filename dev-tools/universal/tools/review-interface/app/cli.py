@@ -5,6 +5,7 @@
   review.py serve                 start the local helper and print the queue link
   review.py paths                 print where pages, state, insights and diffs live (for an AI)
   review.py ai list               threads waiting for a reply
+  review.py ai thinking SLUG THREAD TEXT   a short progress note shown while the reply is being written
   review.py ai reply SLUG THREAD TEXT
   review.py ai post SLUG THREAD   post the thread's latest message marked for posting to GitHub
 
@@ -75,14 +76,29 @@ def ai_list(cfg):
         print("no threads waiting")
 
 
-def ai_reply(cfg, s, thread_id, text):
+def _edit_thread(cfg, s, thread_id, change):
     with state.locked(cfg, s):
         data = state.load_state(cfg, s)
         t = next((t for t in data.get("threads", []) if t["id"] == thread_id), None)
         if not t:
             sys.exit("thread not found")
-        t["messages"].append({"id": secrets.token_hex(5), "who": state.AI, "text": text, "at": now()})
+        change(t)
         state.save_state(cfg, s, data)
+
+
+def ai_thinking(cfg, s, thread_id, text):
+    _edit_thread(cfg, s, thread_id, lambda t: t.setdefault("thinking", []).append({"text": text, "at": now()}))
+    print("noted")
+
+
+def ai_reply(cfg, s, thread_id, text):
+    def add(t):
+        msg = {"id": secrets.token_hex(5), "who": state.AI, "text": text, "at": now()}
+        steps = t.pop("thinking", None)
+        if steps:
+            msg["steps"] = steps
+        t["messages"].append(msg)
+    _edit_thread(cfg, s, thread_id, add)
     print("replied")
 
 
@@ -110,6 +126,10 @@ def build_parser():
     ai_sub = ai.add_subparsers(dest="ai_cmd", required=True)
     ai_sub.add_parser("list")
     ai_sub.add_parser("changes", help="what changed in the latest rebuild or refresh")
+    th = ai_sub.add_parser("thinking")
+    th.add_argument("slug")
+    th.add_argument("thread")
+    th.add_argument("text")
     r = ai_sub.add_parser("reply")
     r.add_argument("slug")
     r.add_argument("thread")
@@ -159,6 +179,8 @@ def main(argv=None):
             ai_list(cfg)
         elif a.ai_cmd == "changes":
             print(json.dumps(events.latest(cfg) or {"type": "none", "note": "no rebuild recorded yet"}, indent=2))
+        elif a.ai_cmd == "thinking":
+            ai_thinking(cfg, a.slug, a.thread, a.text)
         elif a.ai_cmd == "reply":
             ai_reply(cfg, a.slug, a.thread, a.text)
         elif a.ai_cmd == "post":

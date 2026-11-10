@@ -1,0 +1,18 @@
+{
+  "name": "Two statements swap order in the same block: execution order changed",
+  "source": "synthetic (rule audit)",
+  "strong_must": [
+    {
+      "side": "old",
+      "line": 2,
+      "text": "save(order)"
+    },
+    {
+      "side": "new",
+      "line": 3,
+      "text": "save(order)"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

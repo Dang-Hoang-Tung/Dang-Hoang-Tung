@@ -1,0 +1,23 @@
+{
+  "name": "Commented cast replaced by a defineProperty block",
+  "source": "OSS (MIT) https://github.com/pmndrs/jotai/pull/3367, excerpt adapted and renamed",
+  "strong_must": [
+    {
+      "side": "old",
+      "line": 3,
+      "text": "as any"
+    },
+    {
+      "side": "new",
+      "line": 2,
+      "text": "defineProperty"
+    },
+    {
+      "side": "new",
+      "line": 3,
+      "text": "get"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

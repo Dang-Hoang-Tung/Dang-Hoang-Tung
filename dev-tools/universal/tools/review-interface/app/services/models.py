@@ -3,7 +3,7 @@ import hashlib
 from app.config import slug
 from app.domain import LAYERS, SEVERITIES, worst
 from app.services import diff as diffs
-from app.services import github, tree
+from app.services import git, github, tokdiff, tree
 from app.services.state import is_approved, waiting_threads
 
 ITEM_KEYS = ("slug", "number", "title", "url", "author", "head_sha", "ci", "draft", "effort", "minutes", "minutes_source",
@@ -72,8 +72,7 @@ def leaf_order(nodes):
 
 
 def display_order(top_nodes, files):
-    leaves = leaf_order(top_nodes)
-    return [i for i in leaves if not files[i]["gen"]] + [i for i in leaves if files[i]["gen"]]
+    return leaf_order(top_nodes)
 
 
 def effort_of(added):
@@ -120,18 +119,24 @@ def build_totals(files):
             "deleted_all": sum(f["d"] for f in files), "effort": effort_of(added)}
 
 
-def file_model(f, by_file, moved):
+def file_model(f, by_file, moved, strong=({}, ())):
     ns = by_file.get(f["path"], [])
-    return {"idx": f["idx"], "path": f["path"], "a": f["a"], "d": f["d"], "gen": f["gen"], "layer": diffs.layer_of(f),
+    return {**{k: f[k] for k in ("noeol", "mode") if k in f},
+            "idx": f["idx"], "path": f["path"], "a": f["a"], "d": f["d"], "gen": f["gen"], "layer": diffs.layer_of(f),
             "hash": diffs.file_hash(f["rows"]), "binary": f["binary"],
             "status": f.get("status", "modified"), "old_path": f.get("old_path"), "kind": worst(x["kind"] for x in ns), "notes": [x["key"] for x in ns],
-            "rows": [list(r) for r in f["rows"]], "moved": moved, "spans": {}}
+            "rows": [list(r) for r in f["rows"]], "moved": moved, "spans": strong[0], "quiet": sorted(strong[1])}
 
 
 def review_model(cfg, pr, diff_text, ins, ins_status, user_name):
     repo, n = pr["repo"], pr["number"]
     files = diffs.parse_diff(diff_text, cfg["generated"])
+    attr_gen = git.generated_paths(pr, [f["path"] for f in files if not f["gen"]])
+    for f in files:
+        f["gen"] = f["gen"] or f["path"] in attr_gen
     moves = diffs.find_moves(files, getattr(diff_text, "moved", None))
+    text_files = [f for f in files if not f["binary"] and not f["gen"]]
+    strong = dict(zip((f["idx"] for f in text_files), tokdiff.strong_spans(text_files)))
     paths = [f["path"] for f in files]
     idx = {f["path"]: f["idx"] for f in files}
     notes = build_notes(ins, paths)
@@ -146,7 +151,7 @@ def review_model(cfg, pr, diff_text, ins, ins_status, user_name):
                "author": (pr.get("author") or {}).get("login", ""), "head_sha": pr["headRefOid"], "base": pr.get("baseRefName"),
                "draft": bool(pr.get("isDraft")), "ci": github.ci_state(pr.get("statusCheckRollup")), "created": pr.get("createdAt")},
         "user": user_name, "ai_name": cfg["ai_name"], "layers": LAYERS,
-        "files": [file_model(f, by_file, moves[f["idx"]]) for f in files],
+        "files": [file_model(f, by_file, moves[f["idx"]], strong.get(f["idx"], ({}, ()))) for f in files],
         "order": display_order(top_nodes, files),
         "tree": top_nodes,
         "tree_layout": tree.layout(root, file_stats),

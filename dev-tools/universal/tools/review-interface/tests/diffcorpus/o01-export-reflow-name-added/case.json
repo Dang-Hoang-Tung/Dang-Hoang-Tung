@@ -1,0 +1,79 @@
+{
+  "name": "Export list reflowed by prettier with one name added",
+  "source": "OSS (MIT) https://github.com/vercel/swr/pull/4336, excerpt adapted and renamed",
+  "strong_must": [
+    {
+      "side": "new",
+      "line": 7,
+      "text": "revalidateTag"
+    }
+  ],
+  "strong_must_not": [
+    {
+      "side": "old",
+      "line": 2
+    },
+    {
+      "side": "new",
+      "line": 2
+    },
+    {
+      "side": "new",
+      "line": 3
+    },
+    {
+      "side": "new",
+      "line": 4
+    },
+    {
+      "side": "new",
+      "line": 5
+    },
+    {
+      "side": "new",
+      "line": 6
+    },
+    {
+      "side": "new",
+      "line": 8
+    },
+    {
+      "side": "new",
+      "line": 9
+    }
+  ],
+  "quiet": [
+    {
+      "side": "old",
+      "line": 2
+    },
+    {
+      "side": "new",
+      "line": 2
+    },
+    {
+      "side": "new",
+      "line": 3
+    },
+    {
+      "side": "new",
+      "line": 4
+    },
+    {
+      "side": "new",
+      "line": 5
+    },
+    {
+      "side": "new",
+      "line": 6
+    },
+    {
+      "side": "new",
+      "line": 8
+    },
+    {
+      "side": "new",
+      "line": 9
+    }
+  ]
+}

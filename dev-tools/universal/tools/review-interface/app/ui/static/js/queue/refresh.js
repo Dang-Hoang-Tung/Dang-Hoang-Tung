@@ -1,5 +1,4 @@
-const AUTO_EVERY = 15 * 60 * 1000;
-const LAST_KEY = 'review-last-refresh';
+const POLL_EVERY = 60 * 1000;
 
 function renderLastRefreshed() {
   const t = $('#qlast');
@@ -31,6 +30,7 @@ function initRefresh() {
     if (!r.ok) throw new Error(s.error || 'the helper replied ' + r.status);
     return s;
   };
+  const fail = e => { busy(false); label.textContent = 'Refresh failed'; btn.title = e.message; };
   const waitForBuild = async () => {
     for (;;) {
       await new Promise(done => setTimeout(done, 1500));
@@ -38,19 +38,19 @@ function initRefresh() {
       if (s.running) continue;
       if (s.error) throw new Error(s.error);
       try { sessionStorage.setItem('review-refreshed', JSON.stringify((s.changes && s.changes.check) || [])); } catch (e) {}
-      stamp();
       location.reload();
       return;
     }
   };
-  const stamp = () => { try { localStorage.setItem(LAST_KEY, String(Date.now())); } catch (e) {} };
-  const last = () => { try { return +localStorage.getItem(LAST_KEY) || 0; } catch (e) { return 0; } };
-  if (!last()) stamp();
-  const due = () => { if (!document.hidden && !btn.disabled && Date.now() - last() >= AUTO_EVERY) { stamp(); btn.click(); } };
-  setInterval(due, 30000);
-  document.addEventListener('visibilitychange', due);
-  btn.title = 'Refreshes on its own every 15 minutes while this page is open';
-  const fail = e => { busy(false); label.textContent = 'Refresh failed'; btn.title = e.message; };
+  // The helper refreshes on its own every 15 minutes; reload when a refresh finishes after this page loaded.
+  let seen;
+  const watch = () => call('GET').then(s => {
+    if (s.running && !btn.disabled) { busy(true); waitForBuild().catch(fail); }
+    else if (seen === undefined) seen = s.finished;
+    else if (s.finished !== seen) location.reload();
+  }).catch(() => {});
+  watch();
+  setInterval(watch, POLL_EVERY);
+  btn.title = 'The queue refreshes on its own every 15 minutes';
   btn.addEventListener('click', () => { busy(true); call('POST').then(waitForBuild).catch(fail); });
-  call('GET').then(s => { if (s.running) { busy(true); waitForBuild().catch(fail); } }).catch(() => {});
 }

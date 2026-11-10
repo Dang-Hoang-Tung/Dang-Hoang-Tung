@@ -36,6 +36,12 @@ class MovedTests(unittest.TestCase):
         self.assertRegex(html, r'<tr id="r0-5"[^>]*class="ctx moved moved-to')
         self.assertIn('<span class="mvlabel plain">moved</span>', html)
 
+    def test_same_file_move_names_only_the_line(self):
+        model = review_model()
+        model["files"][0]["moved"] = {"2": {"dir": "to", "file": 0, "row": 4, "path": model["files"][0]["path"], "line": 7, "start": True}}
+        html = review_page.render(model)
+        self.assertIn('>moved to L7</button>', html)
+
     def test_missing_moved_key_is_fine(self):
         html = review_page.render(review_model())
         self.assertNotIn('class="del moved', html)

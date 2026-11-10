@@ -1,0 +1,18 @@
+{
+  "name": "Added-only assignment lines next to similar ones",
+  "source": "OSS (MIT) https://github.com/vercel/swr/pull/4336, excerpt adapted and renamed",
+  "strong_must": [
+    {
+      "side": "new",
+      "line": 5,
+      "text": "revalidateTag"
+    },
+    {
+      "side": "new",
+      "line": 5,
+      "text": "cacheContext[5]"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

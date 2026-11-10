@@ -3,8 +3,9 @@ import subprocess
 FAILURES = (subprocess.CalledProcessError, subprocess.TimeoutExpired)
 
 
-def run(*args, timeout=60, **kw):
-    return subprocess.run(args, capture_output=True, text=True, check=True, timeout=timeout, **kw).stdout
+def run(*args, timeout=60, errors="replace", **kw):
+    """Stdout as text. Bytes are decoded as-is, so a lone carriage return stays inside its line."""
+    return subprocess.run(args, capture_output=True, check=True, timeout=timeout, **kw).stdout.decode("utf-8", errors)
 
 
 def why(e):

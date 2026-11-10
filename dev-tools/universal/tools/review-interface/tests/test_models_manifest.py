@@ -99,12 +99,12 @@ class ReviewModelTests(TmpCase):
         self.assertEqual(self.model(pr=make_pr(statusCheckRollup=[{"conclusion": "FAILURE"}]))["pr"]["ci"], "failing")
         self.assertEqual(self.model()["pr"]["ci"], "none")
 
-    def test_generated_file_flagged_and_ordered_last(self):
+    def test_generated_file_flagged_and_kept_in_tree_order(self):
         m = self.model()
         gen = next(f for f in m["files"] if f["path"].endswith("api.ts"))
         self.assertTrue(gen["gen"])
         self.assertNotEqual(gen["layer"], "Generated")
-        self.assertEqual(m["order"][-1], gen["idx"])
+        self.assertEqual(m["order"], models.leaf_order(m["tree"]))
         self.assertEqual(sorted(m["order"]), [0, 1, 2])
 
     def test_tree_and_layout(self):

@@ -1,0 +1,13 @@
+{
+  "name": "One word changed inside a long multi-line string",
+  "source": "difftastic manual, Tricky Cases (adapted, own words and code): https://difftastic.wilfred.me.uk/tricky_cases.html #Small Changes To Large Strings",
+  "strong_must": [
+    {
+      "side": "new",
+      "line": 2,
+      "text": "NOVEL"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

@@ -1,0 +1,38 @@
+{
+  "name": "Parameter renamed in declaration and uses",
+  "source": "synthetic edge case written for this corpus (original neutral code, no external source); modelled on common review-diff shapes",
+  "strong_must": [
+    {
+      "side": "old",
+      "line": 1,
+      "text": "userId"
+    },
+    {
+      "side": "new",
+      "line": 1,
+      "text": "customerId"
+    },
+    {
+      "side": "old",
+      "line": 2,
+      "text": "userId"
+    },
+    {
+      "side": "new",
+      "line": 2,
+      "text": "customerId"
+    },
+    {
+      "side": "old",
+      "line": 3,
+      "text": "userId"
+    },
+    {
+      "side": "new",
+      "line": 3,
+      "text": "customerId"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

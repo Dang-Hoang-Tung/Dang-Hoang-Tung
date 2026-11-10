@@ -1,0 +1,73 @@
+{
+  "name": "JSX tree wrapped in a provider, children re-indented",
+  "source": "synthetic edge case written for this corpus (original neutral code, no external source); modelled on common review-diff shapes",
+  "strong_must": [
+    {
+      "side": "new",
+      "line": 3,
+      "text": "ThemeProvider"
+    },
+    {
+      "side": "new",
+      "line": 3,
+      "text": "theme={theme}"
+    },
+    {
+      "side": "new",
+      "line": 7,
+      "text": "ThemeProvider"
+    }
+  ],
+  "strong_must_not": [
+    {
+      "side": "old",
+      "line": 3
+    },
+    {
+      "side": "old",
+      "line": 4
+    },
+    {
+      "side": "old",
+      "line": 5
+    },
+    {
+      "side": "new",
+      "line": 4
+    },
+    {
+      "side": "new",
+      "line": 5
+    },
+    {
+      "side": "new",
+      "line": 6
+    }
+  ],
+  "quiet": [
+    {
+      "side": "old",
+      "line": 3
+    },
+    {
+      "side": "old",
+      "line": 4
+    },
+    {
+      "side": "old",
+      "line": 5
+    },
+    {
+      "side": "new",
+      "line": 4
+    },
+    {
+      "side": "new",
+      "line": 5
+    },
+    {
+      "side": "new",
+      "line": 6
+    }
+  ]
+}

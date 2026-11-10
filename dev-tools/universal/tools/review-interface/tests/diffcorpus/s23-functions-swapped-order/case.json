@@ -1,0 +1,41 @@
+{
+  "name": "Two functions swapped in position, bodies identical",
+  "source": "synthetic edge case written for this corpus (original neutral code, no external source); modelled on common review-diff shapes",
+  "strong_must": [],
+  "strong_must_not": [
+    {
+      "side": "old",
+      "line": 1
+    },
+    {
+      "side": "old",
+      "line": 2
+    },
+    {
+      "side": "new",
+      "line": 5
+    },
+    {
+      "side": "new",
+      "line": 6
+    }
+  ],
+  "quiet": [
+    {
+      "side": "old",
+      "line": 1
+    },
+    {
+      "side": "old",
+      "line": 2
+    },
+    {
+      "side": "new",
+      "line": 5
+    },
+    {
+      "side": "new",
+      "line": 6
+    }
+  ]
+}

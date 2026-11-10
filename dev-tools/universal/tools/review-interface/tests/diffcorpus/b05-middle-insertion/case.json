@@ -1,0 +1,13 @@
+{
+  "name": "Wrapper call inserted in the middle of a nest",
+  "source": "difftastic manual, Tricky Cases (adapted, own words and code): https://difftastic.wilfred.me.uk/tricky_cases.html #Middle Insertions",
+  "strong_must": [
+    {
+      "side": "new",
+      "line": 1,
+      "text": "extra"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

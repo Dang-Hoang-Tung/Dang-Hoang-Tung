@@ -1,5 +1,5 @@
 """A changed file shown whole: the PR's diff for one path with unlimited context."""
-from app.services import git
+from app.services import git, tokdiff
 from app.services.diff import parse_file_rows
 from app.services.shell import run
 from app.ui.components import file_section
@@ -23,4 +23,5 @@ def rows(cfg, meta, path):
 
 def render(cfg, meta, path, idx):
     found = rows(cfg, meta, path)
-    return {"html": file_section.full_table(idx, found) if found else "", "lines": len(found)}
+    spans, quiet = tokdiff.strong_spans([{"path": path, "rows": found}])[0]
+    return {"html": file_section.full_table(idx, found, spans, quiet) if found else "", "lines": len(found)}

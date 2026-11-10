@@ -1,0 +1,18 @@
+{
+  "name": "Parentheses added that change grouping",
+  "source": "difftastic manual, Tricky Cases (adapted, own words and code): https://difftastic.wilfred.me.uk/tricky_cases.html #Adding Delimiters",
+  "strong_must": [
+    {
+      "side": "new",
+      "line": 1,
+      "text": "("
+    },
+    {
+      "side": "new",
+      "line": 1,
+      "text": ")"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

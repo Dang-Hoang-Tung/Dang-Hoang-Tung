@@ -1,0 +1,13 @@
+{
+  "name": "YAML: dedenting moves env from the build job to jobs",
+  "source": "synthetic (rule audit)",
+  "strong_must": [
+    {
+      "side": "new",
+      "line": 4,
+      "text": "env"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

@@ -1,0 +1,13 @@
+{
+  "name": "JSX: removing the space between an expression and text changes rendered output",
+  "source": "synthetic (rule audit)",
+  "strong_must": [
+    {
+      "side": "new",
+      "line": 1,
+      "text": "items"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

@@ -42,16 +42,26 @@ def _status(f):
 
 FOLD = '<button type="button" class="fold" aria-expanded="true" aria-label="Collapse file"></button>'
 SPACER = '<span class="fold-spacer"></span>'
+FORMAT_MARK = '<span class="fmtmark" title="Only whitespace or formatting changed on this line">format</span>'
 
 
 def _no_diff(f):
     return not f["rows"]
 
 
+def _mode_text(f):
+    mode = f.get("mode")
+    return f'mode {esc(mode["old"])} → {esc(mode["new"])}' if mode else ""
+
+
 def _stat(f):
+    mode = _mode_text(f)
     if _no_diff(f):
-        return f'<span class="stat nodiff-note">{"moved, no changes" if f.get("status") == "renamed" else "no changes"}</span>'
-    return f'<span class="stat"><span class="a">+{f["a"]}</span> <span class="d">−{f["d"]}</span></span>'
+        moved = f.get("status") == "renamed"
+        text = (f"moved, {mode}" if moved else mode) if mode else ("moved, no changes" if moved else "no changes")
+        return f'<span class="stat nodiff-note">{text}</span>'
+    note = f'<span class="nodiff-note">{mode}</span> ' if mode else ""
+    return f'<span class="stat">{note}<span class="a">+{f["a"]}</span> <span class="d">−{f["d"]}</span></span>'
 
 
 def _header(f):
@@ -68,16 +78,17 @@ def _header(f):
     )
 
 
-def _moved_label(info):
+def _moved_label(info, own):
     if info.get("file") is None or info.get("row") is None:
         return '<span class="mvlabel plain">moved</span>'
-    name = _path_parts(info.get("path") or "")[1]
+    path = info.get("path") or ""
     verb = "to" if info["dir"] == "to" else "from"
     target = f'r{info["file"]}-{info["row"]}'
-    line = f' L{esc(info["line"])}' if info.get("line") is not None else ""
+    line = f'L{esc(info["line"])}' if info.get("line") is not None else ""
+    where = line if info["file"] == own and line else " ".join(x for x in (esc(_path_parts(path)[1]), line) if x)
     return (
         f'<button type="button" class="mvlabel" data-file="{esc(info["file"])}" data-target="{target}" '
-        f'title="Go to {esc(info.get("path") or name)}">moved {verb} {esc(name)}{line}</button>'
+        f'title="Go to {esc(path)}{":" + line[1:] if line else ""}">moved {verb} {where}</button>'
     )
 
 
@@ -100,7 +111,18 @@ def _data_f(f):
     return "" if f["idx"] is None else f' data-f="{f["idx"]}"'
 
 
-def _row(f, index, row, hot, prefix="r"):
+def _noeol_rows(f):
+    noeol = f.get("noeol") or {}
+    last = {}
+    for index, row in enumerate(f["rows"]):
+        if row[0] in ("del", "ctx"):
+            last["old"] = index
+        if row[0] in ("add", "ctx"):
+            last["new"] = index
+    return {last[side] for side in ("old", "new") if noeol.get(side) and side in last}
+
+
+def _row(f, index, row, hot, prefix="r", quiet=(), noeol=()):
     kind, old, new, text = row
     if kind == "hunk":
         return f'<tr class="hunk"><td colspan="3">{esc(text)}</td></tr>'
@@ -109,24 +131,28 @@ def _row(f, index, row, hot, prefix="r"):
     hot_class = " hot " + worst(n["kind"] for n in hot_notes) if hot_notes else ""
     info = (f.get("moved") or {}).get(str(index))
     moved_class = f" moved moved-{info['dir']}" if info else ""
-    label = _moved_label(info) if info and info.get("start") else ""
+    label = _moved_label(info, f["idx"]) if info and info.get("start") else ""
+    quiet_class = " quiet" if index in quiet else ""
+    fmt = FORMAT_MARK if index in quiet and not info else ""
+    mark = f'<span class="noeol" title="No newline at end of file" aria-label="No newline at end of file">{icons.NOEOL}</span>' if index in noeol else ""
     return (
-        f'<tr id="{row_id}"{_data_f(f)} data-o="{_num(old)}" data-n="{_num(new)}" class="{kind}{moved_class}{hot_class}">'
+        f'<tr id="{row_id}"{_data_f(f)} data-o="{_num(old)}" data-n="{_num(new)}" class="{kind}{moved_class}{quiet_class}{hot_class}">'
         f'<td class="num">{_num(old)}</td><td class="num">{_num(new)}</td>'
-        f'<td class="code"><span class="sign">{SIGNS.get(kind, " ")}</span><span class="t">{_code(text, _row_spans(f, index))}</span>{label}</td></tr>'
+        f'<td class="code"><span class="sign">{SIGNS.get(kind, " ")}</span><span class="t">{_code(text, _row_spans(f, index))}</span>{fmt}{mark}{label}</td></tr>'
     )
 
 
 def _table(f, notes, prefix="r"):
     hot = _index_notes(notes)
-    rows = "\n".join(_row(f, i, row, hot, prefix) for i, row in enumerate(f["rows"]))
-    flag = ' data-spans="difft"' if f.get("spans") else ""
-    return f'<div class="diffwrap"><table class="diff"{flag}><tbody>\n{rows}\n</tbody></table></div>'
+    quiet = set(f.get("quiet") or ())
+    noeol = _noeol_rows(f)
+    rows = "\n".join(_row(f, i, row, hot, prefix, quiet, noeol) for i, row in enumerate(f["rows"]))
+    return f'<div class="diffwrap"><table class="diff"><tbody>\n{rows}\n</tbody></table></div>'
 
 
-def full_table(idx, rows):
+def full_table(idx, rows, spans=None, quiet=()):
     """The whole file as one table, with row ids that don't clash with the preview's."""
-    return _table({"idx": idx, "rows": rows}, [], prefix="x")
+    return _table({"idx": idx, "rows": rows, "spans": spans or {}, "quiet": quiet}, [], prefix="x")
 
 
 def blob_table(text):

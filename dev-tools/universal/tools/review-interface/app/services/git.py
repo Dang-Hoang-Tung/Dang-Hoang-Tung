@@ -6,6 +6,8 @@ MOVED_COLORS = [f"color.diff.{k}={v}" for k, v in (
     ("oldMoved", "magenta"), ("newMoved", "cyan"), ("oldMovedAlternative", "magenta"), ("newMovedAlternative", "cyan"),
     ("oldMovedDimmed", "magenta"), ("newMovedDimmed", "cyan"), ("oldMovedAlternativeDimmed", "magenta"),
     ("newMovedAlternativeDimmed", "cyan"), ("old", "red"), ("new", "green"))]
+MOVED_ARGS = ["--color=always", "--ws-error-highlight=none", "--histogram", "--color-moved=blocks",
+              "--color-moved-ws=allow-indentation-change", "-U12"]
 
 
 class Diff(str):
@@ -22,8 +24,7 @@ def diff(clone, rng):
     out = Diff(run("git", "-C", clone, "diff", "--histogram", "-U12", rng, timeout=120))
     cfg = [a for c in MOVED_COLORS for a in ("-c", c)]
     try:
-        out.moved = run("git", "-C", clone, *cfg, "diff", "--color=always", "--ws-error-highlight=none", "--histogram",
-                        "--color-moved=blocks", "--color-moved-ws=allow-indentation-change", "-U12", rng, timeout=120)
+        out.moved = run("git", "-C", clone, *cfg, "diff", *MOVED_ARGS, rng, timeout=120)
     except FAILURES:
         out.moved = None
     return out
@@ -36,18 +37,18 @@ def fetch_diff(pr):
     return diff(clone, f"{base_ref}...{head_ref}")
 
 
-def merge_base(pr):
-    n = pr["number"]
-    try:
-        return run("git", "-C", pr["source"]["clone"], "merge-base", f"refs/review/base-{n}", f"refs/review/pr-{n}").strip()
-    except FAILURES:
-        return None
-
-
-def file_pair(pr, base, path):
-    """(old, new) contents of a file at the merge base and at the PR head, or None if either is missing or not text."""
-    clone = pr["source"]["clone"]
-    try:
-        return tuple(run("git", "-C", clone, "show", f"{rev}:{path}", timeout=30) for rev in (base, f"refs/review/pr-{pr['number']}"))
-    except FAILURES + (UnicodeDecodeError,):
-        return None
+def generated_paths(pr, paths):
+    """The paths the clone marks `linguist-generated`, read at the PR head when git supports --source, else from the working tree."""
+    if not paths or not has_clone(pr["source"]):
+        return set()
+    stdin = "".join(p + "\0" for p in paths).encode()
+    for source in (["--source", f"refs/review/pr-{pr['number']}"], []):
+        try:
+            out = run("git", "-C", pr["source"]["clone"], "check-attr", *source, "-z", "--stdin", "linguist-generated", input=stdin, timeout=30)
+            break
+        except FAILURES + (OSError,):
+            continue
+    else:
+        return set()
+    parts = out.split("\0")
+    return {parts[i] for i in range(0, len(parts) - 2, 3) if parts[i + 2] in ("true", "set")}

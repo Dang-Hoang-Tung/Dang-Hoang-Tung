@@ -81,6 +81,20 @@ class CliTests(TmpCase):
         self.assertEqual((last["who"], last["text"]), ("ai", "answer"))
         self.assertEqual(state.waiting_threads(state.load_state(self.cfg, "acme-widgets-7")), [])
 
+    def test_thinking_notes_show_while_waiting_then_move_onto_the_reply(self):
+        state.save_state(self.cfg, "acme-widgets-7", {"threads": [thread("t", [msg("1", "me", "q", "1")])]})
+        with mock.patch("sys.stdout"):
+            cli.ai_thinking(self.cfg, "acme-widgets-7", "t", "reading the diff")
+            cli.ai_thinking(self.cfg, "acme-widgets-7", "t", "checking callers")
+        t = state.load_state(self.cfg, "acme-widgets-7")["threads"][0]
+        self.assertEqual([n["text"] for n in t["thinking"]], ["reading the diff", "checking callers"])
+        self.assertEqual(len(state.waiting_threads(state.load_state(self.cfg, "acme-widgets-7"))), 1)
+        with mock.patch("sys.stdout"):
+            cli.ai_reply(self.cfg, "acme-widgets-7", "t", "answer")
+        t = state.load_state(self.cfg, "acme-widgets-7")["threads"][0]
+        self.assertNotIn("thinking", t)
+        self.assertEqual([n["text"] for n in t["messages"][-1]["steps"]], ["reading the diff", "checking callers"])
+
     def test_ensure_server_starts_module_from_repo_root(self):
         calls = []
         with mock.patch.object(cli, "server_info", side_effect=[None, {"port": 1, "token": "t"}]), \

@@ -1,0 +1,18 @@
+{
+  "name": "One word changed in JSX text that contains apostrophes",
+  "source": "synthetic edge case written for this corpus (original neutral code, no external source); modelled on common review-diff shapes",
+  "strong_must": [
+    {
+      "side": "old",
+      "line": 2,
+      "text": "total"
+    },
+    {
+      "side": "new",
+      "line": 2,
+      "text": "subtotal"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

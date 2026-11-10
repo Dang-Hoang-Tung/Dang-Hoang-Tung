@@ -1,0 +1,18 @@
+{
+  "name": "Guard clause added at top of function",
+  "source": "synthetic edge case written for this corpus (original neutral code, no external source); modelled on common review-diff shapes",
+  "strong_must": [
+    {
+      "side": "new",
+      "line": 2,
+      "text": "if (!order)"
+    },
+    {
+      "side": "new",
+      "line": 2,
+      "text": "return 0"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

@@ -1,0 +1,18 @@
+{
+  "name": "Non-ASCII and emoji earlier on the line, change later",
+  "source": "synthetic edge case written for this corpus (original neutral code, no external source); modelled on common review-diff shapes",
+  "strong_must": [
+    {
+      "side": "old",
+      "line": 1,
+      "text": "1"
+    },
+    {
+      "side": "new",
+      "line": 1,
+      "text": "2"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

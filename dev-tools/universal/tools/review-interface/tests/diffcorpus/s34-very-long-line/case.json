@@ -1,0 +1,13 @@
+{
+  "name": "One element changed in a 4000-character line",
+  "source": "synthetic edge case written for this corpus (original neutral code, no external source); modelled on common review-diff shapes",
+  "strong_must": [
+    {
+      "side": "new",
+      "line": 1,
+      "text": "999999"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

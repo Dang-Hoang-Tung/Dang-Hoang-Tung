@@ -1,0 +1,25 @@
+{
+  "name": "Quote style changed, same string value: formatting only",
+  "source": "synthetic (rule audit)",
+  "strong_must": [],
+  "strong_must_not": [
+    {
+      "side": "new",
+      "line": 1
+    },
+    {
+      "side": "old",
+      "line": 1
+    }
+  ],
+  "quiet": [
+    {
+      "side": "new",
+      "line": 1
+    },
+    {
+      "side": "old",
+      "line": 1
+    }
+  ]
+}

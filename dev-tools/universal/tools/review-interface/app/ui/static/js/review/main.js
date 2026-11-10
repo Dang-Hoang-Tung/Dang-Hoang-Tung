@@ -1,7 +1,6 @@
 function renderAll() { renderReadUI(); renderThreads(); renderApprove(); }
 
 initFileSections();
-initIntraline();
 initHideWs();
 initHighlight();
 initTabs();

@@ -32,3 +32,12 @@
 .msg.gh .avatar{background:var(--text-3)}
 .msg.gh .bubble .text{background:var(--surface-2)}
 .msg.gh .bubble .meta a{color:inherit}
+.thinking{display:flex;flex-direction:column;gap:3px;margin:2px 0 8px 36px;font-size:12px;line-height:1.4;color:var(--text-3)}
+.thinking .now{color:var(--text-2)}
+.thinking .now::after{content:"…";animation:thinkdots 1.2s steps(3,end) infinite;display:inline-block;overflow:hidden;vertical-align:bottom;width:1ch}
+@keyframes thinkdots{from{width:0}to{width:1ch}}
+@media (prefers-reduced-motion:reduce){.thinking .now::after{animation:none}}
+.steps{margin-top:6px;font-size:12px;color:var(--text-3)}
+.steps summary{cursor:pointer;user-select:none}
+.steps summary:hover{color:var(--text-2)}
+.steps ol{margin:4px 0 0;padding-left:18px;line-height:1.45}

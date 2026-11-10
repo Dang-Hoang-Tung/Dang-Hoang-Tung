@@ -1,0 +1,13 @@
+{
+  "name": "New call inserted before an existing nested call",
+  "source": "difftastic manual, Tricky Cases (adapted, own words and code): https://difftastic.wilfred.me.uk/tricky_cases.html #Disconnected Delimiters",
+  "strong_must": [
+    {
+      "side": "new",
+      "line": 1,
+      "text": "fresh"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

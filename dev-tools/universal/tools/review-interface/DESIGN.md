@@ -52,7 +52,7 @@ app/
       js/    shared/dom.js shared/markdown.js shared/time.js shared/theme.js shared/dropdown.js
              review/data.js review/store.js review/read-state.js review/files.js review/left-panel.js
              review/scroll-spy.js review/tree-canvas.js review/modals.js review/treemap.js
-             review/selection.js review/checks.js review/threads.js review/popover.js review/nav.js review/intraline.js review/resizers.js review/main.js
+             review/selection.js review/checks.js review/threads.js review/popover.js review/nav.js review/whitespace.js review/resizers.js review/main.js
              queue/filters.js queue/main.js
 tests/
 ```

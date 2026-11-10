@@ -1,0 +1,33 @@
+{
+  "name": "Type union reflowed so the leading pipe disappears",
+  "source": "OSS (MIT) https://github.com/pmndrs/jotai/pull/3367, excerpt adapted and renamed",
+  "strong_must": [],
+  "strong_must_not": [
+    {
+      "side": "old",
+      "line": 4
+    },
+    {
+      "side": "old",
+      "line": 5
+    },
+    {
+      "side": "new",
+      "line": 4
+    }
+  ],
+  "quiet": [
+    {
+      "side": "old",
+      "line": 4
+    },
+    {
+      "side": "old",
+      "line": 5
+    },
+    {
+      "side": "new",
+      "line": 4
+    }
+  ]
+}

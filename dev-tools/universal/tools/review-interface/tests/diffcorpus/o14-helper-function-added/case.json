@@ -1,0 +1,23 @@
+{
+  "name": "New exported helper with JSDoc added between functions",
+  "source": "OSS (MIT) https://github.com/colinhacks/zod/pull/6739, excerpt adapted and renamed",
+  "strong_must": [
+    {
+      "side": "new",
+      "line": 6,
+      "text": "ownPaths"
+    },
+    {
+      "side": "new",
+      "line": 9,
+      "text": "slice"
+    },
+    {
+      "side": "new",
+      "line": 7,
+      "text": "for"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

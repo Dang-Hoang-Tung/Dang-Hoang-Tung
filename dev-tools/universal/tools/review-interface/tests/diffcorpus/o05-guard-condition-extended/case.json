@@ -1,0 +1,13 @@
+{
+  "name": "Early-return guard gains a condition and a line moves up",
+  "source": "OSS (MIT) https://github.com/vercel/swr/pull/4312, excerpt adapted and renamed",
+  "strong_must": [
+    {
+      "side": "new",
+      "line": 4,
+      "text": "isUndefined(data)"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

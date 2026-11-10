@@ -1,0 +1,33 @@
+{
+  "name": "Guarded call removed, bare call retargeted",
+  "source": "difftastic manual, Tricky Cases (adapted, own words and code): https://difftastic.wilfred.me.uk/tricky_cases.html #Minimising Depth Changes",
+  "strong_must": [
+    {
+      "side": "old",
+      "line": 1,
+      "text": "if (enabled)"
+    },
+    {
+      "side": "old",
+      "line": 2,
+      "text": "123"
+    },
+    {
+      "side": "old",
+      "line": 3,
+      "text": "}"
+    },
+    {
+      "side": "old",
+      "line": 4,
+      "text": "456"
+    },
+    {
+      "side": "new",
+      "line": 1,
+      "text": "789"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

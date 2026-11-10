@@ -124,6 +124,6 @@ def read(clone, sha, path):
     if size > MAX_BYTES:
         raise NotFound(path + " is too big to show")
     try:
-        return run("git", "-C", clone, "show", f"{sha}:{path}", timeout=30)
+        return run("git", "-C", clone, "show", f"{sha}:{path}", timeout=30, errors="strict")
     except UnicodeDecodeError:
         raise NotFound(path + " isn't a text file")

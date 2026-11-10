@@ -1,0 +1,41 @@
+{
+  "name": "Existing statement wrapped in try/catch, body re-indented",
+  "source": "synthetic edge case written for this corpus (original neutral code, no external source); modelled on common review-diff shapes",
+  "strong_must": [
+    {
+      "side": "new",
+      "line": 3,
+      "text": "try"
+    },
+    {
+      "side": "new",
+      "line": 5,
+      "text": "catch"
+    },
+    {
+      "side": "new",
+      "line": 6,
+      "text": "report"
+    }
+  ],
+  "strong_must_not": [
+    {
+      "side": "old",
+      "line": 3
+    },
+    {
+      "side": "new",
+      "line": 4
+    }
+  ],
+  "quiet": [
+    {
+      "side": "old",
+      "line": 3
+    },
+    {
+      "side": "new",
+      "line": 4
+    }
+  ]
+}

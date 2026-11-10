@@ -1,0 +1,58 @@
+{
+  "name": "Imports split over lines with names added, assertions added in a function",
+  "source": "OSS (MIT) https://github.com/vercel/swr/pull/4336, excerpt adapted and renamed",
+  "strong_must": [
+    {
+      "side": "new",
+      "line": 1,
+      "text": "TagRevalidator"
+    },
+    {
+      "side": "new",
+      "line": 3,
+      "text": "globalRevalidateTag"
+    },
+    {
+      "side": "new",
+      "line": 11,
+      "text": "TagRevalidator"
+    },
+    {
+      "side": "new",
+      "line": 12,
+      "text": "globalRevalidateTag"
+    }
+  ],
+  "strong_must_not": [
+    {
+      "side": "new",
+      "line": 4
+    },
+    {
+      "side": "new",
+      "line": 5
+    },
+    {
+      "side": "new",
+      "line": 6
+    },
+    {
+      "side": "old",
+      "line": 2
+    }
+  ],
+  "quiet": [
+    {
+      "side": "new",
+      "line": 4
+    },
+    {
+      "side": "new",
+      "line": 5
+    },
+    {
+      "side": "new",
+      "line": 6
+    }
+  ]
+}

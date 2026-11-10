@@ -333,3 +333,18 @@ class ServerHardeningTests(ServerBase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class RefreshTimerTests(unittest.TestCase):
+    def test_refresh_due_after_interval_since_last_start(self):
+        status = helper.new_refresh_status()
+        cfg = {"refresh_minutes": 15}
+        self.assertFalse(helper.refresh_due(cfg, status, 1000, 1000 + 14 * 60))
+        self.assertTrue(helper.refresh_due(cfg, status, 1000, 1000 + 15 * 60))
+        status["started"] = 1000 + 15 * 60
+        self.assertFalse(helper.refresh_due(cfg, status, 1000, 1000 + 20 * 60))
+
+    def test_no_refresh_while_running_or_when_off(self):
+        status = dict(helper.new_refresh_status(), running=True)
+        self.assertFalse(helper.refresh_due({"refresh_minutes": 15}, status, 0, 10 ** 6))
+        self.assertFalse(helper.refresh_due({"refresh_minutes": 0}, helper.new_refresh_status(), 0, 10 ** 6))

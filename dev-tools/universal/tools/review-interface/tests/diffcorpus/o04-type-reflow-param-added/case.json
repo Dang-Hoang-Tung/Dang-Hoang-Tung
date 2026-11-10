@@ -1,0 +1,35 @@
+{
+  "name": "Property type reflowed into a union with an extra callback parameter",
+  "source": "OSS (MIT) https://github.com/vercel/swr/pull/4318, excerpt adapted and renamed",
+  "strong_must": [
+    {
+      "side": "new",
+      "line": 5,
+      "text": "displayedData"
+    }
+  ],
+  "strong_must_not": [
+    {
+      "side": "new",
+      "line": 3
+    },
+    {
+      "side": "new",
+      "line": 4
+    },
+    {
+      "side": "old",
+      "line": 3
+    }
+  ],
+  "quiet": [
+    {
+      "side": "new",
+      "line": 3
+    },
+    {
+      "side": "new",
+      "line": 4
+    }
+  ]
+}

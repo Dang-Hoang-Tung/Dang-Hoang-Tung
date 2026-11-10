@@ -9,6 +9,7 @@ DEFAULTS = {
     "data_dir": "~/.claude/agent-files/shared/team-reviewer/review-ui",
     "port": 47615,
     "idle_hours": 2,
+    "refresh_minutes": 15,
     "keep_days": 14,
     "ai_name": "AI",
     "user_name": "",

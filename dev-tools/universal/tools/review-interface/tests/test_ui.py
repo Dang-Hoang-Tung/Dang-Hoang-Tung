@@ -231,9 +231,39 @@ class ReviewPageTests(unittest.TestCase):
              "rows": [("add", None, 1, "ab<c")], "spans": {"0": [[1, 3]]}}
         out = file_section.render(f, [])
         self.assertIn('<span class="t">a<span class="hl">b&lt;</span>c</span>', out)
-        self.assertIn('<table class="diff" data-spans="difft">', out)
-        f2 = dict(f, spans={})
-        self.assertNotIn("data-spans", file_section.render(f2, []))
+        self.assertNotIn("data-spans", out)
+
+    def test_quiet_rows_get_class_and_format_marker_unless_moved(self):
+        f = {"idx": 0, "path": "a.py", "a": 3, "d": 0, "gen": False, "kind": None, "moved": {"2": {"dir": "from"}},
+             "rows": [("add", None, 1, "x"), ("add", None, 2, "y"), ("add", None, 3, "z")], "quiet": [1, 2]}
+        out = file_section.render(f, [])
+        self.assertRegex(out, r'<tr id="r0-0"[^>]*class="add">')
+        self.assertRegex(out, r'<tr id="r0-1"[^>]*class="add quiet">.*class="fmtmark"')
+        self.assertRegex(out, r'<tr id="r0-2"[^>]*class="add moved moved-from quiet">(?:(?!fmtmark).)*</tr>')
+
+    def test_noeol_marker_on_last_rows_only(self):
+        f = {"idx": 0, "path": "a.py", "a": 1, "d": 1, "gen": False, "kind": None, "moved": {},
+             "rows": [("ctx", 1, 1, "a"), ("del", 2, None, "b"), ("add", None, 2, "c"), ("ctx", 3, 3, "d")],
+             "noeol": {"old": True, "new": False}}
+        out = file_section.render(f, [])
+        self.assertEqual(out.count('class="noeol"'), 1)
+        self.assertRegex(out, r'id="r0-3".*class="noeol"')
+        f["noeol"] = {"old": True, "new": True}
+        f["rows"] = f["rows"][:3]
+        out = file_section.render(f, [])
+        self.assertEqual(out.count('class="noeol"'), 2)
+        self.assertNotIn('class="noeol"', file_section.render(dict(f, noeol={}), []))
+
+    def test_mode_change_text(self):
+        mode = {"old": "100644", "new": "100755"}
+        f = {"idx": 0, "path": "a.sh", "a": 1, "d": 0, "gen": False, "kind": None, "moved": {},
+             "rows": [("add", None, 1, "x")], "mode": mode}
+        self.assertIn("mode 100644 → 100755", file_section.render(f, []))
+        only = dict(f, rows=[], a=0, d=0)
+        out = file_section.render(only, [])
+        self.assertIn("mode 100644 → 100755", out)
+        self.assertNotIn("no changes", out)
+        self.assertIn("no changes", file_section.render(dict(only, mode=None), []))
 
     def test_head_has_themes_before_style(self):
         self.assertLess(self.page.index("REVIEW_THEMES"), self.page.index("<style>"))
@@ -457,12 +487,11 @@ if __name__ == "__main__":
     unittest.main()
 
 
-class IntralineTests(unittest.TestCase):
-    def test_review_page_loads_pinned_jsdiff_with_integrity_before_the_bundle(self):
+class HighlightSourceTests(unittest.TestCase):
+    def test_review_page_has_no_browser_word_diff(self):
         page = review_page.render(review_model())
-        tag = 'src="https://cdn.jsdelivr.net/npm/diff@5.2.0/dist/diff.min.js" integrity="sha384-'
-        self.assertIn(tag, page)
-        self.assertLess(page.index(tag), page.rindex("initIntraline();"))
+        self.assertNotIn("diff@5", page)
+        self.assertNotIn("Diff.", page)
 
 
 class QueueEffortFilterTests(unittest.TestCase):

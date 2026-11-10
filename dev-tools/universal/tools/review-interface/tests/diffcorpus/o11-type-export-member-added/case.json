@@ -1,0 +1,13 @@
+{
+  "name": "Type name added to an existing export list",
+  "source": "OSS (MIT) https://github.com/TanStack/query/pull/12537, excerpt adapted and renamed",
+  "strong_must": [
+    {
+      "side": "new",
+      "line": 4,
+      "text": "UseInfiniteQueryDefinedReturnType"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

@@ -84,6 +84,20 @@ function composer(key, placeholder, value, onSave, onCancel, saveLabel, blocked,
   c.append(ta, row);
   return c;
 }
+function stepsList(steps) {
+  const d = el('details', 'steps');
+  d.append(el('summary', null, `Show steps (${steps.length})`));
+  const ol = el('ol');
+  steps.forEach(st => ol.append(el('li', null, st.text)));
+  d.append(ol);
+  return d;
+}
+function thinkingNow(steps) {
+  const box = el('div', 'thinking');
+  box.setAttribute('aria-live', 'polite');
+  steps.forEach((st, k) => box.append(el('div', k === steps.length - 1 ? 'now' : 'done', st.text)));
+  return box;
+}
 function messageList(t, box) {
   for (const m of t.messages) {
     const gh = m.who === 'github';
@@ -94,9 +108,11 @@ function messageList(t, box) {
     if (gh && String(m.url).startsWith('https://')) { const a = el('a', null, name); a.href = m.url; a.target = '_blank'; a.rel = 'noopener'; meta.append(el('b', null), tm); $('b', meta).append(a); }
     else meta.append(el('b', null, name), tm);
     bub.append(meta, el('div', 'text', m.text));
+    if (isAi(m) && m.steps && m.steps.length) bub.append(stepsList(m.steps));
     d.append(el('span', 'avatar', name.charAt(0).toUpperCase()), bub);
     box.append(d);
   }
+  if (t.thinking && t.thinking.length && lastFromMe(t)) box.append(thinkingNow(t.thinking));
   if (t.posted && t.posted.url) {
     const d = el('div', 'posted'), label = t.posted.dry_run ? 'Posted (dry run)' : 'Posted to GitHub';
     if (String(t.posted.url).startsWith('https://')) { const a = el('a', null, label); a.href = t.posted.url; a.target = '_blank'; a.rel = 'noopener'; d.append(a); }

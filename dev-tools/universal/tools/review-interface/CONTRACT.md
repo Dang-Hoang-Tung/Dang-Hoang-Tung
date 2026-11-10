@@ -124,6 +124,10 @@ Each new reviewer message adds one line to `inbox.jsonl`:
 
 `kind` is `chat` for the PR-wide chat, otherwise `comment`. The chat is a normal thread with id `chat` and no `path` or `line`; answer it with `review.py ai reply <slug> chat "text"`.
 
+### Thinking notes
+
+While working on a reply, post short progress notes with `review.py ai thinking <slug> <thread> "text"`: one line per real step (what you're checking and why), not a transcript. They are stored on the thread as `thinking: [{text, at}]` and shown live under the waiting reviewer's message. `ai reply` moves them onto the reply as `steps`, shown collapsed ("Show steps (N)"). They are notes the AI chooses to write, not its internal reasoning.
+
 ## Posting to GitHub
 
 A reviewer message with `"post": true` is posted to the PR as written when the reviewer sends it (the legacy form, text starting with `post:`, is still accepted and the prefix is stripped): a line comment for a thread on lines, otherwise a conversation comment. An AI can post a thread's latest message marked for posting with `review.py ai post <slug> <thread>`. Posting is recorded per message in `posted_messages` (and in `posted`) and is never repeated for the same message.
@@ -141,7 +145,7 @@ Fields: `synced`, `gh_root`; threads from GitHub also have id `gh-<root id>`, `p
 
 ## After a refresh
 
-Clicking **Refresh** on the queue page, the queue's own refresh every 15 minutes while it is open, or running `review.py build` rebuilds every page and appends an event to `events.jsonl`. It only ever appends, so `tail -F` on it shows each new event once. `review.py ai changes` prints the latest one:
+Clicking **Refresh** on the queue page, the helper's own refresh every `refresh_minutes` (default 15) while it runs, or running `review.py build` rebuilds every page and appends an event to `events.jsonl`. It only ever appends, so `tail -F` on it shows each new event once. `review.py ai changes` prints the latest one:
 
 ```json
 {"type": "rebuild", "source": "refresh", "at": "…", "partial": false,
@@ -158,6 +162,7 @@ Clicking **Refresh** on the queue page, the queue's own refresh every 15 minutes
 python3 review.py paths                      # where everything lives
 python3 review.py ai list                    # threads waiting for a reply
 python3 review.py ai changes                 # what changed in the latest rebuild or Refresh
+python3 review.py ai thinking <slug> <thread> "text"   # progress note shown live while you work on a reply
 python3 review.py ai reply <slug> <thread> "text"
 python3 review.py ai post <slug> <thread>    # only when the reviewer asked for it; never approve
 python3 review.py build --no-open [PR …]     # rebuild pages after writing insights

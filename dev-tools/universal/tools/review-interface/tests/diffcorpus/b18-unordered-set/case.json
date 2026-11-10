@@ -1,0 +1,28 @@
+{
+  "name": "Set constructor arguments swapped",
+  "source": "difftastic manual, Tricky Cases (adapted, own words and code): https://difftastic.wilfred.me.uk/tricky_cases.html #Unordered Data Types",
+  "strong_must": [
+    {
+      "side": "old",
+      "line": 1,
+      "text": "1"
+    },
+    {
+      "side": "new",
+      "line": 1,
+      "text": "1"
+    },
+    {
+      "side": "old",
+      "line": 1,
+      "text": "2"
+    },
+    {
+      "side": "new",
+      "line": 1,
+      "text": "2"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

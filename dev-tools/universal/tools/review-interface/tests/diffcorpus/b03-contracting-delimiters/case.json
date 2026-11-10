@@ -1,0 +1,23 @@
+{
+  "name": "Array literal dissolved into call arguments",
+  "source": "difftastic manual, Tricky Cases (adapted, own words and code): https://difftastic.wilfred.me.uk/tricky_cases.html #Expanding/Contracting Delimiters",
+  "strong_must": [
+    {
+      "side": "old",
+      "line": 1,
+      "text": "["
+    },
+    {
+      "side": "old",
+      "line": 1,
+      "text": "]"
+    },
+    {
+      "side": "new",
+      "line": 1,
+      "text": ")"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

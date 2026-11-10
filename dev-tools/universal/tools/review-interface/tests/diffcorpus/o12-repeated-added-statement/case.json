@@ -1,0 +1,23 @@
+{
+  "name": "Same statement added on two code paths",
+  "source": "OSS (MIT) https://github.com/colinhacks/zod/pull/6739, excerpt adapted and renamed",
+  "strong_must": [
+    {
+      "side": "new",
+      "line": 1,
+      "text": "const start"
+    },
+    {
+      "side": "new",
+      "line": 6,
+      "text": "ownPaths"
+    },
+    {
+      "side": "new",
+      "line": 11,
+      "text": "ownPaths"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

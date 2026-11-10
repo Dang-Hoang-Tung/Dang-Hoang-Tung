@@ -58,13 +58,16 @@ tr.moved .sign{color:var(--text-3);opacity:.7}
 /* whitespace-only changes */
 tr.ws-hidden{display:none}
 tr.ws-only td{background:transparent}tr.ws-only td.num{background:transparent;color:var(--text-3)}
-tr.ws-only .sign{color:transparent}tr.ws-only .hl{background:none}
+tr.ws-only .sign{color:transparent}
+.fmtmark{margin-left:10px;font:500 10.5px var(--font);color:var(--text-3);opacity:.8;user-select:none;vertical-align:1px}
+tr.ws-only .fmtmark{display:none}
 .mvlabel.plain{cursor:default}
+.noeol{margin-left:8px;color:var(--text-3);vertical-align:-2px;user-select:none}.noeol svg{width:13px;height:13px}
 /* Shiki tokens */
 .tk{color:color-mix(in srgb,var(--shiki-light) 80%,#000)}
 .is-dark .tk{color:color-mix(in srgb,var(--shiki-dark) 70%,#fff)}
 tr.ws-only .tk{color:inherit}
-td.code :is(.ti,.mvlabel,.hl,.tk,.implink){text-indent:0}
+td.code :is(.ti,.mvlabel,.fmtmark,.hl,.tk,.implink){text-indent:0}
 .fold-spacer{flex:none;width:26px;height:26px}
 section.nodiff .fh{border-bottom:0}
 section.nodiff .fbody{display:none}

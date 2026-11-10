@@ -1,0 +1,13 @@
+{
+  "name": "Multi-line props with one prop line added",
+  "source": "synthetic edge case written for this corpus (original neutral code, no external source); modelled on common review-diff shapes",
+  "strong_must": [
+    {
+      "side": "new",
+      "line": 4,
+      "text": "size"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

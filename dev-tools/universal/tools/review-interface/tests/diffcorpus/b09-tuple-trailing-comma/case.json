@@ -1,0 +1,13 @@
+{
+  "name": "Parenthesised value becomes a one-tuple",
+  "source": "difftastic manual, Tricky Cases (adapted, own words and code): https://difftastic.wilfred.me.uk/tricky_cases.html #Trailing Punctuation (Python tuple)",
+  "strong_must": [
+    {
+      "side": "new",
+      "line": 1,
+      "text": ","
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

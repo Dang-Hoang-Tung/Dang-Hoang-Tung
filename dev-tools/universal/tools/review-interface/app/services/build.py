@@ -1,11 +1,9 @@
 import json
-import shutil
 import subprocess
 import sys
-from concurrent.futures import ThreadPoolExecutor
 
 from app.config import dirs, slug
-from app.services import diff, events
+from app.services import events
 from app.services import gh_sync, git, github, manifest, models
 from app.services.adapters import team_reviewer
 from app.services.insights import load as load_insights
@@ -43,31 +41,11 @@ def fetch_diffs(prs):
     return diffs
 
 
-def _difft_spans(pr, base, f):
-    pair = git.file_pair(pr, base, f["path"])
-    data = pair and diff.run_difft(*pair, f["path"])
-    spans = diff.difft_spans(f["rows"], data) if data else None
-    moved = f.get("moved") or {}
-    return {i: r for i, r in spans.items() if str(i) not in moved} if spans is not None else None
-
-
-def refine_spans(pr, model):
-    base = git.has_clone(pr["source"]) and shutil.which("difft") and git.merge_base(pr)
-    if not base:
-        return
-    files = [f for f in model["files"] if not f["binary"] and {"del", "add"} <= {r[0] for r in f["rows"]}]
-    with ThreadPoolExecutor(max_workers=8) as pool:
-        for f, spans in zip(files, pool.map(lambda f: _difft_spans(pr, base, f), files)):
-            if spans is not None:
-                f["spans"] = spans
-
-
 def build_pr(cfg, pr, diff_text, name):
     d = dirs(cfg)
     s = slug(pr["repo"], pr["number"])
     ins, status = load_insights(cfg, pr["repo"], pr["number"], pr["headRefOid"])
     model = models.review_model(cfg, pr, diff_text, ins, status, name)
-    refine_spans(pr, model)
     summary = models.pr_summary(model, status)
     (d["pages"] / f"{s}.html").write_text(review_page.render(model))
     (d["pages"] / f"{s}.json").write_text(json.dumps(summary))

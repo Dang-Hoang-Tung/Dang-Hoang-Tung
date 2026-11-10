@@ -1,0 +1,18 @@
+{
+  "name": "No final newline on either side, last token changed",
+  "source": "synthetic edge case written for this corpus (original neutral code, no external source); modelled on common review-diff shapes",
+  "strong_must": [
+    {
+      "side": "old",
+      "line": 2,
+      "text": "a"
+    },
+    {
+      "side": "new",
+      "line": 2,
+      "text": "b"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

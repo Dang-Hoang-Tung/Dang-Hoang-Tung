@@ -1,0 +1,13 @@
+{
+  "name": "No-semicolon style: removing the leading ';' joins the two lines into one call",
+  "source": "synthetic (rule audit)",
+  "strong_must": [
+    {
+      "side": "old",
+      "line": 2,
+      "text": ";"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

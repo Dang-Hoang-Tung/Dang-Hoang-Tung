@@ -1,0 +1,28 @@
+{
+  "name": "Braces dropped from a guard and one body line deleted",
+  "source": "OSS (MIT) https://github.com/colinhacks/zod/pull/6735, excerpt adapted and renamed",
+  "strong_must": [
+    {
+      "side": "old",
+      "line": 3,
+      "text": "{"
+    },
+    {
+      "side": "old",
+      "line": 4,
+      "text": "canary.aborted"
+    },
+    {
+      "side": "old",
+      "line": 6,
+      "text": "}"
+    }
+  ],
+  "strong_must_not": [
+    {
+      "side": "old",
+      "line": 5
+    }
+  ],
+  "quiet": []
+}

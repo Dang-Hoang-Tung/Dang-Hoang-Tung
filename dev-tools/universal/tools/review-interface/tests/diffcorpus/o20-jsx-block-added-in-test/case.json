@@ -1,0 +1,23 @@
+{
+  "name": "JSX tree added inside a render call",
+  "source": "OSS (MIT) https://github.com/radix-ui/primitives/pull/4201, excerpt adapted and renamed",
+  "strong_must": [
+    {
+      "side": "new",
+      "line": 6,
+      "text": "reports value changes"
+    },
+    {
+      "side": "new",
+      "line": 9,
+      "text": "onValueChange"
+    },
+    {
+      "side": "new",
+      "line": 10,
+      "text": "Tabs.Trigger"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

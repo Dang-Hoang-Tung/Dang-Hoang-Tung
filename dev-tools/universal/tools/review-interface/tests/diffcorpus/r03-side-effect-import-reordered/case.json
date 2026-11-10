@@ -1,0 +1,13 @@
+{
+  "name": "Side-effect import moved after a normal import: load order changed",
+  "source": "synthetic (rule audit)",
+  "strong_must": [
+    {
+      "side": "new",
+      "line": 2,
+      "text": "'./polyfills'"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

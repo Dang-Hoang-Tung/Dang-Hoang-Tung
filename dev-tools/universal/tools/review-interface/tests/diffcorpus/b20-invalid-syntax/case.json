@@ -1,0 +1,13 @@
+{
+  "name": "Unparseable file with one token changed",
+  "source": "difftastic manual, Tricky Cases (adapted, own words and code): https://difftastic.wilfred.me.uk/tricky_cases.html #Invalid Syntax",
+  "strong_must": [
+    {
+      "side": "new",
+      "line": 1,
+      "text": "2"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

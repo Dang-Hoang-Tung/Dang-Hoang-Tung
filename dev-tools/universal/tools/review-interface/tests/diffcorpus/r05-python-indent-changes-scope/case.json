@@ -1,0 +1,13 @@
+{
+  "name": "Python: dedenting a line moves it out of the if",
+  "source": "synthetic (rule audit)",
+  "strong_must": [
+    {
+      "side": "new",
+      "line": 4,
+      "text": "run()"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

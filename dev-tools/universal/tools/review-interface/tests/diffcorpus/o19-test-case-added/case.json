@@ -1,0 +1,23 @@
+{
+  "name": "Whole test case appended after an existing one",
+  "source": "OSS (MIT) https://github.com/colinhacks/zod/pull/6740, excerpt adapted and renamed",
+  "strong_must": [
+    {
+      "side": "new",
+      "line": 7,
+      "text": "a throwing getter"
+    },
+    {
+      "side": "new",
+      "line": 15,
+      "text": "ready = true"
+    },
+    {
+      "side": "new",
+      "line": 9,
+      "text": "boom"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

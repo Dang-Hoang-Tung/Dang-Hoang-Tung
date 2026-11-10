@@ -40,9 +40,11 @@ function goToRows(rowIds, instant) {
   end.scrollIntoView({ block: 'center', behavior: reduced || instant ? 'auto' : 'smooth' });
 }
 function goToMoved(btn) {
-  const id = btn.dataset.target;
-  setCollapsed(+btn.dataset.file, false);
-  if (!document.getElementById(id)) { goToFile(+btn.dataset.file); return; }
+  const id = btn.dataset.target, i = +btn.dataset.file;
+  setCollapsed(i, false);
+  const expand = !document.getElementById(id) && $('button.expand', section(i));
+  if (expand) expand.click();
+  if (!document.getElementById(id)) { goToFile(i); return; }
   goToRows([id]);
   setTimeout(() => { const r = document.getElementById(id); if (r) r.classList.remove('flash'); }, 1600);
 }

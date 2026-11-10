@@ -71,8 +71,12 @@ def cookie_name(port):
     return f"rt{port}"
 
 
-def make_handler(cfg, token, touch):
-    refresh = {"running": False, "error": None, "started": None, "finished": None}
+def new_refresh_status():
+    return {"running": False, "error": None, "started": None, "finished": None}
+
+
+def make_handler(cfg, token, touch, refresh=None):
+    refresh = refresh if refresh is not None else new_refresh_status()
     pages = dirs(cfg)["pages"].resolve()
     synced_at, sync_lock = {}, threading.Lock()
 
@@ -335,11 +339,19 @@ def prune_state(cfg):
             f.unlink()
 
 
-def housekeeping(httpd, cfg, last):
-    """Prune old state every few hours; stop after `idle_hours` without requests (0 = never stop)."""
-    pruned = time.time()
+def refresh_due(cfg, status, started_at, now):
+    every = cfg.get("refresh_minutes", 0) * 60
+    return every > 0 and not status["running"] and now - (status["started"] or started_at) >= every
+
+
+def housekeeping(httpd, cfg, last, refresh):
+    """Refresh the queue every `refresh_minutes`, prune old state every few hours, and stop after `idle_hours`
+    without requests (0 = never stop). Background refreshes don't count as requests."""
+    pruned = started_at = time.time()
     while True:
         time.sleep(30)
+        if refresh_due(cfg, refresh, started_at, time.time()):
+            start_refresh(cfg, refresh)
         if time.time() - pruned > 6 * 3600:
             prune_state(cfg)
             pruned = time.time()
@@ -375,8 +387,8 @@ def serve(cfg):
     d = dirs(cfg)
     prune_state(cfg)
     token = session_token(d["root"])
-    last = [time.time()]
-    handler = make_handler(cfg, token, lambda: last.__setitem__(0, time.time()))
+    last, refresh = [time.time()], new_refresh_status()
+    handler = make_handler(cfg, token, lambda: last.__setitem__(0, time.time()), refresh)
     try:
         httpd = ThreadingHTTPServer(("127.0.0.1", cfg["port"]), handler)
     except OSError:
@@ -384,7 +396,7 @@ def serve(cfg):
     info = d["root"] / "server.json"
     info.write_text(json.dumps({"pid": os.getpid(), "port": httpd.server_address[1], "token": token, "started": time.time()}))
     os.chmod(info, 0o600)
-    threading.Thread(target=housekeeping, args=(httpd, cfg, last), daemon=True).start()
+    threading.Thread(target=housekeeping, args=(httpd, cfg, last, refresh), daemon=True).start()
     try:
         httpd.serve_forever()
     finally:

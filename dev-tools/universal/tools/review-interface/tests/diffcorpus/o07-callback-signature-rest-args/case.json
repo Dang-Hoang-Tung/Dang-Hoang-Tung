@@ -1,0 +1,28 @@
+{
+  "name": "Parameters replaced by rest args with a cast",
+  "source": "OSS (MIT) https://github.com/pmndrs/zustand/pull/3592, excerpt adapted and renamed",
+  "strong_must": [
+    {
+      "side": "old",
+      "line": 3,
+      "text": "replace"
+    },
+    {
+      "side": "new",
+      "line": 3,
+      "text": "...args"
+    },
+    {
+      "side": "old",
+      "line": 4,
+      "text": "as any"
+    },
+    {
+      "side": "new",
+      "line": 4,
+      "text": "Parameters"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

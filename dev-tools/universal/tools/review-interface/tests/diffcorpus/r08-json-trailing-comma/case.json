@@ -1,0 +1,13 @@
+{
+  "name": "JSON: a trailing comma makes the file invalid",
+  "source": "synthetic (rule audit)",
+  "strong_must": [
+    {
+      "side": "new",
+      "line": 3,
+      "text": ","
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

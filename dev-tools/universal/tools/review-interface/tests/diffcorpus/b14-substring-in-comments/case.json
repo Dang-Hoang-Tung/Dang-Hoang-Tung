@@ -1,0 +1,28 @@
+{
+  "name": "Word changed in comment and similar word in code",
+  "source": "difftastic manual, Tricky Cases (adapted, own words and code): https://difftastic.wilfred.me.uk/tricky_cases.html #Matching Substrings In Comments",
+  "strong_must": [
+    {
+      "side": "old",
+      "line": 1,
+      "text": "quick"
+    },
+    {
+      "side": "new",
+      "line": 1,
+      "text": "slow"
+    },
+    {
+      "side": "old",
+      "line": 2,
+      "text": "foobar"
+    },
+    {
+      "side": "new",
+      "line": 2,
+      "text": "foobaz"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

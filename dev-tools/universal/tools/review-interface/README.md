@@ -11,7 +11,7 @@ python3 review.py build --no-open # build only
 python3 review.py serve           # start the helper and print the link
 ```
 
-Needs `gh` (signed in) and Python 3.9+. [difftastic](https://difftastic.wilfred.me.uk) (`difft`) is optional: for sources with a `clone`, it marks the changed tokens inside diff lines. Without it, or without a clone, a simpler character diff is used. Every command takes `--config PATH` first; the default is `config.json` next to `review.py`.
+Needs `gh` (signed in) and Python 3.9+. Changed lines keep git's red, green or purple (moved) tint; `app/services/tokdiff.py` adds the strong highlight on the tokens that changed, and marks lines whose only change is whitespace or formatting. Every command takes `--config PATH` first; the default is `config.json` next to `review.py`.
 
 ## Config
 

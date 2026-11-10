@@ -1,0 +1,13 @@
+{
+  "name": "Python: a trailing comma turns a value into a tuple",
+  "source": "synthetic (rule audit)",
+  "strong_must": [
+    {
+      "side": "new",
+      "line": 1,
+      "text": ","
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

@@ -1,0 +1,18 @@
+{
+  "name": "Prop added in the middle of other props",
+  "source": "synthetic edge case written for this corpus (original neutral code, no external source); modelled on common review-diff shapes",
+  "strong_must": [
+    {
+      "side": "new",
+      "line": 2,
+      "text": "disabled"
+    },
+    {
+      "side": "new",
+      "line": 2,
+      "text": "!dirty"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

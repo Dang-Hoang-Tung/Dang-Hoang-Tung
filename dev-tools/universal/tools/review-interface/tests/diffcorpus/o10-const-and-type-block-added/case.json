@@ -1,0 +1,23 @@
+{
+  "name": "New constants and a derived type added at end of file",
+  "source": "OSS (MIT) https://github.com/TanStack/query/pull/12538, excerpt adapted and renamed",
+  "strong_must": [
+    {
+      "side": "new",
+      "line": 3,
+      "text": "FILTER_SCOPES"
+    },
+    {
+      "side": "new",
+      "line": 5,
+      "text": "FilterScope"
+    },
+    {
+      "side": "new",
+      "line": 6,
+      "text": "DEFAULT_FILTER_SCOPE"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

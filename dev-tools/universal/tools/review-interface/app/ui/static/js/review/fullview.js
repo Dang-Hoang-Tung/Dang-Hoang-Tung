@@ -146,7 +146,7 @@ async function show(entry, { side = 'R', line = null, flash = false } = {}) {
       if (fv !== ticket) return;
       if (!res.html) { fvBody.replaceChildren(el('p', 'fv-msg', 'Nothing to show for this file.')); return; }
       wrap.innerHTML = res.html;
-      if (typeof Diff !== 'undefined') highlightTable($('table.diff', wrap));
+      applyHideWs();
     } else {
       const res = await fvApi(`/api/blob/${D.slug}?path=${encodeURIComponent(entry.path)}`);
       if (fv !== ticket) return;

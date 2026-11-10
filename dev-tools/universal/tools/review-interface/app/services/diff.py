@@ -1,12 +1,7 @@
 import hashlib
-import json
-import os
 import re
-import tempfile
-from pathlib import Path
 
 from app.domain import LAYERS  # noqa: F401
-from app.services.shell import FAILURES, run
 
 HUNK = re.compile(r"@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@")
 
@@ -21,15 +16,29 @@ def parse_file_rows(lines):
         elif not rows or ln.startswith("\\"):
             continue
         elif ln.startswith("+"):
-            rows.append(("add", None, new, ln[1:]))
+            rows.append(("add", None, new, ln[1:].removesuffix("\r")))
             new, a = new + 1, a + 1
         elif ln.startswith("-"):
-            rows.append(("del", old, None, ln[1:]))
+            rows.append(("del", old, None, ln[1:].removesuffix("\r")))
             old, d = old + 1, d + 1
         else:
-            rows.append(("ctx", old, new, ln[1:]))
+            rows.append(("ctx", old, new, ln[1:].removesuffix("\r")))
             old, new = old + 1, new + 1
     return rows, a, d
+
+
+def no_eol(lines):
+    """Which sides end without a trailing newline, from git's "\\ No newline at end of file" markers."""
+    out, prev = {"old": False, "new": False}, ""
+    for ln in lines:
+        if ln.startswith("\\"):
+            if prev in ("-", " "):
+                out["old"] = True
+            if prev in ("+", " "):
+                out["new"] = True
+        elif not ln.startswith("@@"):
+            prev = ln[:1]
+    return out if any(out.values()) else None
 
 
 ESCAPES = {"n": 10, "t": 9, "r": 13, "a": 7, "b": 8, "f": 12, "v": 11, "\\": 92, '"': 34}
@@ -97,69 +106,17 @@ def file_status(lines):
     return status, old
 
 
-def _char_col(text, byte_col):
-    return len(text.encode()[:byte_col].decode(errors="ignore"))
-
-
-def _merged(ranges):
-    out = []
-    for start, end in sorted(ranges):
-        if end <= start:
-            continue
-        if out and start <= out[-1][1]:
-            out[-1][1] = max(out[-1][1], end)
-        else:
-            out.append([start, end])
-    return out
-
-
-def _bridged(ranges, text):
-    out = []
-    for start, end in ranges:
-        if out and not text[out[-1][1]:start].strip():
-            out[-1][1] = end
-        else:
-            out.append([start, end])
-    return out
-
-
-def difft_spans(rows, data):
-    """{row index: [[start, end], ...]} for removed/added lines, from difftastic's JSON. None when difftastic fell back to plain text."""
-    if str(data.get("language", "Text")).startswith("Text"):
-        return None
-    changes = {"lhs": {}, "rhs": {}}
-    for chunk in data.get("chunks", []):
-        for entry in chunk:
-            for side, line in entry.items():
-                changes[side].setdefault(line["line_number"], []).extend(line["changes"])
-    spans = {}
-    for i, (kind, old, new, text) in enumerate(rows):
-        if kind == "del":
-            found = changes["lhs"].get(old - 1)
-        elif kind == "add":
-            found = changes["rhs"].get(new - 1)
-        else:
-            continue
-        ranges = _bridged(_merged([_char_col(text, c["start"]), _char_col(text, c["end"])] for c in found or []), text)
-        if ranges:
-            spans[i] = ranges
-    return spans
-
-
-def run_difft(old, new, name, timeout=10):
-    """difftastic's JSON for two file contents, or None if it is missing, fails or times out."""
-    base = Path(name).name
-    with tempfile.TemporaryDirectory() as tmp:
-        paths = []
-        for side, text in (("old", old), ("new", new)):
-            Path(tmp, side).mkdir()
-            path = Path(tmp, side, base)
-            path.write_text(text)
-            paths.append(str(path))
-        try:
-            return json.loads(run("difft", "--display", "json", *paths, timeout=timeout, env={**os.environ, "DFT_UNSTABLE": "yes"}))
-        except FAILURES + (OSError, ValueError):
-            return None
+def file_mode(lines):
+    """{"old": mode, "new": mode} when the file's mode changed, from the lines before the first hunk."""
+    old = new = None
+    for ln in lines:
+        if ln.startswith("@@"):
+            break
+        if ln.startswith("old mode "):
+            old = ln[9:].strip()
+        elif ln.startswith("new mode "):
+            new = ln[9:].strip()
+    return {"old": old, "new": new} if old and new and old != new else None
 
 
 def parse_diff(diff, generated):
@@ -178,6 +135,9 @@ def parse_diff(diff, generated):
         files.append({"idx": len(files), "path": path, "rows": rows, "a": a, "d": d, "binary": binary,
                       "status": status, "old_path": old_path,
                       "gen": any(r.search(path) for r in gen_re)})
+        for key, found in (("noeol", no_eol(lines)), ("mode", file_mode(lines))):
+            if found:
+                files[-1][key] = found
     return files
 
 

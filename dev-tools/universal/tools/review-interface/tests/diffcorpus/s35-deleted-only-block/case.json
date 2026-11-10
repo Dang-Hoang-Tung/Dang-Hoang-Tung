@@ -1,0 +1,18 @@
+{
+  "name": "Function deleted, rest untouched",
+  "source": "synthetic edge case written for this corpus (original neutral code, no external source); modelled on common review-diff shapes",
+  "strong_must": [
+    {
+      "side": "old",
+      "line": 5,
+      "text": "legacyTotal"
+    },
+    {
+      "side": "old",
+      "line": 6,
+      "text": "reduce"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

@@ -1,0 +1,18 @@
+{
+  "name": "Braces dropped around two statements, so the second always runs",
+  "source": "synthetic (the 'goto fail' pattern)",
+  "strong_must": [
+    {
+      "side": "old",
+      "line": 2,
+      "text": "{"
+    },
+    {
+      "side": "old",
+      "line": 5,
+      "text": "}"
+    }
+  ],
+  "strong_must_not": [],
+  "quiet": []
+}

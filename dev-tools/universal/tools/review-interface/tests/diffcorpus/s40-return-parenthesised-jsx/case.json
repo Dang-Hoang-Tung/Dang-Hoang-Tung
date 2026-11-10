@@ -1,0 +1,41 @@
+{
+  "name": "JSX return wrapped in parentheses by the formatter",
+  "source": "synthetic edge case written for this corpus (original neutral code, no external source); modelled on common review-diff shapes",
+  "strong_must": [],
+  "strong_must_not": [
+    {
+      "side": "old",
+      "line": 2
+    },
+    {
+      "side": "new",
+      "line": 2
+    },
+    {
+      "side": "new",
+      "line": 3
+    },
+    {
+      "side": "new",
+      "line": 4
+    }
+  ],
+  "quiet": [
+    {
+      "side": "old",
+      "line": 2
+    },
+    {
+      "side": "new",
+      "line": 2
+    },
+    {
+      "side": "new",
+      "line": 3
+    },
+    {
+      "side": "new",
+      "line": 4
+    }
+  ]
+}

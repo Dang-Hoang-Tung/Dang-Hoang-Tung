@@ -1,0 +1,31 @@
+{
+  "name": "Enum member added, previous line gains a comma",
+  "source": "synthetic edge case written for this corpus (original neutral code, no external source); modelled on common review-diff shapes",
+  "strong_must": [
+    {
+      "side": "new",
+      "line": 3,
+      "text": "Shipped"
+    }
+  ],
+  "strong_must_not": [
+    {
+      "side": "old",
+      "line": 3
+    },
+    {
+      "side": "new",
+      "line": 4
+    }
+  ],
+  "quiet": [
+    {
+      "side": "old",
+      "line": 3
+    },
+    {
+      "side": "new",
+      "line": 4
+    }
+  ]
+}
