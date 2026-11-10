@@ -12,6 +12,8 @@ header.appbar{position:sticky;top:0;z-index:34;height:var(--bar);display:flex;al
 .meta .dotc{width:7px;height:7px;border-radius:50%;background:var(--text-3)}
 .meta .ci.ok .dotc{background:var(--add-fg);box-shadow:0 0 0 3px var(--add-num)}.meta .ci.bad .dotc{background:var(--del-fg);box-shadow:0 0 0 3px var(--del-num)}
 .topleft{display:flex;align-items:center;flex:0 0 30%;min-width:0}
+.topstart{display:flex;align-items:center;gap:16px;flex:1 1 0;min-width:0}
+.topright{display:flex;align-items:center;justify-content:flex-end;gap:16px;flex:1 1 0;min-width:0}
 .progtop{display:flex;align-items:center;gap:14px;width:100%;min-width:0;height:34px;font-size:14px;color:var(--text-2);white-space:nowrap;font-variant-numeric:tabular-nums}
 .pwrap{position:relative;flex:1 1 auto;min-width:60px;height:14px}
 .ptrack{position:absolute;inset:0;border-radius:999px;background:var(--surface-3);box-shadow:inset 0 0 0 1px var(--line);overflow:hidden}
@@ -24,12 +26,12 @@ header.appbar{position:sticky;top:0;z-index:34;height:var(--bar);display:flex;al
 .pfx{z-index:5}
 .pfx i{position:absolute;top:50%;font:normal var(--sz,12px)/1 var(--font);color:var(--c,var(--add));text-shadow:0 0 6px var(--c,var(--add)),0 0 12px var(--c,var(--add));opacity:0;transform:translate(-50%,-50%);animation:pspark var(--t,1.3s) cubic-bezier(.15,.7,.3,1) var(--delay,0s) forwards}
 @keyframes pspark{0%{opacity:0;transform:translate(-50%,-50%) scale(.2) rotate(0)}12%{opacity:1;transform:translate(-50%,-50%) scale(1.3) rotate(40deg)}100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.4) rotate(var(--rot,180deg))}}
-.plabel{display:flex;align-items:baseline;gap:10px;flex:none}
-.left-files{font-weight:600;color:var(--text)}
-.plines{display:inline-flex;gap:6px;font-size:13px;font-weight:500;color:var(--text-3)}
+.left-files,.plines{flex:none;min-width:11ch;font-weight:600}
+.left-files{color:var(--text)}
+.plines{display:inline-flex;justify-content:flex-end;gap:6px}
 .plines .a{color:var(--add-fg)}.plines .d{color:var(--del-fg)}
 .progtop.done .left-files{color:var(--add)}
-.progtop.done .plines{display:none}
+.progtop.done .plines{visibility:hidden}
 @media (prefers-reduced-motion:reduce){.ptrack b{transition:none}.ptrack b.bump::after{display:none}.pfx{display:none}.pwrap.glow .ptrack{animation:none}}
 .titletip{position:fixed;z-index:60;max-width:min(560px,calc(100vw - 32px));padding:6px 10px;font:500 12.5px/1.4 var(--font);color:var(--text);background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;box-shadow:var(--shadow-2);pointer-events:none;overflow-wrap:anywhere}
 .titletip[hidden]{display:none}

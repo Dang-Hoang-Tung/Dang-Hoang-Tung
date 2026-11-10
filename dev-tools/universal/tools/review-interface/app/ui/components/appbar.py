@@ -38,9 +38,9 @@ def timer_chip(minutes):
 def size_chip(totals):
     return (
         '<div class="progtop" id="leftchip" title="Files you have marked as viewed. The lines are what is left to read.">'
+        f'<span class="plines"><span class="a">+{totals["added_all"]:,}</span><span class="d">−{totals["deleted_all"]:,}</span></span>'
         '<span class="pwrap"><span class="ptrack"><b id="pbar"></b></span><span class="pfx" id="pfx" aria-hidden="true"></span></span>'
-        f'<span class="plabel"><span class="left-files">0/{totals["files"]} · 0%</span>'
-        f'<span class="plines"><span class="a">+{totals["added_all"]:,}</span><span class="d">−{totals["deleted_all"]:,}</span></span></span></div>'
+        f'<span class="left-files">0/{totals["files"]} · 0%</span></div>'
     )
 
 
@@ -84,10 +84,10 @@ def _tools(pr):
 def render(pr, totals, minutes=None):
     title = esc(pr["title"])
     return (
-        f'<header class="appbar"><a class="back" href="index.html" title="Back to the review queue">{icons.BACK}Back</a>\n'
-        f'<div class="brand"><h1 id="prtitle" tabindex="0" aria-label="{title}">{title}</h1>{meta_line(pr)}</div>\n'
+        f'<header class="appbar"><div class="topstart"><a class="back" href="index.html" title="Back to the review queue">{icons.BACK}Back</a>\n'
+        f'<div class="brand"><h1 id="prtitle" tabindex="0" aria-label="{title}">{title}</h1>{meta_line(pr)}</div></div>\n'
         f'<div class="topleft">{size_chip(totals)}</div>\n'
-        f'{timer_chip(minutes)}\n'
+        f'<div class="topright">{timer_chip(minutes)}\n'
         f'{NAVCHIP}\n'
-        f'{_tools(pr)}</header>'
+        f'{_tools(pr)}</div></header>'
     )
