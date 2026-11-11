@@ -36,6 +36,19 @@ class BuildHelper(TmpCase):
 
 
 class BuildTests(BuildHelper):
+    def test_each_repo_is_cloned_once_per_build(self):
+        calls = []
+        prs = [make_pr(number=7), make_pr(number=8)]
+        with mock.patch.object(builder, "review_page"), mock.patch.object(builder, "queue_page") as q, \
+                mock.patch("sys.stdout"), mock.patch("app.services.gh_sync.sync", return_value=0), \
+                mock.patch.object(github, "list_pending", return_value=prs), \
+                mock.patch.object(git, "ensure_clone", side_effect=lambda cfg, src: calls.append(src) or src), \
+                mock.patch.object(github, "fetch_api_diff", return_value=DIFF), \
+                mock.patch.object(github, "requested_at", return_value="2026-11-02T00:00:00Z"):
+            q.render.return_value = "q"
+            builder.build(self.cfg)
+        self.assertEqual(len(calls), 1)
+
     def test_build_writes_files_and_manifest(self):
         self.cfg["user_name"] = "Tony"
         m, review, queue = self.run_build(make_pr())

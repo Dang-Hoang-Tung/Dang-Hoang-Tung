@@ -56,6 +56,8 @@ def _make_cache_clone(cfg, repo):
         fcntl.flock(lock, fcntl.LOCK_EX)
         if Path(path, ".git").exists():
             return
+        for stale in path.parent.glob(f"{path.name}.tmp-*"):
+            shutil.rmtree(stale, ignore_errors=True)
         tmp = Path(f"{path}.tmp-{os.getpid()}")
         print(f"  cloning {repo} into the cache…", file=sys.stderr)
         try:

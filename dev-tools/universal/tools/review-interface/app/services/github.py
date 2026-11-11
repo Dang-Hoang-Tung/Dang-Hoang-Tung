@@ -36,13 +36,13 @@ def _view_all(pairs):
     return prs
 
 
-def _hits(src, earlier, only, first):
+def _hits(src, earlier, only, bare):
     """The PRs `src` finds, as dicts with `repo` set. A repo an earlier source covers is left to that source."""
     def mine(repo):
         return sources.covers(src, repo) and not any(sources.covers(s, repo) for s in earlier)
 
     if only:
-        pairs = [(r or src.get("repo"), n) for r, n in only if (r is None and first and "repo" in src) or (r and mine(r))]
+        pairs = [(r or src["repo"], n) for r, n in only if (r is None and bare) or (r and mine(r))]
         return _view_all(pairs)
     if "repo" in src:
         if not mine(src["repo"]):
@@ -56,9 +56,13 @@ def _hits(src, earlier, only, first):
 def list_pending(cfg, only=None):
     out, seen = [], set()
     configured = cfg["sources"]
+    # A bare PR number belongs to the first single-repo source.
+    bare_to = next((i for i, s in enumerate(configured) if "repo" in s), None)
+    if only and bare_to is None and any(r is None for r, _ in only):
+        print("  a bare PR number needs a 'repo' source; give it as owner/repo#N", file=sys.stderr)
     for i, src in enumerate(configured):
         try:
-            prs = _hits(src, configured[:i], only, i == 0)
+            prs = _hits(src, configured[:i], only, i == bare_to)
         except FAILURES + (ValueError,) as e:
             print(f"  {src.get('repo') or src['owner']}: could not list PRs: {why(e)}", file=sys.stderr)
             continue

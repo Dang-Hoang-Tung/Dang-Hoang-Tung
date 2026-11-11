@@ -68,7 +68,27 @@ class OwnerSourceTests(unittest.TestCase):
         self.assertEqual([(p["repo"], p["number"]) for p in prs], [("acme/chat", 9)])
 
 
+class BarePrNumberTests(unittest.TestCase):
+    def test_bare_number_goes_to_the_first_repo_source_even_after_an_owner(self):
+        cfg = {"sources": [dict(OWNER, owner="other"), {"repo": "acme/app"}]}
+        with mock.patch.object(github, "run", side_effect=fake_run([])):
+            prs = github.list_pending(cfg, only=[(None, 7)])
+        self.assertEqual([(p["repo"], p["number"]) for p in prs], [("acme/app", 7)])
+
+    def test_bare_number_without_a_repo_source_says_how_to_give_it(self):
+        with mock.patch.object(github, "run", side_effect=fake_run([])), mock.patch("sys.stderr") as err:
+            prs = github.list_pending({"sources": [OWNER]}, only=[(None, 7)])
+        self.assertEqual(prs, [])
+        self.assertIn("owner/repo#N", "".join(c.args[0] for c in err.write.call_args_list))
+
+
 class SourcesTests(unittest.TestCase):
+    def test_matching_ignores_case(self):
+        src = dict(OWNER, owner="Acme", exclude=["ACME/Old-*"])
+        self.assertTrue(sources.covers(src, "acme/chat"))
+        self.assertFalse(sources.covers(src, "acme/old-site"))
+        self.assertTrue(sources.covers({"repo": "Acme/App"}, "acme/app"))
+
     def test_for_repo_fills_in_the_repo(self):
         cfg = {"sources": [{"repo": "acme/app", "clone": "/x"}, OWNER]}
         self.assertEqual(sources.for_repo(cfg, "acme/app"), {"repo": "acme/app", "clone": "/x"})
@@ -80,7 +100,8 @@ class SourcesTests(unittest.TestCase):
         sources.validate([{"repo": "acme/app", "clone": "/x"}, OWNER])
 
     def test_validate_rejects_bad_entries(self):
-        for bad in ({}, {"repo": "a/b", "owner": "a"}, dict(OWNER, clone="/code/{nam}"), dict(OWNER, clone="/code/{}")):
+        for bad in ({}, {"repo": "a/b", "owner": "a"}, dict(OWNER, clone="/code/{nam}"), dict(OWNER, clone="/code/{}"),
+                    dict(OWNER, exclude="acme/old-*"), dict(OWNER, limit="50"), dict(OWNER, limit=True)):
             with self.assertRaises(SystemExit, msg=bad):
                 sources.validate([bad])
 
@@ -132,6 +153,14 @@ class CacheCloneTests(unittest.TestCase):
         self.assertNotIn("clone", src)
         self.assertEqual(list(self.cache.parent.glob("*")), [])
         self.assertIn("no access", "".join(c.args[0] for c in err.write.call_args_list))
+
+    def test_stale_temp_dirs_from_a_killed_clone_are_swept(self):
+        stale = Path(f"{self.cache}.tmp-1")
+        (stale / ".git").mkdir(parents=True)
+        with mock.patch.object(git, "run", side_effect=self.fake_clone([])), mock.patch("sys.stderr"):
+            git.ensure_clone(self.cfg, {"repo": "acme/chat"})
+        self.assertFalse(stale.exists())
+        self.assertTrue(self.cache.joinpath(".git").exists())
 
     def test_cached_clone_never_clones(self):
         with mock.patch.object(git, "run", side_effect=AssertionError):

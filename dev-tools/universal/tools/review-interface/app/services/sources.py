@@ -3,9 +3,10 @@ from fnmatch import fnmatch
 
 
 def covers(src, repo):
+    repo = repo.lower()
     if "repo" in src:
-        return src["repo"] == repo
-    return repo.split("/")[0] == src["owner"] and not any(fnmatch(repo, pat) for pat in src.get("exclude", []))
+        return src["repo"].lower() == repo
+    return repo.split("/")[0] == src["owner"].lower() and not any(fnmatch(repo, pat.lower()) for pat in src.get("exclude", []))
 
 
 def for_repo(cfg, repo):
@@ -24,6 +25,11 @@ def validate(sources):
     for src in sources:
         if ("repo" in src) == ("owner" in src):
             raise SystemExit(f"Bad source {src}: it needs exactly one of 'repo' or 'owner'.")
+        exclude = src.get("exclude", [])
+        if not (isinstance(exclude, list) and all(isinstance(p, str) for p in exclude)):
+            raise SystemExit(f"Bad source {src}: 'exclude' must be a list of repo globs.")
+        if not isinstance(src.get("limit", 1), int) or isinstance(src.get("limit"), bool):
+            raise SystemExit(f"Bad source {src}: 'limit' must be a whole number.")
         if "owner" in src and src.get("clone"):
             try:
                 src["clone"].format(owner="o", name="n")

@@ -71,7 +71,12 @@ def queue_items(cfg, entries):
 
 def build(cfg, only=None, source="cli"):
     d = dirs(cfg)
-    prs = [dict(pr, source=git.ensure_clone(cfg, pr["source"])) for pr in github.list_pending(cfg, only)]
+    clones = {}
+    prs = []
+    for pr in github.list_pending(cfg, only):
+        if pr["repo"] not in clones:
+            clones[pr["repo"]] = git.ensure_clone(cfg, pr["source"])
+        prs.append(dict(pr, source=clones[pr["repo"]]))
     name = user_name(cfg)
     diffs = fetch_diffs(prs)
     previous = {e["slug"]: e for e in manifest.read_manifest(cfg)["prs"] if "slug" in e}
