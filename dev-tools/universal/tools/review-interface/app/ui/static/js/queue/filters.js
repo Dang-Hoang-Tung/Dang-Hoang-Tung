@@ -63,7 +63,7 @@ function initFilters() {
   $$('.qclear:not(#fclear)').forEach(b => b.addEventListener('click', () => set({...blank})));
   $('#fclear').addEventListener('click', () => set(Object.fromEntries(TOGGLE_KEYS.map(k => [k, false]))));
   document.addEventListener('keydown', e => {
-    if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey || /^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement.tagName)) return;
+    if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey || typingIn(e)) return;
     e.preventDefault(); $('#qs').focus();
   });
   if (!items.some(i => i.dataset.author === f.author)) f.author = '';

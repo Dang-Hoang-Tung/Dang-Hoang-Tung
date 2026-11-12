@@ -48,15 +48,31 @@ def _ci(ci):
     if ci == "none":
         return ""
     css = "ok" if ci == "passing" else "bad" if ci == "failing" else ""
-    return f'<span class="ci {css}"><span class="dotc"></span>CI {esc(ci)}</span>'
+    return f'<span class="ci {css}" role="img" data-tip="CI {esc(ci)}" aria-label="CI {esc(ci)}"><span class="dotc"></span></span>'
+
+
+def _branches(pr):
+    """Head branch on the meta line, its base on the line below it."""
+    sha = esc(pr["head_sha"][:7])
+    if not (pr.get("base") and pr.get("head")):
+        return f'<span class="mono sha" data-tip="Commit under review">{sha}</span>'
+    base, head = esc(pr["base"]), esc(pr["head"])
+    stacked = pr.get("stacked")
+    base_tip = f"Base: {base}" + (" (stacked on another branch)" if stacked else "")
+    return (
+        f'<span class="branch head" data-tip="Head: {head} · commit {sha}"><span class="bname">{head}</span>'
+        f'<button type="button" class="bcopy" data-copy="{head}" aria-label="Copy branch name" data-tip="Copy branch name">{icons.COPY}</button></span>'
+        f'<span class="baserow"><span class="elbow" aria-hidden="true"></span>'
+        f'<span class="branch base{" stacked" if stacked else ""}" data-tip="{base_tip}">{base}</span></span>'
+    )
 
 
 def meta_line(pr):
     parts = [
-        f'<span class="author">{esc(pr["author"])}</span>',
-        f'<a class="prlink" href="{esc(pr["url"])}" target="_blank" rel="noopener" title="Open pull request on GitHub">#{esc(pr["number"])}</a>',
-        f'<span class="mono sha" title="Commit under review">{esc(pr["head_sha"][:7])}</span>',
+        f'<span class="author" role="img" data-tip="Author: {esc(pr["author"])}" aria-label="Author: {esc(pr["author"])}">{esc((pr["author"] or "?")[:1].upper())}</span>',
+        f'<a class="prlink" href="{esc(pr["url"])}" target="_blank" rel="noopener" data-tip="Open pull request on GitHub">#{esc(pr["number"])}</a>',
         _ci(pr["ci"]),
+        _branches(pr),
     ]
     return '<div class="meta">' + "".join(p for p in parts if p) + "</div>"
 

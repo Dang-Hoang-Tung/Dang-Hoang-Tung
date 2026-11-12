@@ -78,7 +78,13 @@ function composer(key, placeholder, value, onSave, onCancel, saveLabel, blocked,
   const label = () => { s.textContent = fixed ? saveLabel : box.checked ? 'Post' : saveLabel; s.classList.toggle('post', box.checked); };
   const keep = () => { drafts[key] = { ...drafts[key], value: ta.value, post: fixed === null && box.checked }; label(); };
   ta.addEventListener('input', keep); box.addEventListener('change', keep); label();
-  s.onclick = () => { const v = ta.value.trim(); if (v) onSave(v, box.checked); };
+  s.onclick = () => {
+    const v = ta.value.trim(), post = box.checked;
+    if (!v) return;
+    // Cleared before saving: the re-render would otherwise read the text back into the draft.
+    ta.value = ''; delete drafts[key];
+    onSave(v, post);
+  };
   ta.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) s.click(); });
   row.append(s);
   c.append(ta, row);

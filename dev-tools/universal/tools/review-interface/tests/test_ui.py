@@ -499,3 +499,23 @@ class QueueEffortFilterTests(unittest.TestCase):
         js = (Path(__file__).resolve().parent.parent / "app/ui/static/js/queue/filters.js").read_text()
         self.assertNotIn("$$('[data-effort]')", js)
         self.assertIn("$$('.seg [data-effort]')", js)
+
+
+class BranchPillTests(unittest.TestCase):
+    def test_base_and_head_branches_in_the_meta_line(self):
+        model = review_model()
+        model["pr"].update(base="main", head="feat/search", stacked=False)
+        html = review_page.render(model)
+        self.assertIn('<span class="branch base" data-tip="Base: main">main</span>', html)
+        self.assertIn('<span class="bname">feat/search</span>', html)
+        self.assertIn('data-copy="feat/search"', html)
+
+    def test_stacked_base_is_marked(self):
+        model = review_model()
+        model["pr"].update(base="feat/lower", head="feat/upper", stacked=True)
+        self.assertIn('class="branch base stacked"', review_page.render(model))
+
+    def test_without_head_branch_the_sha_shows(self):
+        model = review_model()
+        model["pr"].pop("head", None)
+        self.assertIn(f'data-tip="Commit under review">{SHA[:7]}</span>', review_page.render(model))

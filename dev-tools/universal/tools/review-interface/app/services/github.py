@@ -6,7 +6,7 @@ from app.config import now
 from app.services import sources
 from app.services.shell import FAILURES, run, why
 
-PR_FIELDS = "number,title,url,author,headRefOid,baseRefName,isDraft,additions,deletions,changedFiles,body,createdAt,labels,statusCheckRollup"
+PR_FIELDS = "number,title,url,author,headRefOid,headRefName,baseRefName,isDraft,additions,deletions,changedFiles,body,createdAt,labels,statusCheckRollup"
 REQUESTS_Q = ("query($o:String!,$n:String!,$p:Int!){repository(owner:$o,name:$n){pullRequest(number:$p){timelineItems("
               "itemTypes:[REVIEW_REQUESTED_EVENT],last:50){nodes{... on ReviewRequestedEvent{createdAt requestedReviewer{"
               "__typename ... on User{login} ... on Team{slug}}}}}}}}")
@@ -70,8 +70,22 @@ def list_pending(cfg, only=None):
             if (pr["repo"], pr["number"]) in seen:
                 continue
             seen.add((pr["repo"], pr["number"]))
-            out.append(dict(pr, source=sources.for_repo(cfg, pr["repo"])))
+            out.append(dict(pr, source=sources.for_repo(cfg, pr["repo"]), defaultBranch=default_branch(pr["repo"])))
     return out
+
+
+_default_branches = {}
+
+
+def default_branch(repo):
+    """The repo's default branch, or None if it can't be read. One lookup per repo per process."""
+    if repo not in _default_branches:
+        try:
+            _default_branches[repo] = run("gh", "repo", "view", repo, "--json", "defaultBranchRef", "--jq", ".defaultBranchRef.name").strip() or None
+        except FAILURES as e:
+            print(f"  {repo}: could not read the default branch: {why(e)}", file=sys.stderr)
+            _default_branches[repo] = None
+    return _default_branches[repo]
 
 
 def view_pr(repo, n):

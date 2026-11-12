@@ -8,3 +8,5 @@ function withAvatarFallback(img, label) {
   else img.addEventListener('error', swap, { once: true });
   return img;
 }
+// Keys typed into a field are the browser's (word jumps, selection), not page shortcuts.
+const typingIn = e => !!(e.target && e.target.closest && e.target.closest('input, textarea, select, [contenteditable]'));

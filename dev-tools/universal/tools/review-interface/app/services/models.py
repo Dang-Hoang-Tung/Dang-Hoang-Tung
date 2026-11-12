@@ -83,13 +83,19 @@ def estimate_minutes(added, risk):
     return max(2, round(added / 50)) + (5 if risk in ("High", "Medium") else 0)
 
 
+def is_stacked(pr):
+    """Based on another branch rather than the repo's default (main/master when the default is unknown)."""
+    base = pr.get("baseRefName")
+    default = pr.get("defaultBranch")
+    return bool(base) and (base != default if default else base not in ("main", "master"))
+
+
 def build_banners(pr, ins, ins_status):
     banners = []
     if pr.get("isDraft"):
         banners.append({"type": "draft"})
-    base = pr.get("baseRefName")
-    if base and base not in ("main", "master"):
-        banners.append({"type": "stacked", "base": base})
+    if is_stacked(pr):
+        banners.append({"type": "stacked", "base": pr["baseRefName"]})
     if ins_status == "stale":
         banners.append({"type": "stale", "from": ins["head_sha"][:7], "to": pr["headRefOid"][:7]})
     if ins_status.startswith("invalid"):
@@ -149,6 +155,7 @@ def review_model(cfg, pr, diff_text, ins, ins_status, user_name):
     return {
         "pr": {"repo": repo, "number": n, "slug": slug(repo, n), "title": pr["title"], "url": pr["url"],
                "author": (pr.get("author") or {}).get("login", ""), "head_sha": pr["headRefOid"], "base": pr.get("baseRefName"),
+               "head": pr.get("headRefName"), "stacked": is_stacked(pr),
                "draft": bool(pr.get("isDraft")), "ci": github.ci_state(pr.get("statusCheckRollup")), "created": pr.get("createdAt")},
         "user": user_name, "ai_name": cfg["ai_name"], "layers": LAYERS,
         "files": [file_model(f, by_file, moves[f["idx"]], strong.get(f["idx"], ({}, ()))) for f in files],

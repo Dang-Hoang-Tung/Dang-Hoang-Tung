@@ -91,6 +91,8 @@ class ReviewModelTests(TmpCase):
     def test_banners(self):
         self.assertEqual(self.model(pr=make_pr(isDraft=True))["banners"], [{"type": "draft"}])
         self.assertEqual(self.model(pr=make_pr(baseRefName="feature/x"))["banners"], [{"type": "stacked", "base": "feature/x"}])
+        self.assertEqual(self.model(pr=make_pr(baseRefName="develop", defaultBranch="develop"))["banners"], [])
+        self.assertEqual(self.model(pr=make_pr(baseRefName="main", defaultBranch="develop"))["banners"], [{"type": "stacked", "base": "main"}])
         ins = insights.validate(good_insights(head_sha="deadbee"))
         self.assertEqual(self.model(ins=ins, status="stale")["banners"], [{"type": "stale", "from": "deadbee", "to": HEAD[:7]}])
         self.assertEqual(self.model(status="invalid: schema must be x")["banners"], [{"type": "invalid", "reason": "schema must be x"}])

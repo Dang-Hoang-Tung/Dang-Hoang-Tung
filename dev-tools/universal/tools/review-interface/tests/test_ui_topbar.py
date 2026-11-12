@@ -30,9 +30,9 @@ class TopbarTests(unittest.TestCase):
 
     def test_no_duplicates_in_chip_row(self):
         html = bar()
-        self.assertEqual(html.count("CI passing"), 1)
+        self.assertEqual(html.count('class="ci ok"'), 1)
         self.assertEqual(html.count(SHA[:7]), 1)
-        self.assertEqual(html.count(">alice<"), 1)
+        self.assertEqual(html.count('data-tip="Author: alice"'), 1)
         self.assertNotIn('class="chip hide-md', html)
 
     def test_ci_none_omitted(self):

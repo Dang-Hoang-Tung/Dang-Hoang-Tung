@@ -14,6 +14,7 @@ initPopover();
 initNav();
 initApprove();
 initTimer();
+initBranchCopy();
 initFullView();
 initComments();
 initChat();

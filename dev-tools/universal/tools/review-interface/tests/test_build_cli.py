@@ -179,12 +179,15 @@ class PartialBuildTests(BuildHelper):
 class ListPendingTests(unittest.TestCase):
     CFG = {"sources": [{"repo": "a/one"}, {"repo": "b/two"}]}
 
+    def setUp(self):
+        github._default_branches.clear()
+
     def test_bare_number_applies_to_first_source_only(self):
         calls = []
         with mock.patch.object(github, "run", side_effect=lambda *a, **k: calls.append(a) or '{"number": 5}'):
             out = github.list_pending(self.CFG, [(None, 5)])
         self.assertEqual([p["repo"] for p in out], ["a/one"])
-        self.assertEqual(len(calls), 1)
+        self.assertEqual(len([c for c in calls if c[:3] == ("gh", "pr", "view")]), 1)
 
     def test_explicit_repo_goes_to_its_source(self):
         with mock.patch.object(github, "run", return_value='{"number": 5}'):

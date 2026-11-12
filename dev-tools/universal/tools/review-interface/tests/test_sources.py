@@ -20,6 +20,8 @@ def fake_run(found, listed=({"number": 1, "title": "t"},)):
             return json.dumps({"number": int(args[3]), "title": "t"})
         if args[:3] == ("gh", "pr", "list"):
             return json.dumps(list(listed))
+        if args[:3] == ("gh", "repo", "view"):
+            return "main\n"
         raise AssertionError(args)
     return fake
 
@@ -80,6 +82,25 @@ class BarePrNumberTests(unittest.TestCase):
             prs = github.list_pending({"sources": [OWNER]}, only=[(None, 7)])
         self.assertEqual(prs, [])
         self.assertIn("owner/repo#N", "".join(c.args[0] for c in err.write.call_args_list))
+
+
+class DefaultBranchTests(unittest.TestCase):
+    def setUp(self):
+        github._default_branches.clear()
+
+    def test_listed_prs_carry_the_repo_default_branch_looked_up_once(self):
+        calls = []
+        def fake(*args, **kw):
+            calls.append(args[:3])
+            return fake_run([["acme/app", 1], ["acme/app", 2]])(*args, **kw)
+        with mock.patch.object(github, "run", side_effect=fake):
+            prs = github.list_pending({"sources": [OWNER]})
+        self.assertEqual([p["defaultBranch"] for p in prs], ["main", "main"])
+        self.assertEqual(calls.count(("gh", "repo", "view")), 1)
+
+    def test_unreadable_default_branch_is_none(self):
+        with mock.patch.object(github, "run", side_effect=subprocess.CalledProcessError(1, "gh")), mock.patch("sys.stderr"):
+            self.assertIsNone(github.default_branch("acme/app"))
 
 
 class SourcesTests(unittest.TestCase):

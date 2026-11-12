@@ -38,7 +38,7 @@ function initNav() {
   if (next) next.onclick = () => navGo(1);
   document.addEventListener('keydown', e => {
     if (e.metaKey || e.ctrlKey || e.altKey || (e.key !== 'n' && e.key !== 'p')) return;
-    if (e.target.closest('input, textarea, select, [contenteditable]') || $('dialog[open]')) return;
+    if (typingIn(e) || $('dialog[open]')) return;
     e.preventDefault();
     navGo(e.key === 'n' ? 1 : -1);
   });

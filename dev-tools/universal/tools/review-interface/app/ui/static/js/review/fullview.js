@@ -317,7 +317,7 @@ function initFullView() {
   fvBody.addEventListener('scroll', () => { placeCard(); if (sel) paintSel(); }, { passive: true });
   addEventListener('keydown', e => {
     if (!fvNav.stack.length) return;
-    if (e.altKey && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) { e.preventDefault(); step(e.key === 'ArrowLeft' ? -1 : 1); return; }
+    if (e.altKey && !typingIn(e) && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) { e.preventDefault(); step(e.key === 'ArrowLeft' ? -1 : 1); return; }
     if (!fv || $('dialog[open]') || e.key !== 'Escape' || cs.id || sel) return;
     e.stopPropagation();
     closeFull();
