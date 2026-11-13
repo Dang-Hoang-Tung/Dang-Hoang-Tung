@@ -6,7 +6,9 @@ function initModals() {
     m.addEventListener('click', e => { if (e.target === m) m.close(); });
   });
   initFabMenu();
-  $('#treebtn').onclick = () => { treeModal.showModal(); tree.start(); };
+  $('#treebtn').onclick = openTreeModal;
+  $('#treeexpand').onclick = openTreeModal;
+  treeModal.addEventListener('close', returnTreeCanvas);
   $('#mapbtn').onclick = () => { mapModal.showModal(); requestAnimationFrame(drawTreemap); };
   $('#briefbtn').onclick = () => startNav({ kind: 'brief' });
 }

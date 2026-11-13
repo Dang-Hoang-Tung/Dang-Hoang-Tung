@@ -15,26 +15,40 @@ def _modal(modal_id, title, body, size="lg", nav=False):
             f'<div class="modal-body">{body}</div></dialog>')
 
 
+TREE_TITLE = "Where this change lands"
+ZOOM = (
+    '<div class="zoom"><button type="button" class="iconbtn sm" data-zoom="out" aria-label="Zoom out">−</button>'
+    '<button type="button" class="iconbtn sm wide" data-zoom="fit" aria-label="Fit to view">Fit</button>'
+    '<button type="button" class="iconbtn sm" data-zoom="in" aria-label="Zoom in">+</button></div>'
+)
+
+
 def _collapse_toggle():
-    return '<label class="switch treecollapse"><input type="checkbox" id="treecollapse">Collapse folders</label>'
+    return '<label class="switch treecollapse"><input type="checkbox" data-treecollapse>Collapse folders</label>'
 
 
-def _tree_modal(layout, full=None):
-    zoom = (
-        '<div class="zoom"><button type="button" class="iconbtn sm" data-zoom="out" aria-label="Zoom out">−</button>'
-        '<button type="button" class="iconbtn sm wide" data-zoom="fit" aria-label="Fit to view">Fit</button>'
-        '<button type="button" class="iconbtn sm" data-zoom="in" aria-label="Zoom in">+</button></div>'
-    )
+def tree_block(layout, full=None):
+    """The code tree on the page, under the description. Opening the tree modal moves this canvas into it."""
     return (
-        '<dialog class="modal tree w-xl" id="treemodal"><div class="modal-head"><h2>Where this change lands</h2>'
-        f'<div class="head-tools">{_collapse_toggle() if full else ""}{zoom}{_close_button()}</div></div>'
-        f'<div class="modal-body">{tree_svg.canvas(layout, full)}</div>'
+        f'<section class="treeblock" id="treeblock"><div class="treeblock-head"><h3>{TREE_TITLE}</h3>'
+        f'<div class="head-tools">{_collapse_toggle() if full else ""}{ZOOM}'
+        '<button type="button" class="iconbtn sm wide" id="treeexpand" aria-label="Open the code tree full size">Expand</button></div></div>'
+        f'<div class="treeblock-body" id="treehome">{tree_svg.canvas(layout, full)}</div>'
+        f'<div class="treeblock-foot">{tree_svg.legend()}</div></section>'
+    )
+
+
+def _tree_modal(full=None):
+    return (
+        f'<dialog class="modal tree w-xl" id="treemodal"><div class="modal-head"><h2>{TREE_TITLE}</h2>'
+        f'<div class="head-tools">{_collapse_toggle() if full else ""}{ZOOM}{_close_button()}</div></div>'
+        '<div class="modal-body" id="treemodalbody"></div>'
         f'<div class="modal-foot">{tree_svg.legend()}</div></dialog>'
     )
 
 
-def render(layout, summary, full_layout=None):
-    tree = _tree_modal(layout, full_layout)
+def render(summary, full_layout=None):
+    tree = _tree_modal(full_layout)
     treemap = _modal("mapmodal", "Treemap · size is lines changed, colour is the top finding", '<div class="treemap" id="treemap"></div>', "xl")
     brief = _modal("briefmodal", "AI Brief", summary_card.brief_html(summary), "lg", nav=True)
     comments = _modal("commentsmodal", "PR comments", '<div class="clist" id="clist"></div>', "lg", nav=True)

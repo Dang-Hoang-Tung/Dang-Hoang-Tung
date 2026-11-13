@@ -1,4 +1,4 @@
-"""The code tree lives only in its modal; the floating button is always shown."""
+"""The code tree sits under the description and moves into its modal; the floating button is always shown."""
 import re
 import shutil
 import subprocess
@@ -27,10 +27,19 @@ class TreeModalTests(unittest.TestCase):
         fab = re.search(r'<button[^>]*id="treebtn"[^>]*>', self.page).group(0)
         self.assertNotIn("hidden", fab)
 
-    def test_modal_has_canvas_and_zoom(self):
+    def test_tree_block_under_description_holds_the_one_canvas(self):
+        start = self.page.index('id="treeblock"')
+        block = self.page[start:self.page.index("</section>", start)]
+        self.assertIn('id="treecanvas"', block)
+        self.assertIn("<svg", block)
+        self.assertIn('id="treeexpand"', block)
+        self.assertIn("Generated", block)
+        self.assertEqual(self.page.count('id="treecanvas"'), 1)
+        self.assertLess(self.page.index('class="summary"'), start)
+
+    def test_modal_has_zoom_and_an_empty_body_for_the_canvas(self):
         modal = self.page[self.page.index('id="treemodal"'):self.page.index('id="mapmodal"')]
-        self.assertIn('id="treecanvas"', modal)
-        self.assertIn("<svg", modal)
+        self.assertIn('<div class="modal-body" id="treemodalbody"></div>', modal)
         for z in ("out", "fit", "in"):
             self.assertIn(f'data-zoom="{z}"', modal)
         self.assertIn("Generated", modal)
