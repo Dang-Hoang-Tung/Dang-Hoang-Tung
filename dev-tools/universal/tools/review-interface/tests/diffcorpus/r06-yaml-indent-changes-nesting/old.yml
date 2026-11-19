@@ -1,5 +1,0 @@
-jobs:
-  build:
-    steps: []
-    env:
-      CI: true

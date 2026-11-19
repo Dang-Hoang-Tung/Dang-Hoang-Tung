@@ -1,0 +1,18 @@
+{
+  "data_dir": "~/.claude/agent-files/shared/team-reviewer/review-ui",
+  "port": 47615,
+  "idle_hours": 2,
+  "keep_days": 14,
+  "ai_name": "Claude",
+  "sources": [
+    {
+      "repo": "omnea-digital/omnea-app",
+      "clone": "~/Omnea/omnea-meta-repo/omnea-app",
+      "search": "review-requested:@me -author:@me"
+    }
+  ],
+  "teams_file": "~/.claude/skills/workspace/review-teams.txt",
+  "adapters": {
+    "team_reviewer_briefs": "~/.claude/agent-files/shared/team-reviewer/briefs"
+  }
+}

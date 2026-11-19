@@ -14,23 +14,6 @@ You help me get through **other people's** PRs fast. Use the same principles we 
 
 Goal: I switch into a PR, decide, and switch out in **under 10 minutes**. Optimise for that, not for completeness.
 
-## 0. Review app
-
-When I start this session, open the review app:
-
-```
-python3 ~/.claude/skills/universal/tools/review-interface/review.py
-```
-
-- It finds the PRs waiting on me, builds a page for each, starts a small local helper and opens the queue in my browser.
-- The helper stops by itself when idle. Run the command again to bring it back.
-- After you write or update briefs, rebuild so they show: `review.py build --no-open` (add a PR number for just one).
-- When answering a chat or comment in the app, post a short `review.py ai thinking <slug> <thread> "…"` note at each real step (what you're checking), then `ai reply`. I see them live while I wait.
-- The helper refreshes the queue every 15 min while it's running (whatever page I'm on, even when I'm away), and when I hit **Refresh**. Each refresh adds a line to `events.jsonl`.
-- Watch both files with one Monitor: `tail -n0 -F <data dir>/inbox.jsonl <data dir>/events.jsonl` (paths from `review.py paths`), 30 min timeout, and re-arm it when it expires. `tail` prints a `==> file <==` header when the source switches.
-- An `inbox.jsonl` line is a comment or chat message from me. Answer it with `review.py ai reply <slug> <thread> "<text>"`. The chat bar is thread `chat`. Keep replies short, in my language style.
-- An `events.jsonl` line is a refresh. If its `check` list is empty, do nothing. Otherwise run `/dev-review` on just those PRs (new, or new commits), update their briefs and rebuild. How the files work: `CONTRACT.md` in the app folder.
-
 ## 1. Queue
 
 Run the queue script:
@@ -75,13 +58,14 @@ Failed lookups: <PR> — <error>
 
 Run `/dev-review` on every PR in the queue, in parallel: one sub-agent per PR, which runs the personas as the skill says. Don't re-review an unchanged PR.
 
-The brief is the review's summary, saved as `~/.claude/agent-files/shared/team-reviewer/briefs/<repo>-<pr>-<sha7>.md`. A brief only counts if its sha7 matches the PR's current commit. Its Check items become the review app's recommendations: ❌ → 🔴, ⚠️ → 🟡, 💡 → ⚪.
+The brief is the review's summary, saved as `~/.claude/agent-files/shared/team-reviewer/briefs/<repo>-<pr>-<sha7>.md`. A brief only counts if its sha7 matches the PR's current commit. Its Check items map to severities: ❌ → 🔴, ⚠️ → 🟡, 💡 → ⚪.
 
 **Format**: `~/.claude/skills/team-reviewer/brief.md`
+
+**Review views** (optional): for PRs over 400 added lines, not counting generated files, write a code tree and treemap so I can see the PR's shape before reading the diff. Skip them for smaller PRs. How to run them: `~/.claude/skills/universal/review/README.md`. Save them next to the brief as `<repo>-<pr>-<sha7>-code-tree.html` and `-treemap.html`, with `--notes` from the verified findings, and link both in the brief.
 
 ## Rules
 
 - **Never post** to the code host: no comments, reviews, approvals, merges or closes. Comments are drafts for me to paste.
-- The review app posts a comment only when I tick "Post GitHub comment" myself, and approves only when I press Approve. Use `review.py ai post` only when I ask. Never approve for me.
 - Reading the diff with `gh` is usually enough. If you need to check a PR out, use a separate worktree, never my working copy.
 - When buddy asks, send a `reply` with the queue as a short summary and the briefs folder path.

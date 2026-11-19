@@ -1,1 +1,0 @@
-render(alpha, beta);
